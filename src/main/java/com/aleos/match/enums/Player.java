@@ -1,10 +1,10 @@
-package com.aleos.model.enums;
+package com.aleos.match.enums;
 
 public enum Player {
     ONE,
     TWO;
 
-    Player getOpponent() {
+    public Player getOpponent() {
         return this == ONE ? TWO : ONE;
     }
 }

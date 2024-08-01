@@ -1,4 +1,4 @@
-package com.aleos.model.enums;
+package com.aleos.match.enums;
 
 import lombok.Getter;
 
