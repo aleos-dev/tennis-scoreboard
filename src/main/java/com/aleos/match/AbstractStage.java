@@ -1,33 +1,47 @@
 package com.aleos.match;
 
 import com.aleos.match.enums.Player;
+import com.aleos.match.enums.StageState;
 import com.aleos.match.interfaces.ScoringStrategy;
 import com.aleos.match.interfaces.stage.Game;
 import com.aleos.match.interfaces.stage.Match;
 import com.aleos.match.interfaces.stage.Stage;
 import com.aleos.match.interfaces.stage.TennisSet;
-import com.aleos.match.score.Score;
+import com.aleos.match.score.ScoreManager;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.EnumMap;
-import java.util.Map;
 
-public abstract class AbstractStage<T extends Score<?>, S extends Stage<T>>
-        implements Game<T>, TennisSet<T>, Match<T>, PropertyChangeListener {
+public abstract class AbstractStage<T extends Stage<?>, S extends ScoreManager<?>>
+        implements Game<S>, TennisSet<S>, Match<S>, PropertyChangeListener {
 
-    protected final ScoringStrategy<S> scoringStrategy;
+    protected final ScoringStrategy<T> scoringStrategy;
 
     protected final PropertyChangeSupport support;
 
-    protected final Map<Player, T> scores = new EnumMap<>(Player.class);
+    @Getter
+    @Setter
+    protected StageState state = StageState.ONGOING;
 
+    @Getter
+    @Setter
     protected Player winner;
 
-    protected AbstractStage(ScoringStrategy<S> strategy) {
+    protected AbstractStage(ScoringStrategy<T> strategy) {
         this.scoringStrategy = strategy;
         this.support = new PropertyChangeSupport(this);
-        initScores();
+    }
+
+    protected abstract void handleScorePoint(Player pointWinner);
+
+    @Override
+    public void scorePoint(Player pointWinner) {
+        if (isOver()) {
+            throw new IllegalCallerException("%s is over. Start a new one.".formatted(this.getClass().getSimpleName()));
+        }
+        handleScorePoint(pointWinner);
     }
 
     @Override
@@ -36,16 +50,9 @@ public abstract class AbstractStage<T extends Score<?>, S extends Stage<T>>
     }
 
     @Override
-    public void setWinner(Player player) {
-        this.winner = player;
-    }
-
-    @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         support.addPropertyChangeListener(listener);
     }
-
-    protected abstract void initScores();
 
     protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
         support.firePropertyChange(propertyName, oldValue, newValue);

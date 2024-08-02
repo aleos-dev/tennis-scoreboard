@@ -1,6 +1,6 @@
 package com.aleos.match.interfaces.stage;
 
-import com.aleos.match.score.Score;
+import com.aleos.match.score.ScoreManager;
 
-public interface Match<T extends Score<?>> extends Stage<T> {
+public interface Match<T extends ScoreManager<?>> extends Stage<T> {
 }

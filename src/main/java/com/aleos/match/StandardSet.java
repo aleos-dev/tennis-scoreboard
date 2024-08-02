@@ -1,31 +1,32 @@
 package com.aleos.match;
 
 import com.aleos.match.enums.Player;
-import com.aleos.match.factory.Factory;
+import com.aleos.match.interfaces.Factory;
 import com.aleos.match.interfaces.ScoringStrategy;
-import com.aleos.match.interfaces.stage.Game;
+import com.aleos.match.interfaces.stage.Stage;
 import com.aleos.match.interfaces.stage.TennisSet;
-import com.aleos.match.score.NumericScoreManager;
-import com.aleos.match.score.PointScoreManager;
+import com.aleos.match.score.ScoreManager;
 
 import java.beans.PropertyChangeEvent;
-import java.util.Map;
 
-public class StandardSet extends AbstractStage<NumericScoreManager, TennisSet<NumericScoreManager>> {
+public class StandardSet<S extends ScoreManager<?>, G extends Stage<?>> extends AbstractStage<TennisSet<S>, S> {
 
-    private final Factory<StandardGame> gameFactory;
+    private final Factory<G> gameFactory;
 
-    private Game<PointScoreManager> currentGame;
+    private final S scoreManager;
 
+    private G currentGame;
 
-    public StandardSet(ScoringStrategy<TennisSet<NumericScoreManager>> scoringStrategy,
-                       Factory<StandardGame> gameFactory) {
+    public StandardSet(ScoringStrategy<TennisSet<S>> scoringStrategy,
+                       S scoreManager,
+                       Factory<G> gameFactory) {
         super(scoringStrategy);
+        this.scoreManager = scoreManager;
         this.gameFactory = gameFactory;
     }
 
     @Override
-    public void scorePoint(Player pointWinner) {
+    public void handleScorePoint(Player pointWinner) {
         if (currentGame == null || currentGame.isOver()) {
             currentGame = gameFactory.create();
             currentGame.addPropertyChangeListener(this);
@@ -34,13 +35,8 @@ public class StandardSet extends AbstractStage<NumericScoreManager, TennisSet<Nu
     }
 
     @Override
-    public Map<Player, NumericScoreManager> getScores() {
-        return scores;
-    }
-
-    protected void initScores() {
-        scores.put(Player.ONE, new NumericScoreManager());
-        scores.put(Player.TWO, new NumericScoreManager());
+    public S getScoreManager() {
+        return scoreManager;
     }
 
     @Override
@@ -52,7 +48,7 @@ public class StandardSet extends AbstractStage<NumericScoreManager, TennisSet<Nu
             if (isOver()) {
                 firePropertyChange("setWinner", null, winner);
             } else {
-                firePropertyChange("setScores", event.getOldValue(), scores);
+                firePropertyChange("setScores", event.getOldValue(), scoreManager);
             }
 
         } else if ("gameScores".equals(event.getPropertyName())) {

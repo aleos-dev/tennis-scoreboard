@@ -1,24 +1,35 @@
 package com.aleos.match.score;
 
-import lombok.NonNull;
+import com.aleos.match.enums.Player;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.EnumMap;
+import java.util.Map;
 
+@Getter
+@Setter
+public class NumericScoreManager implements ScoreManager<Integer> {
 
-public class NumericScoreManager implements Score<Integer> {
+    protected final Map<Player, Integer> scores = new EnumMap<>(Player.class);
 
-    private final List<Integer> scores = new ArrayList<>();
-
-    public void setScore(@NonNull Integer score) {
-        scores.add(score);
+    public NumericScoreManager() {
+        scores.putIfAbsent(Player.ONE, 0);
+        scores.putIfAbsent(Player.TWO, 0);
     }
 
-    public Integer getScore() {
-        return scores.size();
+    @Override
+    public void setScore(Player player, Integer score) {
+        scores.put(player, score);
     }
 
-    public List<Integer> getWonGameNumbers() {
-        return List.copyOf(scores);
+    @Override
+    public Integer getScore(Player player) {
+        return scores.get(player);
+    }
+
+    @Override
+    public Integer awardPoint(Player player) {
+        return scores.computeIfPresent(player, (k, v) -> v + 1);
     }
 }
