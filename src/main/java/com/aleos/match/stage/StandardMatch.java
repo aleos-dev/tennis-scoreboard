@@ -1,28 +1,27 @@
 package com.aleos.match.stage;
 
+import com.aleos.match.creation.Factory;
 import com.aleos.match.model.enums.MatchFormat;
 import com.aleos.match.model.enums.Player;
-import com.aleos.match.creation.Factory;
-import com.aleos.match.scoring.ScoringStrategy;
 import com.aleos.match.score.ScoreManager;
+import com.aleos.match.scoring.ScoringStrategy;
 import com.aleos.match.scoring.strategy.StandardMatchScoringStrategy;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 
 import java.beans.PropertyChangeEvent;
 import java.util.UUID;
 
-@Getter
-@Setter
 public class StandardMatch<M extends ScoreManager<?>, C extends Stage<? extends ScoreManager<?>>> extends AbstractStage<Match<M>, M> {
 
     private final Factory<C> setFactory;
 
     private final M scoreManager;
 
+    @Getter
     private final UUID id = UUID.randomUUID();
 
+    @Getter
     private final MatchFormat matchFormat;
 
     private C currentSet;
