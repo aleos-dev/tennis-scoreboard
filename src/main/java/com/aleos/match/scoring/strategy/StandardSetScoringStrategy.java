@@ -30,6 +30,7 @@ public class StandardSetScoringStrategy implements ScoringStrategy<TennisSet<Num
 
         if (isWinningConditionMet(stageState, playerScore, opponentScore)) {
             set.setWinner(player);
+            set.setState(StageState.FINISHED);
         }
     }
 

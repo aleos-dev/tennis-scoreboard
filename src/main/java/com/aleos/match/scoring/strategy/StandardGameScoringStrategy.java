@@ -19,6 +19,7 @@ public class StandardGameScoringStrategy implements ScoringStrategy<Game<PointSc
 
         if (isWinningConditionMet(playerScore, opponentScore)) {
             game.setWinner(player);
+            game.setState(StageState.FINISHED);
             return;
         }
         manager.awardPoint(player);

@@ -1,6 +1,7 @@
 package com.aleos.match.scoring.strategy;
 
 import com.aleos.match.model.enums.Player;
+import com.aleos.match.model.enums.StageState;
 import com.aleos.match.scoring.ScoringStrategy;
 import com.aleos.match.stage.Match;
 import com.aleos.match.score.manager.NumericScoreManager;
@@ -22,6 +23,7 @@ public abstract class StandardMatchScoringStrategy implements ScoringStrategy<Ma
 
         if (hasEnoughScoreToWin(playerScore, minGameCountToWin)) {
             stage.setWinner(player);
+            stage.setState(StageState.FINISHED);
         }
     }
 
