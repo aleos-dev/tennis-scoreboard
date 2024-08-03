@@ -1,5 +1,6 @@
 package com.aleos.match.stage;
 
+import com.aleos.match.exception.StageIsOverException;
 import com.aleos.match.model.enums.Player;
 import com.aleos.match.model.enums.StageState;
 import com.aleos.match.scoring.ScoringStrategy;
@@ -35,7 +36,7 @@ public abstract class AbstractStage<T extends Stage<M>, M extends ScoreManager<?
     @Override
     public void scorePoint(Player pointWinner) {
         if (isOver()) {
-            throw new IllegalCallerException("%s is over. Start a new one.".formatted(this.getClass().getSimpleName()));
+            throw new StageIsOverException("%s is over. Start a new one.".formatted(this.getClass().getSimpleName()));
         }
         handleScorePoint(pointWinner);
     }
