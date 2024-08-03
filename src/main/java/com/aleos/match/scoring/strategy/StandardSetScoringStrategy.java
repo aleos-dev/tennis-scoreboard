@@ -16,6 +16,10 @@ public class StandardSetScoringStrategy implements ScoringStrategy<TennisSet<Num
 
     @Override
     public void scorePoint(TennisSet<NumericScoreManager> set, Player player) {
+        if (set.getState() == StageState.FINISHED) {
+            return;
+        }
+
         var stageState = set.getState();
         var manager = set.getScoreManager();
         manager.awardPoint(player);

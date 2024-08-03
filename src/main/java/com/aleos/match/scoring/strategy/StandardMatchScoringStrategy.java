@@ -16,6 +16,10 @@ public abstract class StandardMatchScoringStrategy implements ScoringStrategy<Ma
 
     @Override
     public void scorePoint(Match<NumericScoreManager> stage, Player player) {
+        if (stage.getState() == StageState.FINISHED) {
+            return;
+        }
+
         var manager = stage.getScoreManager();
         manager.awardPoint(player);
 

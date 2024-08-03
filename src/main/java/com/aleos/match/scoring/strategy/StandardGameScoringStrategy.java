@@ -2,9 +2,10 @@ package com.aleos.match.scoring.strategy;
 
 import com.aleos.match.model.enums.Player;
 import com.aleos.match.model.enums.PointValue;
+import com.aleos.match.model.enums.StageState;
+import com.aleos.match.score.manager.PointScoreManager;
 import com.aleos.match.scoring.ScoringStrategy;
 import com.aleos.match.stage.Game;
-import com.aleos.match.score.manager.PointScoreManager;
 
 import static com.aleos.match.model.enums.PointValue.ADVANTAGE;
 import static com.aleos.match.model.enums.PointValue.FORTY;
@@ -13,6 +14,10 @@ public class StandardGameScoringStrategy implements ScoringStrategy<Game<PointSc
 
     @Override
     public void scorePoint(Game<PointScoreManager> game, Player player) {
+        if (game.getState() == StageState.FINISHED) {
+            return;
+        }
+
         var manager = game.getScoreManager();
         var playerScore = manager.getScore(player);
         var opponentScore = manager.getScore(player.getOpponent());
@@ -22,7 +27,7 @@ public class StandardGameScoringStrategy implements ScoringStrategy<Game<PointSc
             game.setState(StageState.FINISHED);
             return;
         }
-        manager.awardPoint(player);
+        playerScore = manager.awardPoint(player);
 
         handleDeuceCondition(manager, playerScore, opponentScore);
     }
