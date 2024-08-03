@@ -1,12 +1,12 @@
 package com.aleos.match.score;
 
-import com.aleos.match.enums.Player;
+import com.aleos.match.model.enums.Player;
 
-public interface ScoreManager<T> {
+public interface ScoreManager<S> {
 
-    void setScore(Player player, T score);
+    void setScore(Player player, S score);
 
-    T getScore(Player player);
+    S getScore(Player player);
 
-    T awardPoint(Player player);
+    S awardPoint(Player player);
 }
