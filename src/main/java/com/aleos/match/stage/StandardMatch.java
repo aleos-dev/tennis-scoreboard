@@ -1,22 +1,23 @@
 package com.aleos.match.stage;
 
 import com.aleos.match.creation.Factory;
+import com.aleos.match.model.enums.MatchEvent;
 import com.aleos.match.model.enums.MatchFormat;
 import com.aleos.match.model.enums.Player;
-import com.aleos.match.score.ScoreManager;
+import com.aleos.match.scoremanager.ScoreManager;
 import com.aleos.match.scoring.ScoringStrategy;
-import com.aleos.match.scoring.strategy.StandardMatchScoringStrategy;
+import com.aleos.match.scoring.strategy.TennisMatchScoringStrategy;
 import lombok.Getter;
 import lombok.NonNull;
 
 import java.beans.PropertyChangeEvent;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 
-public class StandardMatch<M extends ScoreManager<?>, C extends Stage<? extends ScoreManager<?>>> extends AbstractStage<Match<M>, M> {
+public class StandardMatch<C extends TennisSet> extends AbstractStage<TennisMatch> implements TennisMatch {
 
     private final Factory<C> setFactory;
-
-    private final M scoreManager;
 
     @Getter
     private final UUID id = UUID.randomUUID();
@@ -26,19 +27,18 @@ public class StandardMatch<M extends ScoreManager<?>, C extends Stage<? extends 
 
     private C currentSet;
 
-    public StandardMatch(@NonNull ScoringStrategy<Match<M>> strategy,
-                         @NonNull M scoreManager,
+    public StandardMatch(@NonNull Supplier<ScoringStrategy<TennisMatch>> strategySupplier,
+                         @NonNull Supplier<ScoreManager> managerSupplier,
                          @NonNull Factory<C> setFactory) {
-        super(strategy);
-        this.scoreManager = scoreManager;
+        super(strategySupplier, managerSupplier);
         this.setFactory = setFactory;
-        this.matchFormat = strategy.getClass().isAssignableFrom(StandardMatchScoringStrategy.Bo3.class)
+        this.matchFormat = scoringStrategy.getClass().isAssignableFrom(TennisMatchScoringStrategy.Bo3.class)
                 ? MatchFormat.BO3
                 : MatchFormat.BO5;
     }
 
     @Override
-    public void handleScorePoint(@NonNull Player pointWinner) {
+    public void processScorePoint(@NonNull Player pointWinner) {
         if (currentSet == null || currentSet.isOver()) {
             currentSet = setFactory.create();
             currentSet.addPropertyChangeListener(this);
@@ -47,27 +47,29 @@ public class StandardMatch<M extends ScoreManager<?>, C extends Stage<? extends 
     }
 
     @Override
-    public M getScoreManager() {
+    public ScoreManager getScoreManager() {
         return scoreManager;
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent event) {
-        if ("setWinner".equals(event.getPropertyName())) {
-            super.scoringStrategy.scorePoint(this, ((Player) event.getNewValue()));
+    protected void handleStageSpecificPropertyChange(PropertyChangeEvent event) {
+        MatchEvent.fromEventName(event.getPropertyName())
+                .filter(name -> name == MatchEvent.SET_WINNER)
+                .map(name -> event)
+                .ifPresent(this::handleSetStageWinner);
+    }
 
-            if (isOver()) {
-                firePropertyChange("matchWinner", null, winner);
-            } else {
-                // check old value for reference (it is cloned?)
-                firePropertyChange("matchScores", event.getOldValue(), scoreManager);
-            }
+    private void handleSetStageWinner(PropertyChangeEvent event) {
+        scoringStrategy.scorePoint(this, (Player) event.getNewValue());
 
-        } else if ("setScores".equals(event.getPropertyName())) {
-            firePropertyChange("setScores", event.getOldValue(), event.getNewValue());
-
-        } else if ("gameScores".equals(event.getPropertyName())) {
-            firePropertyChange("gameScores", event.getOldValue(), event.getNewValue());
+        firePropertyChange(MatchEvent.MATCH_SCORES.getEventName(), null, scoreManager);
+        if (isOver()) {
+            firePropertyChange(MatchEvent.MATCH_WINNER.getEventName(), null, winner);
         }
+    }
+
+    @Override
+    public Optional<Stage> getChildStage() {
+        return Optional.ofNullable(currentSet);
     }
 }

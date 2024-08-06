@@ -1,57 +1,69 @@
 package com.aleos.match.stage;
 
-import com.aleos.match.model.enums.Player;
 import com.aleos.match.creation.Factory;
+import com.aleos.match.model.enums.MatchEvent;
+import com.aleos.match.model.enums.Player;
+import com.aleos.match.scoremanager.ScoreManager;
 import com.aleos.match.scoring.ScoringStrategy;
-import com.aleos.match.score.ScoreManager;
+import lombok.Getter;
 
 import java.beans.PropertyChangeEvent;
+import java.util.Optional;
+import java.util.function.Supplier;
 
-public class StandardSet<M extends ScoreManager<?>, C extends Stage<? extends ScoreManager<?>>>
-        extends AbstractStage<TennisSet<M>, M> {
+import static com.aleos.match.model.enums.StageState.TIE_BREAK;
 
-    private final Factory<C> gameFactory;
+public class StandardSet<G extends TennisGame> extends AbstractStage<TennisSet> implements TennisSet {
 
-    private final M scoreManager;
+    private final Factory<G> gameFactory;
 
-    private C currentGame;
+    @Getter
+    private G currentGame;
 
-    public StandardSet(ScoringStrategy<TennisSet<M>> scoringStrategy,
-                       M scoreManager,
-                       Factory<C> gameFactory) {
-        super(scoringStrategy);
-        this.scoreManager = scoreManager;
+    public StandardSet(Supplier<ScoringStrategy<TennisSet>> strategySupplier,
+                       Supplier<ScoreManager> managerSupplier,
+                       Factory<G> gameFactory) {
+
+        super(strategySupplier, managerSupplier);
         this.gameFactory = gameFactory;
     }
 
     @Override
-    public void handleScorePoint(Player pointWinner) {
+    public void processScorePoint(Player pointWinner) {
         if (currentGame == null || currentGame.isOver()) {
             currentGame = gameFactory.create();
             currentGame.addPropertyChangeListener(this);
+            if (state == TIE_BREAK) {
+                currentGame.setState(TIE_BREAK);
+            }
         }
         currentGame.scorePoint(pointWinner);
     }
 
     @Override
-    public M getScoreManager() {
+    public ScoreManager getScoreManager() {
         return scoreManager;
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent event) {
+    protected void handleStageSpecificPropertyChange(PropertyChangeEvent event) {
+        MatchEvent.fromEventName(event.getPropertyName())
+                .filter(name -> name == MatchEvent.GAME_WINNER)
+                .map(name -> event)
+                .ifPresent(this::handleGameStageWinner);
+    }
 
-        if ("gameWinner".equals(event.getPropertyName())) {
-            super.scoringStrategy.scorePoint(this, (Player) event.getNewValue());
+    private void handleGameStageWinner(PropertyChangeEvent event) {
+        scoringStrategy.scorePoint(this, (Player) event.getNewValue());
 
-            if (isOver()) {
-                firePropertyChange("setWinner", null, winner);
-            } else {
-                firePropertyChange("setScores", event.getOldValue(), scoreManager);
-            }
-
-        } else if ("gameScores".equals(event.getPropertyName())) {
-            firePropertyChange("gameScores", event.getOldValue(), event.getNewValue());
+        firePropertyChange(MatchEvent.SET_SCORES.getEventName(), null, scoreManager);
+        if (isOver()) {
+            firePropertyChange(MatchEvent.SET_WINNER.getEventName(), null, winner);
         }
+    }
+
+    @Override
+    public Optional<Stage> getChildStage() {
+        return Optional.ofNullable(currentGame);
     }
 }

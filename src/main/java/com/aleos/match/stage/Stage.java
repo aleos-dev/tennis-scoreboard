@@ -2,15 +2,16 @@ package com.aleos.match.stage;
 
 import com.aleos.match.model.enums.Player;
 import com.aleos.match.model.enums.StageState;
-import com.aleos.match.score.ScoreManager;
+import com.aleos.match.scoremanager.ScoreManager;
 
 import java.beans.PropertyChangeListener;
+import java.util.Optional;
 
-public interface Stage<S extends ScoreManager<?>> {
+public interface Stage {
 
     void scorePoint(Player player);
 
-    S getScoreManager();
+    ScoreManager getScoreManager();
 
     boolean isOver();
 
@@ -23,4 +24,6 @@ public interface Stage<S extends ScoreManager<?>> {
     StageState getState();
 
     void setState(StageState state);
+
+    Optional<Stage> getChildStage();
 }

@@ -1,38 +1,40 @@
 package com.aleos.match.stage;
 
+import com.aleos.match.model.enums.MatchEvent;
 import com.aleos.match.model.enums.Player;
+import com.aleos.match.scoremanager.ScoreManager;
 import com.aleos.match.scoring.ScoringStrategy;
-import com.aleos.match.score.ScoreManager;
 
 import java.beans.PropertyChangeEvent;
+import java.util.Optional;
+import java.util.function.Supplier;
 
-public class StandardGame<M extends ScoreManager<?>> extends AbstractStage<Game<M>, M> {
+public class StandardGame extends AbstractStage<TennisGame> implements TennisGame {
 
-    private final M scoreManager;
+    public StandardGame(Supplier<ScoringStrategy<TennisGame>> strategySupplier,
+                        Supplier<ScoreManager> managerSupplier) {
 
-    public StandardGame(ScoringStrategy<Game<M>> strategy, M scoreManager) {
-        super(strategy);
-        this.scoreManager = scoreManager;
+        super(strategySupplier, managerSupplier);
     }
 
     @Override
-    public void handleScorePoint(Player pointWinner) {
-        super.scoringStrategy.scorePoint(this, pointWinner);
+    public void processScorePoint(Player pointWinner) {
+        scoringStrategy.scorePoint(this, pointWinner);
 
+        firePropertyChange(MatchEvent.GAME_SCORES.getEventName(), null, scoreManager);
         if (isOver()) {
-            firePropertyChange("gameWinner", null, winner);
-        } else {
-            firePropertyChange("gameScores", null, scoreManager);
+            firePropertyChange(MatchEvent.GAME_WINNER.getEventName(), null, winner);
         }
     }
 
     @Override
-    public M getScoreManager() {
-        return scoreManager;
+    protected void handleStageSpecificPropertyChange(PropertyChangeEvent event) {
+        // Low-level stages do not need to listen to child stage events
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        // This method would react to changes if this class were observing other properties
+    public Optional<Stage> getChildStage() {
+        // Low-level stages do not have a child stage
+        return Optional.empty();
     }
 }
