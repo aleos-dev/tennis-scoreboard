@@ -177,78 +177,68 @@ This API allows you to interact with a Tennis scoreboard. Below are the availabl
    GET /api/v1/matches?status=ongoing&playerName=Arthur%20Bok&page=0&size=10
    ```
 
-**Response Example (for finished matches):**
+**Response Example:**
 
 ```json
 {
   "content": [
     {
-      "id": 0,
+      "id": "uuid-of-ongoing-match",
       "playerOne": {
-        "id": 0,
         "name": "Arthur Bok",
         "country": "MY",
-        "imageURL": "/images/arthur_bok.jpg",
+        "playerImageUrl": "/images/0_arthur.jpg",
+        "countryImageUrl": "/images/my_flag.jpg",
         "matches": "GET /api/v1/matches?fullName=arthur%20bok"
       },
       "playerTwo": {
-        "id": 1,
         "name": "Richard Gorba",
         "country": "DE",
-        "imageURL": "/images/richard_gorba.jpg",
+        "playerImageUrl": "/images/1_richard.jpg",
+        "countryImageUrl": "/images/de_flag.jpg",
         "matches": "GET /api/v1/matches?fullName=richard%20gorba"
       },
-      "type": "bo3",
-      "status": "finished",
-      "date": "2024-03-21",
+      "status": "ONGOING",
+      "score": {
+        "": "format undefined at the moment"
+      },
+      "startedAt": "12:34:56"
+    },
+    
+    {
+      "id": "uuid-of-finished-match",
+      "playerOne": {
+        "name": "John Doe",
+        "country": "US",
+        "playerImageUrl": "/images/0_john.jpg",
+        "countryImageUrl": "/images/us_flag.jpg",
+        "matches": "GET /api/v1/matches?fullName=john%20doe"
+      },
+      "playerTwo": {
+        "name": "Jane Smith",
+        "country": "UK",
+        "playerImageUrl": "/images/1_jane.jpg",
+        "countryImageUrl": "/images/uk_flag.jpg",
+        "matches": "GET /api/v1/matches?fullName=jane%20smith"
+      },
+      "status": "FINISHED",
       "winner": {
-        "id": 0,
-        "name": "Arthur Bok",
-        "country": "MY",
-        "imageURL": "/images/arthur_bok.jpg",
-        "matches": "GET /api/v1/matches?fullName=arthur%20bok"
+        "name": "Jane Smith",
+        "country": "UK",
+        "playerImageUrl": "/images/1_jane.jpg",
+        "countryImageUrl": "/images/uk_flag.jpg",
+        "matches": "GET /api/v1/matches?fullName=jane%20smith"
       },
-      "scores": "/api/v1/matches/0/scores"
+      "info": {
+        "details": "Match details here"
+      },
+      "date": "2024-08-08"
     }
   ],
   "page": 0,
   "size": 10,
-  "totalPages": 5,
-  "totalItems": 50
-}
-```
-
-**Response Example (for ongoing matches):**
-
-```json
-{
-  "content": [
-    {
-      "id": 0,
-      "playerOne": {
-        "id": 0,
-        "name": "Arthur Bok",
-        "country": "MY",
-        "imageURL": "/images/arthur_bok.jpg",
-        "matches": "GET /api/v1/matches?fullName=arthur%20bok"
-      },
-      "playerTwo": {
-        "id": 1,
-        "name": "Richard Gorba",
-        "country": "DE",
-        "imageURL": "/images/richard_gorba.jpg",
-        "matches": "GET /api/v1/matches?fullName=richard%20gorba"
-      },
-      "type": "bo3",
-      "status": "ongoing",
-      "started": "10:45:00",
-      "scores": "/api/v1/matches/0/scores"
-    }
-  ],
-  "page": 0,
-  "size": 10,
-  "totalPages": 3,
-  "totalItems": 25
+  "totalPages": 1,
+  "totalItems": 2
 }
 ```
 
@@ -267,8 +257,8 @@ This API allows you to interact with a Tennis scoreboard. Below are the availabl
 
 **Request Body:**
 
-- `playerOneFullName`: The full name (name + surname) of the first player.
-- `playerTwoFullName`: The full name (name + surname) of the second player.
+- `playerOneName`: The name of the first player.
+- `playerTwoName`: The name of the second player.
 - `type`: The type of match. Possible values are `bo3` (best of 3 sets) or `bo5` (best of 5 sets).
 - `playerOneCountry` (optional): The country of the first player.
 - `playerTwoCountry` (optional): The country of the second player.
@@ -277,8 +267,8 @@ This API allows you to interact with a Tennis scoreboard. Below are the availabl
 
 ```json
 {
-  "playerOneFullName": "Arthur Bok",
-  "playerTwoFullName": "Richard Gorba",
+  "playerOneName": "Arthur Bok",
+  "playerTwoName": "Richard Gorba",
   "type": "bo5",
   "playerOneCountry": "MY",
   "playerTwoCountry": "DE"
@@ -352,24 +342,31 @@ This API allows you to interact with a Tennis scoreboard. Below are the availabl
 {
   "content": [
     {
-      "id": 0,
       "name": "Arthur Bok",
       "country": "MY",
-      "imageUrl": "/images/0_arthur.jpg",
+      "playerImageUrl": "/images/0_arthur.jpg",
+      "countryImageUrl": "/images/my_flag.jpg",
       "matches": "GET /api/v1/matches?fullName=arthur%20bok"
     },
     {
-      "id": 1,
       "name": "Richard Gorba",
       "country": "DE",
-      "imageUrl": "/images/1_richard.jpg",
+      "playerImageUrl": "/images/1_richard.jpg",
+      "countryImageUrl": "/images/de_flag.jpg",
       "matches": "GET /api/v1/matches?fullName=richard%20gorba"
+    },
+    {
+      "name": "Jane Smith",
+      "country": "UK",
+      "playerImageUrl": "/images/1_jane.jpg",
+      "countryImageUrl": "/images/uk_flag.jpg",
+      "matches": "GET /api/v1/matches?fullName=jane%20smith"
     }
   ],
   "page": 0,
   "size": 10,
   "totalPages": 1,
-  "totalItems": 2
+  "totalItems": 3
 }
 ```
 
@@ -393,12 +390,13 @@ GET /api/v1/players/Arthur%20Bok
 
 ```json
 {
-  "id": 0,
   "name": "Arthur Bok",
   "country": "MY",
-  "imageUrl": "/images/0_arthur.jpg",
+  "playerImageUrl": "/images/0_arthur.jpg",
+  "countryImageUrl": "/images/my_flag.jpg",
   "matches": "GET /api/v1/matches?fullName=arthur%20bok"
 }
+
 ```
 
 **HTTP Response Codes:**
@@ -410,35 +408,49 @@ GET /api/v1/players/Arthur%20Bok
 
 **Endpoint:** `POST /api/v1/players`
 
+**Request Headers:**
+    Content-Type: multipart/form-data
+
 **Description:** Adds a new player to the system.
 
 **Request Body:**
+The request should be of type multipart/form-data and include the following parts:
 
-```json
-{
-  "name": "Arthur Bok",
+- name: (string) The name of the player.
 
+- country: (string) The country of the player.
 
-  "country": "MY",
-  "imageUrl": "/images/0_arthur.jpg"
-}
+- playerImage: (file) The image file for the player.
+
+**Example using curl:**
+
+```curl
+curl -X POST http://localhost:8080/api/v1/players \
+-F "name=Arthur Bok" \
+-F "country=MY" \
+-F "playerImage=@/path/to/arthur.jpg"
+
 ```
 
 **Response Example:**
 
 ```json
 {
-  "id": 2,
   "name": "Arthur Bok",
   "country": "MY",
-  "imageUrl": "/images/0_arthur.jpg"
+  "playerImageUrl": "/images/0_arthur.jpg",
+  "countryImageUrl": "/images/my_flag.jpg",
+  "matches": "GET /api/v1/matches?fullName=arthur%20bok"
 }
+
+
 ```
 
 **HTTP Response Codes:**
 
 - `201 Created` - The player was successfully created.
 - `400 Bad Request` - The request was malformed or contained invalid parameters.
+- `500 Internal Server Error` - There was an error processing the request.
 
 ### Update Player
 
@@ -448,7 +460,7 @@ GET /api/v1/players/Arthur%20Bok
 
 **Path Parameters:**
 
-- `fullName`: The full name of the player to update.
+- `fullName`: The name of the player to update.
 
 **Request Body:**
 
@@ -458,12 +470,24 @@ Fields to update:
 - `country` (optional): The new country code of the player.
 - `imageUrl` (optional): The new image URL of the player.
 
+**Example using curl:**
+
+```curl
+curl -X POST http://localhost:8080/api/v1/players \
+-F "name=Bob Bok" \
+-F "country=MY" \
+-F "playerImage=@/path/to/arthur.jpg"
+
+```
 ```json
 {
-  "name": "Updated Name",
-  "country": "Updated Country",
-  "imageUrl": "/images/updated_arthur.jpg"
+  "name": "Bob Bok",
+  "country": "MY",
+  "playerImageUrl": "/images/0_bob.jpg",
+  "countryImageUrl": "/images/my_flag.jpg",
+  "matches": "GET /api/v1/matches?fullName=bob%20bok"
 }
+
 ```
 
 **Response Codes:**
@@ -471,6 +495,8 @@ Fields to update:
 - `204 No Content` - The player was successfully updated.
 - `400 Bad Request` - The request was malformed or contained invalid parameters.
 - `404 Not Found` - The player with the specified full name was not found.
+- `409 Conflict` - The player name already is taken.
+- `500 Internal Server Error` - There was an error processing the request.
 
 ### Delete Player
 
