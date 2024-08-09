@@ -140,10 +140,8 @@ This API allows you to interact with a Tennis scoreboard. Below are the availabl
 **Query Parameters:**
 
 - `status` (optional): Filter matches by status. Possible values are `finished`, `ongoing`, or omit for all matches.
-- `playerId` (optional): Filter matches by a specific player's ID. Only matches where the specified player participated will be returned.
 - `playerName` (optional): Filter matches by a specific player's name. Only matches where the specified player participated will be returned.
-- `page` (optional): The page number to retrieve. Default is `0`.
-- `size` (optional): The number of items per page. Default is `10`.
+- `pageSize` (optional): The number of items per page. Default is `5`.
 
 **Example Requests:**
 
@@ -156,7 +154,7 @@ This API allows you to interact with a Tennis scoreboard. Below are the availabl
 2. **Retrieve all ongoing matches:**
 
    ```
-   GET /api/v1/matches?status=ongoing&page=2&size=5
+   GET /api/v1/matches?status=ongoing&pageSize=10
    ```
 
 3. **Retrieve all matches (default):**
@@ -165,16 +163,10 @@ This API allows you to interact with a Tennis scoreboard. Below are the availabl
    GET /api/v1/matches
    ```
 
-4. **Retrieve all finished matches involving a specific player by ID:**
-
-   ```
-   GET /api/v1/matches?status=finished&playerId=0&page=0&size=10
-   ```
-
 5. **Retrieve all ongoing matches involving a specific player by name:**
 
    ```
-   GET /api/v1/matches?status=ongoing&playerName=Arthur%20Bok&page=0&size=10
+   GET /api/v1/matches?status=ongoing&playerName=arthur&pageSize=10
    ```
 
 **Response Example:**
