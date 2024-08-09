@@ -23,6 +23,8 @@ public record MatchPayload(
         String playerOneCountry,
 
         @ValidCountryCode
-        String playerTwoCountry
+        String playerTwoCountry,
+
+        String lastTimestampToken
 ) {
 }
