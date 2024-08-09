@@ -10,6 +10,9 @@ import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.Instant;
 
 @Entity
 @Table(name = "player", indexes = @Index(name = "player_name_idx", columnList = "name", unique = true))
@@ -32,5 +35,10 @@ public class Player {
     private String country;
 
     @ValidFilePath(message = "The path to the image file is invalid.", groups = ExtendedGroup.class)
+    @Column(name = "image_path")
     private String imagePath = ImageService.DEFAULT_PLAYER_IMAGE_PATH;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    Instant createdAt;
 }

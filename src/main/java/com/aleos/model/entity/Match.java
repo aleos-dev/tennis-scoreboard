@@ -39,7 +39,8 @@ public class Match {
     private Player winner;
 
     @CreationTimestamp
-    private Instant instant;
+    @Column(name = "concluded_at", updatable = false)
+    private Instant concludedAt;
 
     private MatchInfo info;
 }
