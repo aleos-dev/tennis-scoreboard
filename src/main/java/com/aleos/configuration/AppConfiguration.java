@@ -1,10 +1,12 @@
 package com.aleos.configuration;
 
 import com.aleos.annotation.Bean;
-import com.aleos.dao.MatchDao;
-import com.aleos.dao.OngoingMatchCache;
-import com.aleos.dao.PlayerDao;
+import com.aleos.repository.MatchDao;
+import com.aleos.repository.MatchRepository;
+import com.aleos.repository.PlayerDao;
+import com.aleos.repository.TennisMatchCache;
 import com.aleos.service.MatchService;
+import com.aleos.service.ScoreTrackerService;
 import com.aleos.util.PropertiesUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManagerFactory;
@@ -15,12 +17,6 @@ import jakarta.validation.ValidatorFactory;
 import org.flywaydb.core.Flyway;
 
 public class AppConfiguration {
-
-    @Bean
-    public MatchService matchService(@Bean(name = "matchDao") MatchDao matchDao,
-                                     @Bean(name = "playerDao") PlayerDao playerDao) {
-        return new MatchService(matchDao, playerDao);
-    }
 
     @Bean
     public ValidatorFactory validationFactory() {
@@ -38,14 +34,25 @@ public class AppConfiguration {
     }
 
     @Bean
-    public OngoingMatchCache ongoingMatchCache() {
-        return new OngoingMatchCache();
+    public MatchRepository matchRepository(@Bean(name = "matchDao") MatchDao matchDao) {
+        return new MatchRepository(new TennisMatchCache(), matchDao);
     }
 
     @Bean
-    public MatchDao matchDao(@Bean(name = "entityManagerFactory") EntityManagerFactory entityManagerFactory,
-                             @Bean(name = "ongoingMatchCache") OngoingMatchCache cache) {
-        return new MatchDao(entityManagerFactory, cache);
+    public MatchService matchService(@Bean(name = "matchRepository") MatchRepository matchRepository,
+                                     @Bean(name = "playerDao") PlayerDao playerDao,
+                                     @Bean(name = "scoreTrackerService") ScoreTrackerService scoreTrackerService) {
+        return new MatchService(matchRepository, playerDao, scoreTrackerService);
+    }
+
+    @Bean
+    public ScoreTrackerService scoreTrackerService() {
+        return new ScoreTrackerService();
+    }
+
+    @Bean
+    public MatchDao matchDao(@Bean(name = "entityManagerFactory") EntityManagerFactory entityManagerFactory) {
+        return new MatchDao(entityManagerFactory);
     }
 
     @Bean
@@ -59,7 +66,7 @@ public class AppConfiguration {
         flyway.migrate();
 
         return Persistence.createEntityManagerFactory(
-                PropertiesUtil.get("hibernate.persistense.unit.name").orElse("default"));
+                PropertiesUtil.get("hibernate.persistence.unit.name").orElse("default"));
     }
 
     @Bean
