@@ -1,5 +1,5 @@
 CREATE TABLE player (
-                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                        id BIGINT PRIMARY KEY,
                         name VARCHAR(50) NOT NULL,
                         country VARCHAR(30) NOT NULL,
                         image_path VARCHAR(255),
