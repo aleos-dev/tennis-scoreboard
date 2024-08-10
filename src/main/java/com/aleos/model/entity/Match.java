@@ -1,6 +1,5 @@
 package com.aleos.model.entity;
 
-import com.aleos.model.MatchInfo;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,7 +14,7 @@ import java.util.UUID;
 @Table(name = "match", indexes = {
         @Index(name = "match_player1_idx", columnList = "player1_id"),
         @Index(name = "match_player2_idx", columnList = "player2_id"),
-        @Index(name = "instant", columnList = "instant", unique = true),
+        @Index(name = "concluded_at_idx", columnList = "concluded_at", unique = true),
 })
 @Getter
 @Setter
@@ -42,5 +41,6 @@ public class Match {
     @Column(name = "concluded_at", updatable = false)
     private Instant concludedAt;
 
+    @Embedded
     private MatchInfo info;
 }
