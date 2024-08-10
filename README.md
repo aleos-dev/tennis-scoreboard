@@ -104,12 +104,166 @@
 Внедрение шаблонов проектирования увеличило количество классов, необходимых для этого решения, но позволило добиться
 модульности и гибкости в комбинации компонентов, составляющих матч.🤖
 
-### Заключение
+### Заключение работы с движком
 
 Это путешествие завершилось идеей доработать и выделить пакет Match в отдельную библиотеку. 📦 Запишу себе в todo. А
 впереди создание инфраструктуры для проекта с дерзким названием "Теннисное табло". 📊
 
 ---
+
+## Архитектура и начальная настройка
+
+### Планирование архитектуры
+
+- Начал с создания нескольких диаграмм последовательностей для определения необходимых компонентов.
+
+- **Диаграммы последовательностей**: Начал с того, что нарисовал несколько диаграмм последовательностей, чтобы
+  определить, какие компоненты мне понадобятся.
+-
+
+## Технические требования
+
+- Необходимо использовать Hibernate ORM. Исходя из этого для валидации выбрал реализацию Java Bean Validation -
+  Hibernate Validation(JSR 380), также используемую в Spring.
+
+### Зависимости Maven для Hibernate Validator
+
+```xml
+<!-- Hibernate Validator -->
+<b>
+    <dependency>
+        <groupId>org.hibernate.validator</groupId>
+        <artifactId>hibernate-validator</artifactId>
+        <version>8.0.1.Final</version>
+    </dependency>
+
+    <!-- API Jakarta Expression Language -->
+    <dependency>
+        <groupId>jakarta.el</groupId>
+        <artifactId>jakarta.el-api</artifactId>
+        <version>6.0.1</version>
+    </dependency>
+
+    <!-- Реализация Jakarta EL -->
+    <dependency>
+        <groupId>org.glassfish</groupId>
+        <artifactId>jakarta.el</artifactId>
+        <version>4.0.2</version>
+    </dependency>
+</b>
+```
+
+**Jakarta Expression Language (EL)**:
+
+- В документации сказано, что Hibernate Validator требует реализацию Jakarta Expression Language для динамического
+  парсинга выражений в сообщениях. Интересно, что эту зависимость не включили по умолчанию. Видимо, это сделано в
+  соответствии с принципом минимальных зависимостей, чтобы разработчики могли сами выбирать нужную реализацию EL.
+
+#### Фабрика по умолчанию
+
+Если нет необходимости в использовании выражений EL, можно получить `ValidationFactory` следующим образом:
+
+```java
+      @Bean
+      public Validator validator(@Bean(name = "validationFactory") ValidatorFactory validationFactory) {
+          return Validation.byDefaultProvider()
+                  .configure()
+                  .messageInterpolator(new ParameterMessageInterpolator())
+                  .buildValidatorFactory();
+      }
+```
+
+Таким образом, будет использоваться `ParameterMessageInterpolator` вместо интерполятора по умолчанию
+`ResourceBundleMessageInterpolator`.
+
+#### Механика Hibernate Validator
+
+**Инициализация ValidatorFactory**: `ValidatorFactory` является тяжеловесным объектом, так как он выполняет
+инициализацию и настройку инфраструктуры валидации. Это включает создание `Validator`, управление метаданными и
+кэширование информации о валидационных ограничениях.
+
+**Использование Validator**: Когда `Validator` используется для валидации объекта, он сканирует класс этого объекта на
+наличие аннотаций валидации и создает метаданные для этого класса. Эти метаданные включают информацию обо всех
+валидационных ограничениях, применяемых к классу.
+
+**Кэширование метаданных**: Для улучшения производительности метаданные о валидационных ограничениях кэшируются, что
+значительно ускоряет процесс валидации при последующих вызовах для того же класса.
+
+**Валидация**: В процессе валидации `Validator` использует рефлексию для анализа всех полей, классов и методов целевого
+объекта, на которых установлены аннотации валидации (например, `@NotNull`, `@Size`). Если данные не соответствуют
+ожиданиям, генерируются сообщения об ошибках.
+
+### Управление контекстом приложения
+
+- Ранее в проекте уже использовал ServletContext для управления зависимостями, нужно что-то другое.
+
+- Управление зависимостями: Исследовал CDI (Contexts and Dependency Injection) для управления зависимостями в Java EE.
+  Решил не использовать его в этом проекте, чтобы избежать дополнительной сложности, так как Tomcat не поддерживает его
+  по умолчанию.
+
+- Решил использовать паттерн ServiceLocator через BeanFactory, реализованный в AppConfiguration с использованием
+  пользовательской аннотации @Bean.
+
+```java
+      public class AppConfiguration {
+
+          @Bean
+          public MatchService matchService(@Bean(name = "matchDao") MatchRepository matchDao,
+                                           @Bean(name = "playerDao") PlayerRepository playerDao) {
+              return new MatchService(matchDao, playerDao);
+          }
+          // ...
+      }
+```
+
+  Чтобы не потерять наши бины, нужно сохранить `BeanFactory` в `ServletContext`. Для этого используем интерфейс `ServletContextListener`.
+
+```java 
+// Интеграция с ServletContext
+@WebListener
+public class AppContextListener implements ServletContextListener {
+
+    @Override
+    public void contextInitialized(ServletContextEvent sce) {
+        injectFactoryBean(sce);
+    }
+
+    private static void injectFactoryBean(ServletContextEvent sce) {
+        var factory = new BeanFactory(AppConfiguration.class);
+        sce.getServletContext().setAttribute(AppContextAttribute.BEAN_FACTORY.name(), factory);
+    }
+}
+```
+
+## Модели данных
+
+### Улучшения в сущности игрока:
+- В профиль игрока были добавлены поля для страны и иконки. Это изменение направлено на развитие навыков работы с загрузкой файлов и реализацию специфичной валидации.
+
+### Сущность матча и управление пагинацией:
+- Для поддержки пагинации в сущность матча был добавлен timestamp.
+- Создана встроенная сущность `MatchInfo`, предназначенная для хранения расширенной информации о матче.
+
+### Валидация:
+- Валидация поля `country` производится в соответствии со стандартом ISO 3166-1 alpha-2, если это поле присутствует.
+- Основная валидация входных данных выполняется на уровне DTO. Критическое поле `imagePath` игрока подвергается дополнительной проверке на валидность в процессе обработки данных сервисом. Остальные поля, полученные с фронтенда, остаются без изменений и не требуют дополнительной валидации.
+
+### Настройки Hibernate:
+- Конфигурации Hibernate задаются в файле `META-INF/persistence.xml`. Используется база данных H2 in-memory и пул соединений HikariCP. Миграция данных осуществляется через Flyway.
+
+## Текущие вызовы и размышления
+
+### Интеграция с внешним хранилищем данных:
+- При попытке использования внешнего хранилища данных, такого как Redis, для управления текущими матчами, я столкнулся с фундаментальными ошибками в архитектуре матча, где функциональность и состояние были неразделимы. Это осознание привело к отказу от Redis(из-за сложностей с сериализацией) в пользу применения `ConcurrentHashMap` для управления состояниями.
+
+### Проблемы декомпозиции:
+- Процесс декомпозиции порой ведёт к неожиданному усложнению структуры проекта, что затрудняет управление его компонентами. Несмотря на это, эффективная декомпозиция позволяет удерживать фокус и облегчает работу с отдельными частями системы.
+
+## Итоги недели
+
+- Эта неделя оказалась насыщенной, и не все запланированное удалось выполнить. Недостаток опыта иногда затрудняет точное планирование объема работы, особенно когда приходится сталкиваться с новыми технологиями и методиками. В некоторых случаях, понимание приходит быстро, в других — требует значительного времени на изучение.
+
+- Цель по созданию рабочей веб-инфраструктуры переносится на следующую неделю. Это даст возможность более детально проработать все аспекты и убедиться в их корректной реализации.
 
 # API Documentation
 
@@ -135,12 +289,14 @@ This API allows you to interact with a Tennis scoreboard. Below are the availabl
 
 **Endpoint:** `GET /api/v1/matches`
 
-**Description:** Retrieves a list of matches. You can filter the matches by their status (e.g., finished, ongoing) and paginate the results.
+**Description:** Retrieves a list of matches. You can filter the matches by their status (e.g., finished, ongoing) and
+paginate the results.
 
 **Query Parameters:**
 
 - `status` (optional): Filter matches by status. Possible values are `finished`, `ongoing`, or omit for all matches.
-- `playerName` (optional): Filter matches by a specific player's name. Only matches where the specified player participated will be returned.
+- `playerName` (optional): Filter matches by a specific player's name. Only matches where the specified player
+  participated will be returned.
 - `pageSize` (optional): The number of items per page. Default is `5`.
 
 **Example Requests:**
@@ -196,7 +352,6 @@ This API allows you to interact with a Tennis scoreboard. Below are the availabl
       },
       "startedAt": "12:34:56"
     },
-    
     {
       "id": "uuid-of-finished-match",
       "playerOne": {
@@ -245,7 +400,9 @@ This API allows you to interact with a Tennis scoreboard. Below are the availabl
 
 **Endpoint:** `POST /api/v1/matches`
 
-**Description:** Creates a match between two specified players. If either player does not exist in the database, they will be automatically created. The endpoint supports specifying the type of match (best of 3 or best of 5 sets) and an optional match date.
+**Description:** Creates a match between two specified players. If either player does not exist in the database, they
+will be automatically created. The endpoint supports specifying the type of match (best of 3 or best of 5 sets) and an
+optional match date.
 
 **Request Body:**
 
@@ -305,7 +462,8 @@ This API allows you to interact with a Tennis scoreboard. Below are the availabl
 
 **Endpoint:** `GET /api/v1/players`
 
-**Description:** Retrieves a list of all players. You can filter players by their name or country code and paginate the results.
+**Description:** Retrieves a list of all players. You can filter players by their name or country code and paginate the
+results.
 
 **Query Parameters:**
 
@@ -401,7 +559,7 @@ GET /api/v1/players/Arthur%20Bok
 **Endpoint:** `POST /api/v1/players`
 
 **Request Headers:**
-    Content-Type: multipart/form-data
+Content-Type: multipart/form-data
 
 **Description:** Adds a new player to the system.
 
@@ -471,6 +629,7 @@ curl -X POST http://localhost:8080/api/v1/players \
 -F "playerImage=@/path/to/arthur.jpg"
 
 ```
+
 ```json
 {
   "name": "Bob Bok",
@@ -505,7 +664,9 @@ curl -X POST http://localhost:8080/api/v1/players \
 - `204 No Content` - The player was successfully deleted.
 - `400 Bad Request` - The request was malformed or contained invalid parameters.
 - `404 Not Found` - The player with the specified full name was not found.
-  Sure! Let's update the API documentation for the scores endpoint using the enhanced representation. This will provide a more comprehensive and detailed view of the match scores, especially useful for applications that need real-time updates or more insights into each match's progress.
+  Sure! Let's update the API documentation for the scores endpoint using the enhanced representation. This will provide
+  a more comprehensive and detailed view of the match scores, especially useful for applications that need real-time
+  updates or more insights into each match's progress.
 
 Here's the revised API documentation for the scores endpoint:
 
@@ -517,7 +678,9 @@ Here's the revised API documentation for the scores endpoint:
 
 **Endpoint:** `GET /api/v1/matches/{id}/scores`
 
-**Description:** Retrieves the scores for a specific match. This endpoint provides detailed set-by-set scores for both finished and ongoing matches. For ongoing matches, it also includes the current game score to give a more granular view of the match's progress.
+**Description:** Retrieves the scores for a specific match. This endpoint provides detailed set-by-set scores for both
+finished and ongoing matches. For ongoing matches, it also includes the current game score to give a more granular view
+of the match's progress.
 
 **Path Parameters:**
 
@@ -537,9 +700,18 @@ Here's the revised API documentation for the scores endpoint:
     "playerName": "Arthur Bok",
     "country": "MY",
     "scores": [
-      { "set": 1, "games": 6 },
-      { "set": 2, "games": 4 },
-      { "set": 3, "games": 6 }
+      {
+        "set": 1,
+        "games": 6
+      },
+      {
+        "set": 2,
+        "games": 4
+      },
+      {
+        "set": 3,
+        "games": 6
+      }
     ],
     "matchOutcome": "winner"
   },
@@ -547,9 +719,18 @@ Here's the revised API documentation for the scores endpoint:
     "playerName": "Richard Gorba",
     "country": "DE",
     "scores": [
-      { "set": 1, "games": 3 },
-      { "set": 2, "games": 6 },
-      { "set": 3, "games": 1 }
+      {
+        "set": 1,
+        "games": 3
+      },
+      {
+        "set": 2,
+        "games": 6
+      },
+      {
+        "set": 3,
+        "games": 1
+      }
     ],
     "matchOutcome": "loser"
   }
@@ -573,9 +754,19 @@ Here's the revised API documentation for the scores endpoint:
     "playerName": "Arthur Bok",
     "country": "MY",
     "scores": [
-      { "set": 1, "games": 6 },
-      { "set": 2, "games": 4 },
-      { "set": 3, "games": 5, "currentGameScore": 30 }
+      {
+        "set": 1,
+        "games": 6
+      },
+      {
+        "set": 2,
+        "games": 4
+      },
+      {
+        "set": 3,
+        "games": 5,
+        "currentGameScore": 30
+      }
     ],
     "matchOutcome": "in-progress"
   },
@@ -583,9 +774,19 @@ Here's the revised API documentation for the scores endpoint:
     "playerName": "Richard Gorba",
     "country": "DE",
     "scores": [
-      { "set": 1, "games": 3 },
-      { "set": 2, "games": 6 },
-      { "set": 3, "games": 5, "currentGameScore": 40 }
+      {
+        "set": 1,
+        "games": 3
+      },
+      {
+        "set": 2,
+        "games": 6
+      },
+      {
+        "set": 3,
+        "games": 5,
+        "currentGameScore": 40
+      }
     ],
     "matchOutcome": "in-progress"
   }
