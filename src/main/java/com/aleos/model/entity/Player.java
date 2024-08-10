@@ -14,12 +14,16 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 
+import static java.time.Instant.now;
+
 @Entity
 @Table(name = "player", indexes = @Index(name = "player_name_idx", columnList = "name", unique = true))
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id")
 public class Player {
+
+    private static final String DEFAULT_COUNTRY = "XX";
 
     @Id
     @GeneratedValue(generator = "player_seq_gen")
@@ -30,9 +34,8 @@ public class Player {
     @Size(min = 5, max = 50, groups = BasicGroup.class, message = "The name must be between {min} and {max}.")
     private String name;
 
-    @NotNull(message = "Country cannot be null.")
     @Size(min = 2, max = 30, groups = BasicGroup.class, message = "The name must be between {min} and {max}.")
-    private String country;
+    private String country = DEFAULT_COUNTRY;
 
     @ValidFilePath(message = "The path to the image file is invalid.", groups = ExtendedGroup.class)
     @Column(name = "image_path")
@@ -40,5 +43,5 @@ public class Player {
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    Instant createdAt;
+    Instant createdAt = now();
 }
