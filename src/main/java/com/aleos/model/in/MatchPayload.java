@@ -17,14 +17,6 @@ public record MatchPayload(
         String playerTwoName,
 
         @ValidMatchFormat
-        String format,
-
-        @ValidCountryCode
-        String playerOneCountry,
-
-        @ValidCountryCode
-        String playerTwoCountry,
-
-        String lastTimestampToken
+        String format
 ) {
 }

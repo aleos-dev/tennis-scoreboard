@@ -8,6 +8,7 @@ import com.aleos.match.scoring.ScoringStrategy;
 import lombok.Getter;
 
 import java.beans.PropertyChangeEvent;
+import java.lang.ref.WeakReference;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -32,7 +33,7 @@ public class StandardSet<G extends TennisGame> extends AbstractStage<TennisSet> 
     public void processScorePoint(Player pointWinner) {
         if (currentGame == null || currentGame.isOver()) {
             currentGame = gameFactory.create();
-            currentGame.addPropertyChangeListener(this);
+            currentGame.addPropertyChangeListener(new WeakReference<>(this).get());
             if (state == TIE_BREAK) {
                 currentGame.setState(TIE_BREAK);
             }
