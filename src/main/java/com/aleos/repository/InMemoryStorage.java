@@ -13,5 +13,5 @@ public interface InMemoryStorage<T, K> {
 
     void remove(K match);
 
-    List<T> getOldest(int count);
+    int matchesCount();
 }

@@ -15,7 +15,7 @@ public class MatchDao extends CrudDao<Match, UUID> {
         super(entityManagerFactory, Match.class);
     }
 
-    public List<Match> findByPlayerPatternBefore(String playerName, Instant before, int limit) {
+    public List<Match> findByPlayerPatternBefore(String playerName, Instant before, int offset, int limit) {
         String findByPlayerNameSql = """
                 FROM Match
                 WHERE   (LOWER(playerOne.name) LIKE :name
@@ -28,6 +28,7 @@ public class MatchDao extends CrudDao<Match, UUID> {
             TypedQuery<Match> query = entityManager.createQuery(findByPlayerNameSql, Match.class);
             query.setParameter("name", '%' + playerName.toLowerCase(Locale.ROOT) + '%');
             query.setParameter("before", before);
+            query.setFirstResult(offset);
             query.setMaxResults(limit);
 
             return query.getResultList();
@@ -35,7 +36,7 @@ public class MatchDao extends CrudDao<Match, UUID> {
         });
     }
 
-    public List<Match> findAllBefore(Instant before, int limit) {
+    public List<Match> findAllBefore(Instant before, int offset, int limit) {
         String findAllConcludedMatchesSql = """
                 FROM Match
                 WHERE concludedAt < :before
@@ -46,9 +47,25 @@ public class MatchDao extends CrudDao<Match, UUID> {
             TypedQuery<Match> query =
                     entityManager.createQuery(findAllConcludedMatchesSql, Match.class);
             query.setParameter("before", before);
+            query.setFirstResult(offset);
             query.setMaxResults(limit);
 
             return query.getResultList();
+        });
+    }
+
+    public int countAllBefore(Instant instant) {
+        String countAllAfterSql = """
+                SELECT COUNT()
+                FROM Match
+                WHERE concludedAt < :instant
+                """;
+
+        return runWithinTxAndReturn(entityManager -> {
+            TypedQuery<Long> query = entityManager.createQuery(countAllAfterSql, Long.class);
+            query.setParameter("instant", instant);
+
+            return query.getSingleResult().intValue();
         });
     }
 }

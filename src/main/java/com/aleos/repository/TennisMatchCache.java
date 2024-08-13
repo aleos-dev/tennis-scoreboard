@@ -3,36 +3,89 @@ package com.aleos.repository;
 import com.aleos.match.stage.TennisMatch;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class TennisMatchCache implements InMemoryStorage<TennisMatch, UUID> {
 
-    private final Map<UUID, TennisMatch> cache = new ConcurrentHashMap<>();
+    private final LinkedHashMap<UUID, TennisMatch> cache = new LinkedHashMap<>();
 
-    private final LinkedHashMap<UUID, TennisMatch> orderedCache = new LinkedHashMap<>();
+    private final Set<String> participants = new HashSet<>();
 
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+
+    @Override
     public Optional<TennisMatch> get(UUID id) {
-        return Optional.ofNullable(cache.get(id));
+        lock.readLock().lock();
+        try {
+            return Optional.ofNullable(cache.get(id));
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
+    @Override
     public List<TennisMatch> getAll() {
-        return cache.values().stream().toList();
+        lock.readLock().lock();
+        try {
+            return new ArrayList<>(cache.values());
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
-    public synchronized void put(TennisMatch match) {
-        UUID id = match.getId();
-        cache.put(id, match);
-        orderedCache.put(id, match);
+    @Override
+    public void put(TennisMatch match) {
+        lock.writeLock().lock();
+        try {
+            validateParticipant(match);
+
+            UUID id = match.getId();
+            cache.put(id, match);
+            addParticipants(match);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
-    public synchronized void remove(UUID id) {
-        cache.remove(id);
-        orderedCache.remove(id);
+    @Override
+    public void remove(UUID id) {
+        lock.writeLock().lock();
+        try {
+            cache.remove(id);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
-    public synchronized List<TennisMatch> getOldest(int count) {
-        return orderedCache.values().stream()
-                .limit(count)
-                .toList();
+    @Override
+    public int matchesCount() {
+        lock.readLock().lock();
+        try {
+            return cache.size();
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    public boolean checkCurrentParticipant(String name) {
+        lock.readLock().lock();
+        try {
+            return participants.contains(name);
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    private void validateParticipant(TennisMatch match) {
+        if (checkCurrentParticipant(match.getPlayerOneName()) ||
+            checkCurrentParticipant(match.getPlayerTwoName())) {
+            throw new IllegalStateException("Participant is already involved in an ongoing match");
+        }
+    }
+
+    private void addParticipants(TennisMatch match) {
+        participants.add(match.getPlayerOneName());
+        participants.add(match.getPlayerTwoName());
     }
 }

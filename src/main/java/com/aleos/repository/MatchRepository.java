@@ -24,20 +24,24 @@ public class MatchRepository {
         return ongoingMatchCache.get(id);
     }
 
-    public List<TennisMatch> findAllOngoing() {
-        return ongoingMatchCache.getAll();
+    public List<TennisMatch> findAllOngoingBefore(Instant before, int offset, int limit) {
+        return ongoingMatchCache.getAll().stream()
+                .filter(match -> match.getCreatedAt().isBefore(before))
+                .skip(offset)
+                .limit(limit)
+                .toList();
     }
 
-    public Match saveConcluded(Match match) {
-        return matchDao.save(match);
+    public void saveConcluded(Match match) {
+        matchDao.save(match);
     }
 
     public Optional<Match> findConcluded(@NonNull UUID id) {
         return matchDao.findById(id);
     }
 
-    public List<Match> findAllConcluded(Instant before, int limit) {
-        return matchDao.findAllBefore(before, limit);
+    public List<Match> findAllConcludedBefore(Instant before, int offset, int limit) {
+        return matchDao.findAllBefore(before, offset, limit);
     }
 
     public void removeOngoingFromCache(UUID id) {
@@ -46,5 +50,13 @@ public class MatchRepository {
 
     public void removeConcluded(UUID id) {
         matchDao.delete(id);
+    }
+
+    public int countAllOngoing() {
+        return ongoingMatchCache.matchesCount();
+    }
+
+    public int countAllConcluded(Instant instant) {
+        return matchDao.countAllBefore(instant);
     }
 }
