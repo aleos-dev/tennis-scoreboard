@@ -19,10 +19,15 @@ public class ScoreTrackerService implements PropertyChangeListener {
 
     private final Map<UUID, MatchScore> scores = new ConcurrentHashMap<>();
 
+    public Optional<MatchScore> findById(UUID id) {
+        return Optional.of(scores.get(id));
+    }
+
     public void trackMatch(TennisMatch match) {
         match.addPropertyChangeListener(new WeakReference<>(this).get());
         scores.put(match.getId(), new MatchScore(match.getId(), match.getPlayerOneName(), match.getPlayerTwoName()));
     }
+
 
     public void untrackMatch(UUID id) {
         scores.remove(id);
