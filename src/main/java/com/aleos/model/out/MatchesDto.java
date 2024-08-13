@@ -7,7 +7,6 @@ public record MatchesDto (
     List<MatchDto> content,
 
     int page,
-    int size,
     int totalPages,
     int totalItems
  ) {

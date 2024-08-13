@@ -1,17 +1,22 @@
 package com.aleos.model.out;
 
-import com.aleos.model.entity.Player;
 import com.aleos.model.enums.MatchStatus;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.util.UUID;
 
-public class MatchDto {
+@Getter
+@Setter
+@RequiredArgsConstructor
+public abstract class MatchDto {
 
-    private UUID id;
+    protected final UUID id;
 
-    private Player playerOne;
+    protected final String playerOne;
 
-    private Player playerTwo;
+    protected final String playerTwo;
 
-    private MatchStatus status;
+    protected final MatchStatus status;
 }
