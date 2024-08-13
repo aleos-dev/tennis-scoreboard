@@ -1,6 +1,7 @@
 package com.aleos.configuration;
 
 import com.aleos.annotation.Bean;
+import com.aleos.mapper.MatchMapper;
 import com.aleos.repository.MatchDao;
 import com.aleos.repository.MatchRepository;
 import com.aleos.repository.PlayerDao;
@@ -15,6 +16,7 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.flywaydb.core.Flyway;
+import org.modelmapper.ModelMapper;
 
 public class AppConfiguration {
 
@@ -41,8 +43,19 @@ public class AppConfiguration {
     @Bean
     public MatchService matchService(@Bean(name = "matchRepository") MatchRepository matchRepository,
                                      @Bean(name = "playerDao") PlayerDao playerDao,
-                                     @Bean(name = "scoreTrackerService") ScoreTrackerService scoreTrackerService) {
-        return new MatchService(matchRepository, playerDao, scoreTrackerService);
+                                     @Bean(name = "scoreTrackerService") ScoreTrackerService scoreTrackerService,
+                                     @Bean(name = "matchMapper")MatchMapper matchMapper) {
+        return new MatchService(matchRepository, playerDao, scoreTrackerService, matchMapper);
+    }
+
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
+    }
+    @Bean
+    public MatchMapper matchMapper(@Bean(name = "modelMapper") ModelMapper modelMapper,
+                                   @Bean(name = "scoreTrackerService") ScoreTrackerService scoreTrackerService) {
+        return new MatchMapper(modelMapper, scoreTrackerService);
     }
 
     @Bean
