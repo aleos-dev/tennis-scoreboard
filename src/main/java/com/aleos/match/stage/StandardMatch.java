@@ -13,6 +13,7 @@ import lombok.NonNull;
 
 import java.beans.PropertyChangeEvent;
 import java.lang.ref.WeakReference;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -31,6 +32,9 @@ public class StandardMatch<C extends TennisSet> extends AbstractStage<TennisMatc
     @Getter
     private final MatchFormat matchFormat;
 
+    @Getter
+    private Instant createdAt;
+
     private C currentSet;
 
     public StandardMatch(@NonNull Supplier<ScoringStrategy<TennisMatch>> strategySupplier,
@@ -41,6 +45,7 @@ public class StandardMatch<C extends TennisSet> extends AbstractStage<TennisMatc
         this.matchFormat = scoringStrategy.getClass().isAssignableFrom(TennisMatchScoringStrategy.Bo3.class)
                 ? MatchFormat.BO3
                 : MatchFormat.BO5;
+        createdAt = Instant.now();
     }
 
     @Override

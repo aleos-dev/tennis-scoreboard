@@ -1,5 +1,6 @@
 package com.aleos.match.stage;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,4 +19,6 @@ public interface TennisMatch extends Stage {
     void setPlayerTwo(String playerTwo);
 
     Optional<String> getMatchWinner();
+
+    Instant getCreatedAt();
 }
