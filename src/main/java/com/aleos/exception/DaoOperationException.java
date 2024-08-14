@@ -6,6 +6,7 @@ public class DaoOperationException extends RuntimeException {
         super(message);
     }
 
-    public DaoOperationException(String s, Exception e) {
+    public DaoOperationException(String message, Exception e) {
+        super(message, e);
     }
 }
