@@ -56,8 +56,8 @@ public class MatchDao extends CrudDao<Match, UUID> {
 
     public int countAllBefore(Instant instant) {
         String countAllAfterSql = """
-                SELECT COUNT()
-                FROM Match
+                SELECT COUNT(m)
+                FROM Match m
                 WHERE concludedAt < :instant
                 """;
 
