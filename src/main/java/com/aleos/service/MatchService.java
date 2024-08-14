@@ -7,7 +7,9 @@ import com.aleos.mapper.MatchMapper;
 import com.aleos.match.creation.StageFactory;
 import com.aleos.match.model.enums.MatchEvent;
 import com.aleos.match.stage.TennisMatch;
+import com.aleos.model.MatchScore;
 import com.aleos.model.entity.Match;
+import com.aleos.model.entity.MatchInfo;
 import com.aleos.model.entity.Player;
 import com.aleos.model.in.MatchPayload;
 import com.aleos.model.in.PageablePayload;
@@ -45,24 +47,29 @@ public class MatchService implements PropertyChangeListener {
     }
 
     public MatchesDto findAll(PageablePayload pageable) {
-        int limit = pageable.limit();
-        int offset = (pageable.page() - 1) * limit;
+        int size = pageable.size();
+        int offset = (pageable.page() - 1) * size;
 
         int totalOngoingCount = matchRepository.countAllOngoing();
 
         List<ActiveMatchDto> ongoingMatches = matchRepository
-                .findAllOngoingBefore(pageable.lastTimestamp(), offset, limit).stream()
+                .findAllOngoingByCriteria(size, offset, pageable.before()).stream()
                 .map(mapper::convertToActiveMatchDto)
                 .toList();
 
-        int remainingLimit = limit - ongoingMatches.size();
-
         List<ConcludedMatchDto> concludedMatches = Collections.emptyList();
+        int remainingLimit = size - ongoingMatches.size();
+
         if (remainingLimit > 0) {
             int updatedOffset = ongoingMatches.isEmpty() ? offset - totalOngoingCount : 0;
-            concludedMatches = matchRepository
-                    .findAllConcludedBefore(pageable.lastTimestamp(), updatedOffset, remainingLimit)
-                    .stream()
+
+            concludedMatches = matchRepository.findAllConcludedByCriteria(
+                            remainingLimit,
+                            updatedOffset,
+                            pageable.sortBy(),
+                            pageable.sortDirection(),
+                            pageable.before()
+                    ).stream()
                     .map(mapper::convertToConcludedMatchDto)
                     .toList();
         }
@@ -76,10 +83,10 @@ public class MatchService implements PropertyChangeListener {
 
     private MatchesDto createMatchesDto(List<MatchDto> allMatches, PageablePayload pageable, int totalOngoingCount) {
 
-        int totalConcludedCount = matchRepository.countAllConcluded(pageable.lastTimestamp());
+        int totalConcludedCount = matchRepository.countAllConcluded(pageable.before());
 
         int totalItems = totalOngoingCount + totalConcludedCount;
-        int totalPages = (int) Math.ceil((double) totalItems / pageable.limit());
+        int totalPages = (int) Math.ceil((double) totalItems / pageable.size());
         int currentPage = pageable.page();
 
         return new MatchesDto(allMatches, currentPage, totalPages, totalItems);
@@ -115,16 +122,41 @@ public class MatchService implements PropertyChangeListener {
     }
 
     private void handleFinishedMatch(TennisMatch finishedMatch) {
+        Match matchEntity = convertToMatchEntity(finishedMatch);
+
         matchRepository.removeOngoingFromCache(finishedMatch.getId());
         scoreTrackerService.untrackMatch(finishedMatch.getId());
 
-        Match matchEntity = convertToMatchEntity(finishedMatch);
         matchRepository.saveConcluded(matchEntity);
     }
 
     private Match convertToMatchEntity(TennisMatch tennisMatch) {
-        // Conversion logic here
-        return new Match(); // Placeholder for the conversion logic
+
+        Match match = new Match();
+        String winnerName = tennisMatch.getMatchWinner().orElseThrow(() ->
+                new IllegalStateException("Match should be concluded, id: %s".formatted(tennisMatch.getId())));
+
+        Player playerOne = playerDao.findByName(tennisMatch.getPlayerOneName()).orElseThrow(() ->
+                new IllegalStateException("Match %s must not be started with unregistered player %s"
+                        .formatted(tennisMatch.getId(), tennisMatch.getPlayerOneName())));
+
+        Player playerTwo = playerDao.findByName(tennisMatch.getPlayerTwoName()).orElseThrow(() ->
+                new IllegalStateException("Match %s must not be started with unregistered player %s"
+                        .formatted(tennisMatch.getId(), tennisMatch.getPlayerTwoName())));
+
+        match.setPlayerOne(playerOne);
+        match.setPlayerTwo(playerTwo);
+        match.setWinner(playerOne.getName().equalsIgnoreCase(winnerName) ? playerOne : playerTwo);
+
+        MatchScore matchScore = scoreTrackerService.findById(tennisMatch.getId())
+                .orElseThrow(() -> new IllegalStateException("Match must be tracked until it does not persisted."));
+
+        MatchInfo matchInfo = new MatchInfo();
+        matchInfo.setFormat(tennisMatch.getMatchFormat().name());
+        matchInfo.getHistoryEntries().addAll(matchScore.getHistoryEntries());
+        match.setInfo(matchInfo);
+
+        return match;
     }
 
     private Player getOrCreatePlayerByName(String name) {
@@ -161,7 +193,7 @@ public class MatchService implements PropertyChangeListener {
 
     private void validatePlayerNotInOngoingMatch(String name1, String name2) {
         // todo: good to cache player in hashset
-        matchRepository.findAllOngoingBefore(Instant.now(), 0, 0).stream()
+        matchRepository.findAllOngoingByCriteria(0, 0, Instant.now()).stream()
                 .filter(m -> m.getPlayerOneName().equals(name1) || m.getPlayerOneName().equals(name2) ||
                              m.getPlayerTwoName().equals(name1) || m.getPlayerTwoName().equals(name2))
                 .findAny()
