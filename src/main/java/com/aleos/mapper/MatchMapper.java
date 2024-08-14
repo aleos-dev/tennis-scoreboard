@@ -8,13 +8,10 @@ import com.aleos.model.out.ConcludedMatchDto;
 import com.aleos.service.ScoreTrackerService;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeMap;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.NoSuchElementException;
-
 
 public class MatchMapper {
 
@@ -39,7 +36,7 @@ public class MatchMapper {
                     MatchStatus.ONGOING,
                     scoreTrackerService.findById(source.getId())
                             .orElseThrow(() -> new NoSuchElementException("Score not found for match ID: " + source.getId())),
-                    LocalDateTime.ofInstant(source.getCreatedAt(), ZoneId.systemDefault()).toLocalTime()
+                    LocalDateTime.ofInstant(source.getCreatedAt(), ZoneId.systemDefault())
             );
         };
 
@@ -52,7 +49,7 @@ public class MatchMapper {
                     MatchStatus.FINISHED,
                     source.getWinner().getName(),
                     source.getInfo(),
-                    LocalDate.ofInstant(source.getConcludedAt(), ZoneId.systemDefault())
+                    LocalDateTime.ofInstant(source.getConcludedAt(), ZoneId.systemDefault())
             );
         };
 
