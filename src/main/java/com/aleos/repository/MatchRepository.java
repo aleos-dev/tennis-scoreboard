@@ -2,6 +2,8 @@ package com.aleos.repository;
 
 import com.aleos.match.stage.TennisMatch;
 import com.aleos.model.entity.Match;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -24,13 +26,51 @@ public class MatchRepository {
         return ongoingMatchCache.get(id);
     }
 
-    public List<TennisMatch> findAllOngoingBefore(Instant before, int offset, int limit) {
+    public List<TennisMatch> findAllOngoingByCriteria(int size, int offset, Instant before) {
+        if (size == 0) {
+            size = Integer.MAX_VALUE;
+        }
+
         return ongoingMatchCache.getAll().stream()
                 .filter(match -> match.getCreatedAt().isBefore(before))
                 .skip(offset)
-                .limit(limit)
+                .limit(size)
                 .toList();
     }
+
+
+    public List<Match> findAllConcludedByCriteria(int size,
+                                                  int offset,
+                                                  String sortBy,
+                                                  String sortDirection,
+                                                  Instant timestamp) {
+
+        return matchDao.runWithinTxAndReturn(entityManager -> {
+            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+            CriteriaQuery<Match> cq = cb.createQuery(Match.class);
+            Root<Match> matchRoot = cq.from(Match.class);
+
+            Order order = sortDirection.equalsIgnoreCase("desc") ?
+                    cb.desc(matchRoot.get(sortBy)) :
+                    cb.asc(matchRoot.get(sortBy));
+            cq.orderBy(order);
+
+            Predicate timestampPredicate = cb.lessThan(matchRoot.get("concludedAt"), timestamp);
+
+            cq.where(timestampPredicate);
+
+            TypedQuery<Match> query = entityManager.createQuery(cq);
+            if (offset != 0) {
+                query.setFirstResult(offset);
+            }
+            if (size != 0) {
+                query.setMaxResults(size);
+            }
+
+            return query.getResultList();
+        });
+    }
+
 
     public void saveConcluded(Match match) {
         matchDao.save(match);
@@ -38,10 +78,6 @@ public class MatchRepository {
 
     public Optional<Match> findConcluded(@NonNull UUID id) {
         return matchDao.findById(id);
-    }
-
-    public List<Match> findAllConcludedBefore(Instant before, int offset, int limit) {
-        return matchDao.findAllBefore(before, offset, limit);
     }
 
     public void removeOngoingFromCache(UUID id) {
