@@ -5,7 +5,7 @@ import com.aleos.model.enums.MatchStatus;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -14,11 +14,8 @@ public class ActiveMatchDto extends MatchDto {
 
     private final MatchScore score;
 
-    private final LocalTime startedAt;
-
-    public ActiveMatchDto(UUID id, String p1, String p2, MatchStatus status, MatchScore score, LocalTime startedAt) {
-        super(id, p1, p2, status);
+    public ActiveMatchDto(UUID id, String p1, String p2, MatchStatus status, MatchScore score, LocalDateTime startedAt) {
+        super(id, p1, p2, status, startedAt);
         this.score = score;
-        this.startedAt = startedAt;
     }
 }

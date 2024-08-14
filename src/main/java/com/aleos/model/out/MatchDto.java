@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -19,4 +20,6 @@ public abstract class MatchDto {
     protected final String playerTwo;
 
     protected final MatchStatus status;
+
+    protected final LocalDateTime eventDateTime;
 }
