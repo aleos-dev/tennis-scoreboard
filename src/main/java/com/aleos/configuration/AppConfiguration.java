@@ -38,15 +38,16 @@ public class AppConfiguration {
     }
 
     @Bean
-    public MatchRepository matchRepository(@Bean(name = "matchDao") MatchDao matchDao) {
-        return new MatchRepository(new TennisMatchCache(), matchDao);
+    public MatchRepository matchRepository(@Bean(name = "matchDao") MatchDao matchDao,
+                                           @Bean(name = "playerDao") PlayerDao playerDao) {
+        return new MatchRepository(new TennisMatchCache(), matchDao, playerDao);
     }
 
     @Bean
     public MatchService matchService(@Bean(name = "matchRepository") MatchRepository matchRepository,
                                      @Bean(name = "playerDao") PlayerDao playerDao,
                                      @Bean(name = "scoreTrackerService") ScoreTrackerService scoreTrackerService,
-                                     @Bean(name = "matchMapper")MatchMapper matchMapper) {
+                                     @Bean(name = "matchMapper") MatchMapper matchMapper) {
         return new MatchService(matchRepository, playerDao, scoreTrackerService, matchMapper);
     }
 
@@ -54,6 +55,7 @@ public class AppConfiguration {
     public ModelMapper modelMapper() {
         return new ModelMapper();
     }
+
     @Bean
     public MatchMapper matchMapper(@Bean(name = "modelMapper") ModelMapper modelMapper,
                                    @Bean(name = "scoreTrackerService") ScoreTrackerService scoreTrackerService) {
