@@ -68,4 +68,20 @@ public class MatchDao extends CrudDao<Match, UUID> {
             return query.getSingleResult().intValue();
         });
     }
+
+    public int countAllByIdBefore(Long playerId, Instant instant) {
+        String countAllAfterSql = """
+                SELECT COUNT(m)
+                FROM Match m
+                WHERE concludedAt < :instant AND (playerOne.id = :playerId OR playerTwo.id = :playerId)
+                """;
+
+        return runWithinTxAndReturn(entityManager -> {
+            TypedQuery<Long> query = entityManager.createQuery(countAllAfterSql, Long.class);
+            query.setParameter("instant", instant);
+            query.setParameter("playerId", playerId);
+
+            return query.getSingleResult().intValue();
+        });
+    }
 }
