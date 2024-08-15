@@ -14,4 +14,6 @@ public interface InMemoryStorage<T, K> {
     void remove(K match);
 
     int matchesCount();
+
+    boolean checkCurrentParticipant(String name);
 }
