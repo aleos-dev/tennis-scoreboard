@@ -1,6 +1,7 @@
 package com.aleos.servlet;
 
 import com.aleos.configuration.AppContextAttribute;
+import com.aleos.model.in.MatchFilterCriteria;
 import com.aleos.model.in.PageablePayload;
 import com.aleos.model.out.MatchesDto;
 import com.aleos.service.MatchService;
@@ -13,12 +14,10 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Set;
 
 @WebServlet("/matches")
 public class MatchServlet extends HttpServlet {
@@ -44,16 +43,10 @@ public class MatchServlet extends HttpServlet {
 
         try {
 
-            var pageable = (PageablePayload) request.getAttribute("pageable");
-            Set<ConstraintViolation<PageablePayload>> violations = validator.validate(pageable);
+            var pageable = (PageablePayload) request.getAttribute("pageablePayload");
+            var filterCriteria = (MatchFilterCriteria) request.getAttribute("matchFilterCriteria");
 
-            if (!violations.isEmpty()) {
-
-                String asString = objectMapper.writeValueAsString(violations.toString());
-                response.getWriter().write(asString);
-            }
-
-            MatchesDto all = matchService.findAll(pageable);
+            MatchesDto all = matchService.findAll(pageable, filterCriteria);
 
             String asString = objectMapper.writeValueAsString(all);
             response.getWriter().write(asString);
