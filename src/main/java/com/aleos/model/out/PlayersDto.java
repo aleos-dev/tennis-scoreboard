@@ -9,6 +9,8 @@ public record PlayersDto (
     int page,
     int size,
     int totalPages,
-    int totalItems
+    long totalItems,
+    boolean hasNext,
+    boolean hasPrevious
 ) {
 }

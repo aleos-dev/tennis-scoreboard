@@ -2,6 +2,7 @@ package com.aleos.repository;
 
 
 import com.aleos.model.entity.Player;
+import com.aleos.model.in.PlayerFilterCriteria;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.TypedQuery;
 import lombok.NonNull;
@@ -20,7 +21,7 @@ public class PlayerDao extends CrudDao<Player, Long> {
     public Optional<Player> findByName(@NonNull String name) {
         String findByPlayerNameSql = """
                 FROM Player
-                WHERE   LOWER(name) = :name
+                WHERE name = :name
                 """;
 
         return runWithinTxAndReturn(entityManager -> {
@@ -35,23 +36,18 @@ public class PlayerDao extends CrudDao<Player, Long> {
         });
     }
 
-    public List<Player> findByNamePatternAfter(@NonNull String nameRegex, @NonNull Instant after, int limit) {
+
+
+    public List<Long> findIdsByNamePattern(@NonNull String namePattern) {
         String findByPlayerNameSql = """
+                SELECT id
                 FROM Player
-                WHERE   (LOWER(name) LIKE :name)
-                        AND createdAt > :after
-                ORDER BY instant
+                WHERE name LIKE :queryPattern
                 """;
+        String queryPattern = "%" + namePattern + "%";
 
-        return runWithinTxAndReturn(entityManager -> {
-            TypedQuery<Player> query = entityManager.createQuery(findByPlayerNameSql, Player.class);
-            query.setParameter("name", '%' + nameRegex.toLowerCase(Locale.ROOT) + '%');
-            query.setParameter("after", after);
-            if (limit > 0) {
-                query.setMaxResults(limit);
-            }
-
-            return query.getResultList();
-        });
+        return runWithinTxAndReturn(entityManager -> entityManager.createQuery(findByPlayerNameSql, Long.class)
+                .setParameter("queryPattern", queryPattern)
+                .getResultList());
     }
 }

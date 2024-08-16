@@ -1,19 +1,19 @@
 package com.aleos.model.in;
 
-import com.aleos.validation.ValidMatchStatus;
+import com.aleos.validation.ValidCountryCode;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 
 import java.time.Instant;
 
+public record PlayerFilterCriteria(
 
-public record MatchFilterCriteria(
-
-        @ValidMatchStatus(allowedValues = {"ongoing", "finished", "any"})
-        String status,
+        @ValidCountryCode
+        String country,
 
         @Size(min = 3, max = 50, message = "The name must be between {min} and {max}.")
-        String playerName,
+        String name,
 
         @PastOrPresent(message = "Timestamp must be in the past or present.")
         Instant instant

@@ -1,7 +1,10 @@
 package com.aleos.servlet;
 
 import com.aleos.configuration.AppContextAttribute;
-import com.aleos.model.in.MatchUuidPayload;
+import com.aleos.model.in.MatchFilterCriteria;
+import com.aleos.model.in.MatchPayload;
+import com.aleos.model.in.PageableInfo;
+import com.aleos.model.out.MatchesDto;
 import com.aleos.service.MatchService;
 import com.aleos.servicelocator.ServiceLocator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,9 +18,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
-@WebServlet("/matches/*")
-public class MatchServlet extends HttpServlet {
+@WebServlet("/matches")
+public class MatchesServlet extends HttpServlet {
 
     private transient MatchService matchService;
 
@@ -34,10 +38,12 @@ public class MatchServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
+        var pageable = (PageableInfo) req.getAttribute("pageablePayload");
+        var filterCriteria = (MatchFilterCriteria) req.getAttribute("matchFilterCriteria");
 
-        Object uuidPayload = req.getAttribute("matchUuidPayload");
+        MatchesDto all = matchService.findAll(pageable, filterCriteria);
 
-        handleGetByUuid((MatchUuidPayload) uuidPayload, resp);
+        makeResponse(resp, all);
     }
 
     private void makeResponse(HttpServletResponse resp, Object obj) {
@@ -56,8 +62,18 @@ public class MatchServlet extends HttpServlet {
 
     }
 
-    private void handleGetByUuid(MatchUuidPayload uuidPayload, HttpServletResponse resp) {
-        matchService.findById(uuidPayload)
-                .ifPresent(match -> makeResponse(resp, match));
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            var payload = (MatchPayload) request.getAttribute("matchPayload");
+
+            UUID matchId = matchService.createMatch(payload);
+
+            String asString = objectMapper.writeValueAsString(matchId);
+            response.getWriter().write(asString);
+
+        } catch (Exception e) {
+
+        }
     }
 }

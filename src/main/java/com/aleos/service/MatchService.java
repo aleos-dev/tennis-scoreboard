@@ -13,7 +13,8 @@ import com.aleos.model.entity.MatchInfo;
 import com.aleos.model.entity.Player;
 import com.aleos.model.in.MatchFilterCriteria;
 import com.aleos.model.in.MatchPayload;
-import com.aleos.model.in.PageablePayload;
+import com.aleos.model.in.MatchUuidPayload;
+import com.aleos.model.in.PageableInfo;
 import com.aleos.model.out.ActiveMatchDto;
 import com.aleos.model.out.ConcludedMatchDto;
 import com.aleos.model.out.MatchDto;
@@ -46,31 +47,25 @@ public class MatchService implements PropertyChangeListener {
         return newMatch.getId();
     }
 
-    public MatchesDto findAll(PageablePayload pageable, MatchFilterCriteria filterCriteria) {
+    public MatchesDto findAll(PageableInfo pageable, MatchFilterCriteria filterCriteria) {
 
-        int size = pageable.size();
-        int offset = (pageable.page() - 1) * size;
-
-        int totalOngoingCount = matchRepository.countAllOngoing(filterCriteria);
+        int totalOngoingCount = (int) matchRepository.getOngoingCount(filterCriteria);
 
         List<ActiveMatchDto> ongoingMatches = matchRepository
-                .findAllOngoingByCriteria(size, offset, pageable.before(), filterCriteria).stream()
+                .findAllOngoingByCriteria(pageable, filterCriteria).stream()
                 .map(mapper::convertToActiveMatchDto)
                 .toList();
 
         List<ConcludedMatchDto> concludedMatches = Collections.emptyList();
-        int remainingLimit = size - ongoingMatches.size();
+        int remainingLimit = pageable.getPageSize() - ongoingMatches.size();
 
         if (remainingLimit > 0) {
-            int updatedOffset = ongoingMatches.isEmpty() ? offset - totalOngoingCount : 0;
+            int offsetCorrection = totalOngoingCount > 0 ? Math.max(pageable.getOffset() - totalOngoingCount, 0) : 0;
 
             concludedMatches = matchRepository.findAllConcludedByCriteria(
-                            remainingLimit,
-                            updatedOffset,
-                            pageable.sortBy(),
-                            pageable.sortDirection(),
-                            pageable.before(),
-                            filterCriteria
+                            pageable,
+                            filterCriteria,
+                            offsetCorrection
                     ).stream()
                     .map(mapper::convertToConcludedMatchDto)
                     .toList();
@@ -80,25 +75,36 @@ public class MatchService implements PropertyChangeListener {
         allMatches.addAll(ongoingMatches);
         allMatches.addAll(concludedMatches);
 
-        return createMatchesDto(allMatches, pageable, totalOngoingCount, filterCriteria);
+
+        int totalConcludedCount = (int) matchRepository.getConcludedCount(filterCriteria);
+
+        int totalItems = totalConcludedCount + totalOngoingCount;
+        int totalPages = (int) Math.ceil(totalItems * 1.0 / pageable.getPageSize());
+        boolean hasNext = pageable.getPageNumber() < totalPages;
+        boolean hasPrevious = pageable.getPageNumber() > 1;
+
+        return new MatchesDto(allMatches,
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                totalPages,
+                totalItems,
+                hasNext,
+                hasPrevious
+                );
     }
 
-    private MatchesDto createMatchesDto(List<MatchDto> allMatches,
-                                        PageablePayload pageable,
-                                        int totalOngoingCount,
-                                        MatchFilterCriteria filterCriteria) {
+    public Optional<MatchDto> findById(MatchUuidPayload uuidPayload) {
+        var dtoOptional = matchRepository.findOngoing(uuidPayload.id())
+                .map(mapper::convertToActiveMatchDto)
+                .map(MatchDto.class::cast);
 
-        int totalConcludedCount = matchRepository.countAllConcluded(pageable.before(), filterCriteria);
 
-        int totalItems = totalOngoingCount + totalConcludedCount;
-        int totalPages = (int) Math.ceil((double) totalItems / pageable.size());
-        int currentPage = pageable.page();
+        if (dtoOptional.isPresent()) {
+            return dtoOptional;
+        }
 
-        return new MatchesDto(allMatches, currentPage, totalPages, totalItems);
-    }
-
-    public Optional<TennisMatch> findOngoinMatch(UUID id) {
-        return matchRepository.findOngoing(id);
+        return matchRepository.findConcluded(uuidPayload.id())
+                .map(mapper::convertToConcludedMatchDto);
     }
 
     @Override
