@@ -59,7 +59,7 @@ public class TennisMatchCache implements InMemoryStorage<TennisMatch, UUID> {
     }
 
     @Override
-    public int matchesCount() {
+    public int size() {
         lock.readLock().lock();
         try {
             return cache.size();

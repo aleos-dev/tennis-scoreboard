@@ -13,7 +13,7 @@ public interface InMemoryStorage<T, K> {
 
     void remove(K match);
 
-    int matchesCount();
+    int size();
 
     boolean checkCurrentParticipant(String name);
 }
