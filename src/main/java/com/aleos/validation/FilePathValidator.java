@@ -10,7 +10,7 @@ public class FilePathValidator implements ConstraintValidator<ValidFilePath, Str
     @Override
     public boolean isValid(String filePath, ConstraintValidatorContext context) {
         if (filePath == null || filePath.trim().isEmpty()) {
-            return false;
+            return true;
         }
         File file = new File(filePath);
         return file.exists() && !file.isDirectory();
