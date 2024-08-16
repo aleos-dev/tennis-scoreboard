@@ -1,12 +1,12 @@
 package com.aleos.configuration;
 
+import com.aleos.ImageService;
 import com.aleos.annotation.Bean;
 import com.aleos.mapper.MatchMapper;
-import com.aleos.repository.MatchDao;
-import com.aleos.repository.MatchRepository;
-import com.aleos.repository.PlayerDao;
-import com.aleos.repository.TennisMatchCache;
+import com.aleos.mapper.PlayerMapper;
+import com.aleos.repository.*;
 import com.aleos.service.MatchService;
+import com.aleos.service.PlayerService;
 import com.aleos.service.ScoreTrackerService;
 import com.aleos.util.PropertiesUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -84,6 +84,32 @@ public class AppConfiguration {
 
         return Persistence.createEntityManagerFactory(
                 PropertiesUtil.get("hibernate.persistence.unit.name").orElse("default"));
+    }
+
+    @Bean
+    public ImageService imageService() {
+        return new ImageService();
+    }
+
+    @Bean
+    public PlayerMapper playerMapper(
+            @Bean(name = "modelMapper") ModelMapper mapper,
+            @Bean(name = "imageService") ImageService imageService
+    ) {
+        return new PlayerMapper(mapper, imageService);
+    }
+
+    @Bean
+    public PlayerService playerService(
+            @Bean(name = "playerRepository") PlayerRepository repository,
+            @Bean(name = "playerMapper") PlayerMapper mapper
+    ) {
+        return new PlayerService(repository, mapper);
+    }
+
+    @Bean
+    public PlayerRepository playerRepository(@Bean(name = "playerDao") PlayerDao playerDao) {
+        return new PlayerRepository(playerDao);
     }
 
     @Bean
