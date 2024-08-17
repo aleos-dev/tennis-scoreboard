@@ -12,9 +12,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = DifferentPlayersValidator.class)
 public @interface DifferentPlayers {
+
     String message() default "Player names must be unique.";
 
-    Class<?>[] group() default {};
+    Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
 }

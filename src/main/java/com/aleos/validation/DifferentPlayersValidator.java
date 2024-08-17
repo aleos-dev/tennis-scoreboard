@@ -8,6 +8,6 @@ public class DifferentPlayersValidator implements ConstraintValidator<DifferentP
 
     @Override
     public boolean isValid(MatchPayload value, ConstraintValidatorContext context) {
-        return value != null && value.playerOneName().equalsIgnoreCase(value.playerTwoName());
+        return !(value == null || value.playerOneName().equalsIgnoreCase(value.playerTwoName()));
     }
 }
