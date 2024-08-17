@@ -1,11 +1,8 @@
 package com.aleos.servlet;
 
 import com.aleos.configuration.AppContextAttribute;
-import com.aleos.model.in.PageableInfo;
-import com.aleos.model.in.PlayerFilterCriteria;
 import com.aleos.model.in.PlayerNamePayload;
 import com.aleos.model.in.PlayerPayload;
-import com.aleos.model.out.PlayersDto;
 import com.aleos.service.PlayerService;
 import com.aleos.servicelocator.ServiceLocator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -56,15 +53,11 @@ public class PlayerServlet extends HttpServlet {
 
     }
 
-    @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            var payload = (PlayerPayload) request.getAttribute("playerPayload");
+    public void doPut(HttpServletRequest req, HttpServletResponse resp) {
+        var identifier = req.getAttribute("playerNamePayload");
+        var payload = req.getAttribute("playerPayload");
 
-            playerService.createPlayer(payload);
-
-        } catch(Exception e ) {
-
-        }
+        playerService.update((PlayerNamePayload) identifier, (PlayerPayload) payload);
+        resp.setStatus(204);
     }
 }
