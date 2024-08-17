@@ -16,9 +16,13 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @WebFilter("/matches")
 public class MatchFilter extends AbstractEndpointFilter {
+
+    private static final Logger logger = Logger.getLogger(MatchFilter.class.getName());
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse resp, FilterChain chain)
@@ -35,39 +39,59 @@ public class MatchFilter extends AbstractEndpointFilter {
 
         if (req.getAttribute("violations") == null) {
             chain.doFilter(req, resp);
-        } {
-            System.out.println(req.getAttribute("violations").toString());
+        } else {
+
+            logger.log(Level.SEVERE, req.getAttribute("violations").toString());
         }
     }
 
     private void handleGetMethodPayload(HttpServletRequest req, HttpServletResponse resp) {
         if (req.getPathInfo() == null) {
 
-            // /matches
-            handleMainContext(req, resp);
+            // -> /matches
+            extractPageablePayloadToReqContext(req, resp);
+            extractMatchFilterCriteriaToReqContext(req, resp);
+
         } else {
 
-            // /matches/{uuid}
-            handleIndividualContext(req);
+            // -> /matches/{uuid}
+            extractMatchUuidPayloadToReqContext(req);
         }
     }
 
-    private void handleMainContext(HttpServletRequest req, HttpServletResponse resp) {
-        var pageablePayload = getPageablePayload(req);
-        var matchFilterCriteria = getMatchFilterCriteria(req);
+    private void handlePostMethodPayload(HttpServletRequest req, HttpServletResponse resp) {
+        extractMatchPayloadToReqContext(req, resp);
+    }
 
-        validatePayload(pageablePayload).ifPresentOrElse(
-                violations -> handlePayloadViolations(req, resp, violations),
-                () -> req.setAttribute("pageablePayload", pageablePayload));
+    private void extractMatchUuidPayloadToReqContext(HttpServletRequest req) {
+        var matchUuidPayload = getMatchUuidPayload(req);
+        req.setAttribute("matchUuidPayload", matchUuidPayload);
+    }
+
+    private void extractMatchFilterCriteriaToReqContext(HttpServletRequest req, HttpServletResponse resp) {
+        var matchFilterCriteria = getMatchFilterCriteria(req);
 
         validatePayload(matchFilterCriteria).ifPresentOrElse(
                 violations -> handlePayloadViolations(req, resp, violations),
                 () -> req.setAttribute("matchFilterCriteria", matchFilterCriteria));
     }
 
-    private void handleIndividualContext(HttpServletRequest req) {
-        var matchUuidPayload = getMatchUuidPayload(req);
-        req.setAttribute("matchUuidPayload", matchUuidPayload);
+
+    private void extractPageablePayloadToReqContext(HttpServletRequest req, HttpServletResponse resp) {
+        var pageablePayload = getPageablePayload(req);
+
+        validatePayload(pageablePayload).ifPresentOrElse(
+                violations -> handlePayloadViolations(req, resp, violations),
+                () -> req.setAttribute("pageablePayload", pageablePayload));
+    }
+
+    private void extractMatchPayloadToReqContext(HttpServletRequest req, HttpServletResponse resp) {
+        MatchPayload matchPayload = getMatchPayload(req);
+
+        validatePayload(matchPayload).ifPresentOrElse(
+                violations -> handlePayloadViolations(req, resp, violations),
+                () -> req.setAttribute("matchPayload", matchPayload)
+        );
     }
 
     private MatchUuidPayload getMatchUuidPayload(HttpServletRequest req) {
@@ -85,12 +109,11 @@ public class MatchFilter extends AbstractEndpointFilter {
         }
     }
 
-    private void handlePostMethodPayload(HttpServletRequest req, HttpServletResponse resp) {
-        MatchPayload matchPayload = getMatchPayload(req);
-
-        validatePayload(matchPayload).ifPresentOrElse(
-                violations -> handlePayloadViolations(req, resp, violations),
-                () -> req.setAttribute("matchPayload", matchPayload)
+    private MatchPayload getMatchPayload(HttpServletRequest req) {
+        return new MatchPayload(
+                req.getParameter("playerOneName"),
+                req.getParameter("playerTwoName"),
+                req.getParameter("matchFormat")
         );
     }
 
@@ -115,14 +138,6 @@ public class MatchFilter extends AbstractEndpointFilter {
                 Optional.ofNullable(req.getParameter("instant"))
                         .map(this::toInstant)
                         .orElse(Instant.now())
-        );
-    }
-
-    private MatchPayload getMatchPayload(HttpServletRequest req) {
-        return new MatchPayload(
-                req.getParameter("playerOneName"),
-                req.getParameter("playerTwoName"),
-                req.getParameter("matchFormat")
         );
     }
 }
