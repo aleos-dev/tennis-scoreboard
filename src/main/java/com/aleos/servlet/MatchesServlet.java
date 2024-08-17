@@ -63,8 +63,7 @@ public class MatchesServlet extends HttpServlet {
     }
 
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) {
-        try {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
             var payload = (MatchPayload) request.getAttribute("matchPayload");
 
             UUID matchId = matchService.createMatch(payload);
@@ -72,8 +71,5 @@ public class MatchesServlet extends HttpServlet {
             String asString = objectMapper.writeValueAsString(matchId);
             response.getWriter().write(asString);
 
-        } catch (Exception e) {
-
-        }
     }
 }
