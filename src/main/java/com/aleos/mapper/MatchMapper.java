@@ -58,7 +58,15 @@ public class MatchMapper {
     }
 
     public ActiveMatchDto convertToActiveMatchDto(TennisMatch tennisMatch) {
-        return mapper.map(tennisMatch, ActiveMatchDto.class);
+        return new ActiveMatchDto(
+                tennisMatch.getId(),
+                tennisMatch.getPlayerOneName(),
+                tennisMatch.getPlayerTwoName(),
+                MatchStatus.ONGOING,
+                scoreTrackerService.findById(tennisMatch.getId())
+                        .orElseThrow(() -> new NoSuchElementException("Score not found for match ID: " + tennisMatch.getId())),
+                LocalDateTime.ofInstant(tennisMatch.getCreatedAt(), ZoneId.systemDefault())
+        );
     }
 
     public ConcludedMatchDto convertToConcludedMatchDto(Match match) {
