@@ -1,4 +1,4 @@
-Plpackage com.aleos.mapper;
+package com.aleos.mapper;
 
 import com.aleos.ImageService;
 import com.aleos.model.entity.Player;
