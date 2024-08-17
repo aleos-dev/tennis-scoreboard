@@ -177,6 +177,7 @@ public class MatchService implements PropertyChangeListener {
                     player.setName(name);
                     player.setImagePath(ImageService.DEFAULT_PLAYER_IMAGE_PATH);
 
+                    playerDao.save(player);
                     return player;
                 });
     }
