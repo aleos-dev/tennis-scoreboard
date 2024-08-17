@@ -1,8 +1,10 @@
 package com.aleos.repository;
 
+import com.aleos.exception.EntityNotFoundDbException;
 import com.aleos.model.entity.Player;
 import com.aleos.model.in.Pageable;
 import com.aleos.model.in.PlayerFilterCriteria;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
@@ -75,6 +77,21 @@ public class PlayerRepository {
         });
     }
 
+    public void update(String nameIdentifier, Player playerToUpdate) {
+        playerDao.runWithinTx(entityManager -> {
+            try {
+                TypedQuery<Player> query = entityManager.createQuery("FROM Player WHERE name = :name", Player.class);
+                query.setParameter("name", nameIdentifier);
+                Player foundedPlayer = query.getSingleResult();
+
+                playerToUpdate.setId(foundedPlayer.getId());
+                entityManager.merge(playerToUpdate);
+            } catch (NoResultException e) {
+                  throw new EntityNotFoundDbException("Player: %s not found.".formatted(nameIdentifier));
+            }
+        });
+    }
+
     public long getCount(PlayerFilterCriteria filterCriteria) {
         return playerDao.runWithinTxAndReturn(entityManager -> {
 
@@ -137,5 +154,4 @@ public class PlayerRepository {
             query.setMaxResults(size);
         }
     }
-
 }

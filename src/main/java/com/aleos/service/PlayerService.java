@@ -65,4 +65,9 @@ public class PlayerService {
                 .map(mapper::toDto)
                 .toList();
     }
+
+    public void update(PlayerNamePayload identifier, PlayerPayload payload) {
+        Player entity = mapper.toEntity(payload);
+        repository.update(identifier.name(), entity);
+    }
 }
