@@ -1,4 +1,4 @@
-package com.aleos.model.in;
+package com.aleos.model.dto.in;
 
 import com.aleos.validation.ValidCountryCode;
 import jakarta.validation.constraints.NotNull;

@@ -1,10 +1,10 @@
 package com.aleos.servlet;
 
 import com.aleos.configuration.AppContextAttribute;
-import com.aleos.model.in.MatchFilterCriteria;
-import com.aleos.model.in.MatchPayload;
-import com.aleos.model.in.PageableInfo;
-import com.aleos.model.out.MatchesDto;
+import com.aleos.model.dto.in.MatchFilterCriteria;
+import com.aleos.model.dto.in.MatchPayload;
+import com.aleos.model.dto.in.PageableInfo;
+import com.aleos.model.dto.out.MatchesDto;
 import com.aleos.service.MatchService;
 import com.aleos.servicelocator.ServiceLocator;
 import com.fasterxml.jackson.core.JsonProcessingException;

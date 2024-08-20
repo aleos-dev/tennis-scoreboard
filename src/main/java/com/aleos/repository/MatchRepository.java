@@ -2,9 +2,9 @@ package com.aleos.repository;
 
 import com.aleos.match.stage.TennisMatch;
 import com.aleos.model.entity.Match;
-import com.aleos.model.in.MatchFilterCriteria;
-import com.aleos.model.in.Pageable;
-import com.aleos.model.in.PageableInfo;
+import com.aleos.model.dto.in.MatchFilterCriteria;
+import com.aleos.model.dto.in.Pageable;
+import com.aleos.model.dto.in.PageableInfo;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import lombok.NonNull;

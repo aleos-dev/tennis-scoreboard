@@ -1,4 +1,4 @@
-package com.aleos.model.in;
+package com.aleos.model.dto.in;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

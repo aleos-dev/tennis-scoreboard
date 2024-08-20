@@ -2,8 +2,8 @@ package com.aleos.repository;
 
 import com.aleos.exception.EntityNotFoundDbException;
 import com.aleos.model.entity.Player;
-import com.aleos.model.in.Pageable;
-import com.aleos.model.in.PlayerFilterCriteria;
+import com.aleos.model.dto.in.Pageable;
+import com.aleos.model.dto.in.PlayerFilterCriteria;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;

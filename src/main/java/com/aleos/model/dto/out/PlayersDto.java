@@ -1,4 +1,4 @@
-package com.aleos.model.out;
+package com.aleos.model.dto.out;
 
 import java.util.List;
 

@@ -1,10 +1,10 @@
 package com.aleos.servlet;
 
 import com.aleos.configuration.AppContextAttribute;
-import com.aleos.model.in.PageableInfo;
-import com.aleos.model.in.PlayerFilterCriteria;
-import com.aleos.model.in.PlayerPayload;
-import com.aleos.model.out.PlayersDto;
+import com.aleos.model.dto.in.PageableInfo;
+import com.aleos.model.dto.in.PlayerFilterCriteria;
+import com.aleos.model.dto.in.PlayerPayload;
+import com.aleos.model.dto.out.PlayersDto;
 import com.aleos.service.PlayerService;
 import com.aleos.servicelocator.ServiceLocator;
 import com.fasterxml.jackson.core.JsonProcessingException;

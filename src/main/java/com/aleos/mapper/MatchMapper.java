@@ -4,8 +4,8 @@ import com.aleos.match.stage.StandardMatch;
 import com.aleos.match.stage.TennisMatch;
 import com.aleos.model.entity.Match;
 import com.aleos.model.enums.MatchStatus;
-import com.aleos.model.out.ActiveMatchDto;
-import com.aleos.model.out.ConcludedMatchDto;
+import com.aleos.model.dto.out.ActiveMatchDto;
+import com.aleos.model.dto.out.ConcludedMatchDto;
 import com.aleos.service.ScoreTrackerService;
 import org.modelmapper.ModelMapper;
 

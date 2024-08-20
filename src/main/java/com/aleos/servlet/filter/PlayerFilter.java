@@ -1,10 +1,10 @@
 package com.aleos.servlet.filter;
 
 import com.aleos.exception.InvalidPathInfo;
-import com.aleos.model.in.PageableInfo;
-import com.aleos.model.in.PlayerFilterCriteria;
-import com.aleos.model.in.PlayerNamePayload;
-import com.aleos.model.in.PlayerPayload;
+import com.aleos.model.dto.in.PageableInfo;
+import com.aleos.model.dto.in.PlayerFilterCriteria;
+import com.aleos.model.dto.in.PlayerNamePayload;
+import com.aleos.model.dto.in.PlayerPayload;
 import com.aleos.util.PropertiesUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

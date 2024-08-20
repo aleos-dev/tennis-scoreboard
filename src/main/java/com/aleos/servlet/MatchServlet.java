@@ -1,7 +1,7 @@
 package com.aleos.servlet;
 
 import com.aleos.configuration.AppContextAttribute;
-import com.aleos.model.in.MatchUuidPayload;
+import com.aleos.model.dto.in.MatchUuidPayload;
 import com.aleos.service.MatchService;
 import com.aleos.servicelocator.ServiceLocator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -40,6 +40,11 @@ public class MatchServlet extends HttpServlet {
         handleGetByUuid((MatchUuidPayload) uuidPayload, resp);
     }
 
+    private void handleGetByUuid(MatchUuidPayload uuidPayload, HttpServletResponse resp) {
+        matchService.findById(uuidPayload)
+                .ifPresent(match -> makeResponse(resp, match));
+    }
+
     private void makeResponse(HttpServletResponse resp, Object obj) {
 
         try {
@@ -53,11 +58,5 @@ public class MatchServlet extends HttpServlet {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-    }
-
-    private void handleGetByUuid(MatchUuidPayload uuidPayload, HttpServletResponse resp) {
-        matchService.findById(uuidPayload)
-                .ifPresent(match -> makeResponse(resp, match));
     }
 }

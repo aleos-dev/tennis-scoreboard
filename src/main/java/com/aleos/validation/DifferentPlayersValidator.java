@@ -1,6 +1,6 @@
 package com.aleos.validation;
 
-import com.aleos.model.in.MatchPayload;
+import com.aleos.model.dto.in.MatchPayload;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

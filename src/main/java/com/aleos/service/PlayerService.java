@@ -3,12 +3,12 @@ package com.aleos.service;
 import com.aleos.exceptions.InvalidPageableRequest;
 import com.aleos.mapper.PlayerMapper;
 import com.aleos.model.entity.Player;
-import com.aleos.model.in.PageableInfo;
-import com.aleos.model.in.PlayerFilterCriteria;
-import com.aleos.model.in.PlayerNamePayload;
-import com.aleos.model.in.PlayerPayload;
-import com.aleos.model.out.PlayerDto;
-import com.aleos.model.out.PlayersDto;
+import com.aleos.model.dto.in.PageableInfo;
+import com.aleos.model.dto.in.PlayerFilterCriteria;
+import com.aleos.model.dto.in.PlayerNamePayload;
+import com.aleos.model.dto.in.PlayerPayload;
+import com.aleos.model.dto.out.PlayerDto;
+import com.aleos.model.dto.out.PlayersDto;
 import com.aleos.repository.PlayerRepository;
 import lombok.RequiredArgsConstructor;
 

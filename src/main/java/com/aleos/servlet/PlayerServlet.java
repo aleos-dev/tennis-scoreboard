@@ -1,8 +1,8 @@
 package com.aleos.servlet;
 
 import com.aleos.configuration.AppContextAttribute;
-import com.aleos.model.in.PlayerNamePayload;
-import com.aleos.model.in.PlayerPayload;
+import com.aleos.model.dto.in.PlayerNamePayload;
+import com.aleos.model.dto.in.PlayerPayload;
 import com.aleos.service.PlayerService;
 import com.aleos.servicelocator.ServiceLocator;
 import com.fasterxml.jackson.core.JsonProcessingException;

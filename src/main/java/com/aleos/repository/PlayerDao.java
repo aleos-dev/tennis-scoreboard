@@ -2,14 +2,11 @@ package com.aleos.repository;
 
 
 import com.aleos.model.entity.Player;
-import com.aleos.model.in.PlayerFilterCriteria;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.TypedQuery;
 import lombok.NonNull;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 public class PlayerDao extends CrudDao<Player, Long> {

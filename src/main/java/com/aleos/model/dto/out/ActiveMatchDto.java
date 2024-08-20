@@ -1,4 +1,4 @@
-package com.aleos.model.out;
+package com.aleos.model.dto.out;
 
 import com.aleos.model.MatchScore;
 import com.aleos.model.enums.MatchStatus;

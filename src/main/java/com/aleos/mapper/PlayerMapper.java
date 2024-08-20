@@ -2,8 +2,8 @@ package com.aleos.mapper;
 
 import com.aleos.ImageService;
 import com.aleos.model.entity.Player;
-import com.aleos.model.in.PlayerPayload;
-import com.aleos.model.out.PlayerDto;
+import com.aleos.model.dto.in.PlayerPayload;
+import com.aleos.model.dto.out.PlayerDto;
 import org.modelmapper.ModelMapper;
 
 public class PlayerMapper {
