@@ -55,6 +55,10 @@ public class MatchRepository {
     public List<Match> findAllConcludedByCriteria(@NonNull PageableInfo pageable,
                                                   @NonNull MatchFilterCriteria filterCriteria,
                                                   int offsetCorrection) {
+        if (!isMatchingStatusCriteria(filterCriteria, "finished")) {
+            return Collections.emptyList();
+        }
+
         return matchDao.runWithinTxAndReturn(entityManager -> {
 
             CriteriaBuilder cb = entityManager.getCriteriaBuilder();
