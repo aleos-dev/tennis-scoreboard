@@ -53,7 +53,7 @@ public class MatchService implements PropertyChangeListener {
 
         List<ActiveMatchDto> ongoingMatches = matchRepository
                 .findAllOngoingByCriteria(pageable, filterCriteria).stream()
-                .map(mapper::convertToActiveMatchDto)
+                .map(mapper::toDto)
                 .toList();
 
         List<ConcludedMatchDto> concludedMatches = Collections.emptyList();
@@ -67,7 +67,7 @@ public class MatchService implements PropertyChangeListener {
                             filterCriteria,
                             offsetCorrection
                     ).stream()
-                    .map(mapper::convertToConcludedMatchDto)
+                    .map(mapper::toDto)
                     .toList();
         }
 
@@ -95,7 +95,7 @@ public class MatchService implements PropertyChangeListener {
 
     public Optional<MatchDto> findById(MatchUuidPayload uuidPayload) {
         var dtoOptional = matchRepository.findOngoing(uuidPayload.id())
-                .map(mapper::convertToActiveMatchDto)
+                .map(mapper::toDto)
                 .map(MatchDto.class::cast);
 
 
@@ -104,7 +104,7 @@ public class MatchService implements PropertyChangeListener {
         }
 
         return matchRepository.findConcluded(uuidPayload.id())
-                .map(mapper::convertToConcludedMatchDto);
+                .map(mapper::toDto);
     }
 
     @Override

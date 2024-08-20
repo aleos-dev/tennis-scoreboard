@@ -1,12 +1,12 @@
 package com.aleos.mapper;
 
+import com.aleos.match.stage.StandardMatch;
 import com.aleos.match.stage.TennisMatch;
 import com.aleos.model.entity.Match;
 import com.aleos.model.enums.MatchStatus;
 import com.aleos.model.out.ActiveMatchDto;
 import com.aleos.model.out.ConcludedMatchDto;
 import com.aleos.service.ScoreTrackerService;
-import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 
 import java.time.LocalDateTime;
@@ -22,54 +22,53 @@ public class MatchMapper {
     public MatchMapper(ModelMapper mapper, ScoreTrackerService scoreTrackerService) {
         this.mapper = mapper;
         this.scoreTrackerService = scoreTrackerService;
-        configureMappings();
+        setupMapper();
     }
 
-    private void configureMappings() {
-
-        Converter<TennisMatch, ActiveMatchDto> toActive = context -> {
-            TennisMatch source = context.getSource();
-            return new ActiveMatchDto(
-                    source.getId(),
-                    source.getPlayerOneName(),
-                    source.getPlayerTwoName(),
-                    MatchStatus.ONGOING,
-                    scoreTrackerService.findById(source.getId())
-                            .orElseThrow(() -> new NoSuchElementException("Score not found for match ID: " + source.getId())),
-                    LocalDateTime.ofInstant(source.getCreatedAt(), ZoneId.systemDefault())
-            );
-        };
-
-        Converter<Match, ConcludedMatchDto> toConcluded = context -> {
-            Match source = context.getSource();
-            return new ConcludedMatchDto(
-                    source.getId(),
-                    source.getPlayerOne().getName(),
-                    source.getPlayerTwo().getName(),
-                    MatchStatus.FINISHED,
-                    source.getWinner().getName(),
-                    source.getInfo(),
-                    LocalDateTime.ofInstant(source.getConcludedAt(), ZoneId.systemDefault())
-            );
-        };
-
-        mapper.createTypeMap(TennisMatch.class, ActiveMatchDto.class).setConverter(toActive);
-        mapper.createTypeMap(Match.class, ConcludedMatchDto.class).setConverter(toConcluded);
+    public ActiveMatchDto toDto(TennisMatch tennisMatch) {
+        return mapper.map(tennisMatch, ActiveMatchDto.class);
     }
 
-    public ActiveMatchDto convertToActiveMatchDto(TennisMatch tennisMatch) {
-        return new ActiveMatchDto(
-                tennisMatch.getId(),
-                tennisMatch.getPlayerOneName(),
-                tennisMatch.getPlayerTwoName(),
-                MatchStatus.ONGOING,
-                scoreTrackerService.findById(tennisMatch.getId())
-                        .orElseThrow(() -> new NoSuchElementException("Score not found for match ID: " + tennisMatch.getId())),
-                LocalDateTime.ofInstant(tennisMatch.getCreatedAt(), ZoneId.systemDefault())
-        );
-    }
-
-    public ConcludedMatchDto convertToConcludedMatchDto(Match match) {
+    public ConcludedMatchDto toDto(Match match) {
         return mapper.map(match, ConcludedMatchDto.class);
+    }
+
+    private void setupMapper() {
+        setConverterFromStandardMatchToActiveMatchDto();
+        setConverterFromMatchToConcludedMatchDto();
+    }
+
+    private void setConverterFromStandardMatchToActiveMatchDto() {
+        mapper.createTypeMap(StandardMatch.class, ActiveMatchDto.class)
+                .setConverter(context -> {
+                    TennisMatch source = context.getSource();
+
+                    return new ActiveMatchDto(
+                            source.getId(),
+                            source.getPlayerOneName(),
+                            source.getPlayerTwoName(),
+                            MatchStatus.ONGOING,
+                            scoreTrackerService.findById(source.getId())
+                                    .orElseThrow(() -> new NoSuchElementException("Score not found for match ID: " + source.getId())),
+                            LocalDateTime.ofInstant(source.getCreatedAt(), ZoneId.systemDefault())
+                    );
+                });
+    }
+
+    private void setConverterFromMatchToConcludedMatchDto() {
+        mapper.createTypeMap(Match.class, ConcludedMatchDto.class)
+                .setConverter(context -> {
+                    Match source = context.getSource();
+
+                    return new ConcludedMatchDto(
+                            source.getId(),
+                            source.getPlayerOne().getName(),
+                            source.getPlayerTwo().getName(),
+                            MatchStatus.FINISHED,
+                            source.getWinner().getName(),
+                            source.getInfo(),
+                            LocalDateTime.ofInstant(source.getConcludedAt(), ZoneId.systemDefault())
+                    );
+                });
     }
 }
