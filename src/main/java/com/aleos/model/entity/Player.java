@@ -43,5 +43,5 @@ public class Player {
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    Instant createdAt = now();
+    private Instant createdAt = now();
 }
