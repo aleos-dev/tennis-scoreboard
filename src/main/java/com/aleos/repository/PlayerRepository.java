@@ -8,10 +8,12 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.TypeMap;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class PlayerRepository {
@@ -73,8 +75,16 @@ public class PlayerRepository {
                 jpaQuery.setParameter("country", filterCriteria.country().toUpperCase());
             }
 
+            if (filterCriteria.before() != null) {
+                jpaQuery.setParameter("before", filterCriteria.before());
+            }
+
             return jpaQuery.getResultList();
         });
+    }
+
+    public Optional<Player> findByName(String name) {
+        return playerDao.findByName(name);
     }
 
     public void update(String nameIdentifier, Player playerToUpdate) {

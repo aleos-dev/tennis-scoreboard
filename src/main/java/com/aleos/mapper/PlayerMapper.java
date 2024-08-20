@@ -6,6 +6,9 @@ import com.aleos.model.dto.in.PlayerPayload;
 import com.aleos.model.dto.out.PlayerDto;
 import org.modelmapper.ModelMapper;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 public class PlayerMapper {
 
     private final ModelMapper mapper;
@@ -39,7 +42,9 @@ public class PlayerMapper {
         mapper.createTypeMap(Player.class, PlayerDto.class)
                 .setConverter(context -> {
                     Player source = context.getSource();
-                    String matchesEndpoint = String.format("/matches?playerName=%s", source.getName());
+
+                    String encodedName = URLEncoder.encode(source.getName(), StandardCharsets.UTF_8);
+                    String matchesEndpoint = String.format("/matches?playerName=%s", encodedName);
                     String avatarImageUrl = source.getImagePath();
                     String countryImageUrl = imageService.resolveImageUrlForCountry(source.getCountry());
 

@@ -40,7 +40,7 @@ public class PlayerServlet extends HttpServlet {
 
             var players = playerService.findByName(payload);
 
-            String asString = objectMapper.writeValueAsString(players);
+            String asString = objectMapper.writeValueAsString(players.get());
             response.getWriter().write(asString);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

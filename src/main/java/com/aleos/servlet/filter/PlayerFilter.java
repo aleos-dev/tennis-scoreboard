@@ -12,6 +12,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -120,12 +122,17 @@ public class PlayerFilter extends AbstractEndpointFilter {
     }
 
     private PlayerNamePayload getPlayerNamePayload(HttpServletRequest req) {
-        return new PlayerNamePayload(req.getParameter("name"));
+        var skipSlash = 1;
+        var name = req.getPathInfo().substring(skipSlash);
+        var decoded = URLDecoder.decode(name, StandardCharsets.UTF_8);
+
+        return new PlayerNamePayload(decoded);
     }
 
     private PlayerFilterCriteria getPlayerFilterCriteria(HttpServletRequest req) {
+        var country = req.getParameter("country");
         return new PlayerFilterCriteria(
-                req.getParameter("country"),
+                country != null ? country.toUpperCase() : null,
                 req.getParameter("name"),
                 Optional.ofNullable(req.getParameter("before"))
                         .map(this::toInstant)

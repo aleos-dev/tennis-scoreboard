@@ -2,18 +2,17 @@ package com.aleos.service;
 
 import com.aleos.exceptions.InvalidPageableRequest;
 import com.aleos.mapper.PlayerMapper;
-import com.aleos.model.entity.Player;
 import com.aleos.model.dto.in.PageableInfo;
 import com.aleos.model.dto.in.PlayerFilterCriteria;
 import com.aleos.model.dto.in.PlayerNamePayload;
 import com.aleos.model.dto.in.PlayerPayload;
 import com.aleos.model.dto.out.PlayerDto;
 import com.aleos.model.dto.out.PlayersDto;
+import com.aleos.model.entity.Player;
 import com.aleos.repository.PlayerRepository;
 import lombok.RequiredArgsConstructor;
 
-import java.time.Instant;
-import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class PlayerService {
@@ -55,15 +54,8 @@ public class PlayerService {
         );
     }
 
-    public List<PlayerDto> findByName(PlayerNamePayload payload) {
-        String countryCode = null;
-        String playerName = payload.name();
-        Instant instant = Instant.now();
-        var criteria = new PlayerFilterCriteria(countryCode, playerName, instant);
-
-        return repository.findByCriteria(criteria).stream()
-                .map(mapper::toDto)
-                .toList();
+    public Optional<PlayerDto> findByName(PlayerNamePayload payload) {
+        return repository.findByName(payload.name()).map(mapper::toDto);
     }
 
     public void update(PlayerNamePayload identifier, PlayerPayload payload) {
