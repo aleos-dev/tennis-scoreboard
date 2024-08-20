@@ -127,7 +127,7 @@ public class PlayerFilter extends AbstractEndpointFilter {
         return new PlayerFilterCriteria(
                 req.getParameter("country"),
                 req.getParameter("name"),
-                Optional.ofNullable(req.getParameter("instant"))
+                Optional.ofNullable(req.getParameter("before"))
                         .map(this::toInstant)
                         .orElse(Instant.now())
         );

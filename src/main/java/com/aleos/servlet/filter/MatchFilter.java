@@ -135,7 +135,7 @@ public class MatchFilter extends AbstractEndpointFilter {
                 Optional.ofNullable(req.getParameter("status"))
                         .orElseGet(() -> PropertiesUtil.get("filter.default.matchStatus").orElse(null)),
                 req.getParameter("playerName"),
-                Optional.ofNullable(req.getParameter("instant"))
+                Optional.ofNullable(req.getParameter("before"))
                         .map(this::toInstant)
                         .orElse(Instant.now())
         );

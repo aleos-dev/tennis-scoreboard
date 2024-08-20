@@ -1,7 +1,6 @@
 package com.aleos.model.dto.in;
 
 import com.aleos.validation.ValidCountryCode;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 
@@ -16,6 +15,6 @@ public record PlayerFilterCriteria(
         String name,
 
         @PastOrPresent(message = "Timestamp must be in the past or present.")
-        Instant instant
+        Instant before
 ) {
 }

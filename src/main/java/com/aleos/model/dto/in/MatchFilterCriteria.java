@@ -16,6 +16,6 @@ public record MatchFilterCriteria(
         String playerName,
 
         @PastOrPresent(message = "Timestamp must be in the past or present.")
-        Instant instant
+        Instant before
 ) {
 }

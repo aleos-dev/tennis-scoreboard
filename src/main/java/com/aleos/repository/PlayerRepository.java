@@ -56,8 +56,8 @@ public class PlayerRepository {
             queryBuilder.append(" AND country = :country");
         }
 
-        if (filterCriteria.instant() != null) {
-            queryBuilder.append(" AND instant < :instant");
+        if (filterCriteria.before() != null) {
+            queryBuilder.append(" AND createdAt < :before");
         }
 
         String query = queryBuilder.toString();
@@ -134,8 +134,8 @@ public class PlayerRepository {
             predicates.add(countryPredicate);
         }
 
-        if (filterCriteria.instant() != null) {
-            Instant instant = filterCriteria.instant();
+        if (filterCriteria.before() != null) {
+            Instant instant = filterCriteria.before();
             Predicate timestampPredicate = cb.lessThan(playerRoot.get("createdAt"), instant);
             predicates.add(timestampPredicate);
         }

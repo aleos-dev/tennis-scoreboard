@@ -140,7 +140,7 @@ public class MatchRepository {
 
 
     private boolean isBeforeInstant(Instant instant, MatchFilterCriteria filterCriteria) {
-        return filterCriteria.instant() == null || instant.isBefore(filterCriteria.instant());
+        return filterCriteria.before() == null || instant.isBefore(filterCriteria.before());
     }
 
 
@@ -175,9 +175,8 @@ public class MatchRepository {
             }
         }
 
-        if (filterCriteria.instant() != null) {
-            Instant timestamp = filterCriteria.instant();
-            Predicate timestampPredicate = cb.lessThan(matchRoot.get("concludedAt"), timestamp);
+        if (filterCriteria.before() != null) {
+            Predicate timestampPredicate = cb.lessThan(matchRoot.get("concludedAt"), filterCriteria.before());
             predicates.add(timestampPredicate);
         }
 
