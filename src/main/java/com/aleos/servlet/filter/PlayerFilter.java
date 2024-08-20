@@ -45,7 +45,7 @@ public class PlayerFilter extends AbstractEndpointFilter {
     }
 
     private void handleGetMethodPayload(HttpServletRequest req, HttpServletResponse resp) {
-        if (req.getPathInfo() == null) {
+        if (isRequestForMainPath(req)) {
 
             extractPageablePayloadToReqContext(req, resp);
             extractFilterCriteriaToReqContext(req, resp);
@@ -116,7 +116,7 @@ public class PlayerFilter extends AbstractEndpointFilter {
     private PlayerPayload getPlayerPayload(HttpServletRequest req) {
         return new PlayerPayload(
                 req.getParameter("name"),
-                req.getParameter("country"),
+                req.getParameter("country").toUpperCase(),
                 req.getParameter("imageUrl")
         );
     }

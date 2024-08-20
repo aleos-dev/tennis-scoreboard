@@ -46,7 +46,7 @@ public class MatchFilter extends AbstractEndpointFilter {
     }
 
     private void handleGetMethodPayload(HttpServletRequest req, HttpServletResponse resp) {
-        if (req.getPathInfo() == null) {
+        if (isRequestForMainPath(req)) {
 
             // -> /matches
             extractPageablePayloadToReqContext(req, resp);

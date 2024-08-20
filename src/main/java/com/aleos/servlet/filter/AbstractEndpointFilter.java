@@ -65,4 +65,8 @@ public abstract class AbstractEndpointFilter extends HttpFilter {
                     "The target resource could not be reached.", e);
         }
     }
+
+    protected boolean isRequestForMainPath(HttpServletRequest req) {
+        return req.getPathInfo() == null;
+    }
 }
