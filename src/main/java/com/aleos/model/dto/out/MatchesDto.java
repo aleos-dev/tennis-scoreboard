@@ -1,17 +1,18 @@
 package com.aleos.model.dto.out;
 
+import lombok.Value;
+
 import java.util.List;
 
-public record MatchesDto (
+@Value(staticConstructor = "of")
+public class MatchesDto {
 
-    List<MatchDto> content,
+    List<MatchDto> content;
 
-    int page,
-    int size,
-    int totalPages,
-    long totalItems,
-    boolean hasNext,
-    boolean hasPrevious
-
- ) {
+    int page;
+    int size;
+    int totalPages;
+    long totalItems;
+    boolean hasNext;
+    boolean hasPrevious;
 }
