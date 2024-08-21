@@ -1,7 +1,7 @@
 package com.aleos.servlet.filter;
 
 import com.aleos.configuration.AppContextAttribute;
-import com.aleos.exception.ResourceForwardingException;
+import com.aleos.exception.JspForwardingException;
 import com.aleos.servicelocator.ServiceLocator;
 import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
@@ -53,16 +53,16 @@ public abstract class AbstractEndpointFilter extends HttpFilter {
     }
 
     protected <T> void handlePayloadViolations(HttpServletRequest req,
-                                             HttpServletResponse resp,
-                                             Set<ConstraintViolation<T>> violations
+                                               HttpServletResponse resp,
+                                               Set<ConstraintViolation<T>> violations
     ) {
         req.setAttribute("violations", violations);
         req.setAttribute("errorMessage", "Validation errors occurred. Please correct them and submit again.");
         try {
-            req.getRequestDispatcher("/originPage.jsp").forward(req, resp);
+            req.getRequestDispatcher("/errorPage.jsp").forward(req, resp);
         } catch (ServletException | IOException e) {
-            throw new ResourceForwardingException("Error occurred while dispatching request '/originPage.jsp'. " +
-                    "The target resource could not be reached.", e);
+            throw new JspForwardingException("Error occurred while dispatching request '/originPage.jsp'. " +
+                                             "The target resource could not be reached.", e);
         }
     }
 
