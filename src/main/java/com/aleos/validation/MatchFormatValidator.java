@@ -17,6 +17,6 @@ public class MatchFormatValidator implements ConstraintValidator<ValidMatchForma
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        return supportedFormats.contains(value.toLowerCase(Locale.ROOT));
+        return value != null && supportedFormats.contains(value.toLowerCase(Locale.ROOT));
     }
 }
