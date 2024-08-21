@@ -2,10 +2,12 @@ package com.aleos.model.dto.out;
 
 import com.aleos.model.entity.MatchInfo;
 import com.aleos.model.enums.MatchStatus;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Getter
 public class ConcludedMatchDto extends MatchDto {
 
     private final String winner;
