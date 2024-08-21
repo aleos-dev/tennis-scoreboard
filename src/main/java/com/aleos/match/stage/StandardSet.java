@@ -27,17 +27,12 @@ public class StandardSet<G extends TennisGame> extends AbstractStage<TennisSet> 
 
         super(strategySupplier, managerSupplier);
         this.gameFactory = gameFactory;
+        initGame();
     }
 
     @Override
     public void processScorePoint(Player pointWinner) {
-        if (currentGame == null || currentGame.isOver()) {
-            currentGame = gameFactory.create();
-            currentGame.addPropertyChangeListener(new WeakReference<>(this).get());
-            if (state == TIE_BREAK) {
-                currentGame.setState(TIE_BREAK);
-            }
-        }
+        initGame();
         currentGame.scorePoint(pointWinner);
     }
 
@@ -66,5 +61,15 @@ public class StandardSet<G extends TennisGame> extends AbstractStage<TennisSet> 
     @Override
     public Optional<Stage> getChildStage() {
         return Optional.ofNullable(currentGame);
+    }
+
+    private void initGame() {
+        if (currentGame == null || currentGame.isOver()) {
+            currentGame = gameFactory.create();
+            currentGame.addPropertyChangeListener(new WeakReference<>(this).get());
+            if (state == TIE_BREAK) {
+                currentGame.setState(TIE_BREAK);
+            }
+        }
     }
 }

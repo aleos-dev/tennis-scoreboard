@@ -46,6 +46,7 @@ public class StandardMatch<C extends TennisSet> extends AbstractStage<TennisMatc
                 ? MatchFormat.BO3
                 : MatchFormat.BO5;
         createdAt = Instant.now();
+        initSet();
     }
 
     @Override
@@ -95,11 +96,15 @@ public class StandardMatch<C extends TennisSet> extends AbstractStage<TennisMatc
 
     @Override
     protected void processScorePoint(@NonNull Player pointWinner) {
+        initSet();
+        currentSet.scorePoint(pointWinner);
+    }
+
+    protected void initSet() {
         if (currentSet == null || currentSet.isOver()) {
             currentSet = setFactory.create();
             currentSet.addPropertyChangeListener(new WeakReference<>(this).get());
         }
-        currentSet.scorePoint(pointWinner);
     }
 
     @Override
