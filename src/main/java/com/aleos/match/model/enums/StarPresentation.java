@@ -18,7 +18,8 @@ public enum StarPresentation {
     MATCH_WINNER("🏆"),
     TIE_BREAK("🔥"),
     DEUCE("❤️"),
-    LOSER("-");
+    LOSER("-"),
+    DISADVANTAGE("_");
 
     private final String symbol;
 
@@ -42,7 +43,7 @@ public enum StarPresentation {
         return switch (state) {
             case NOT_STARTED -> createScoreArray(PREPARED.symbol, PREPARED.symbol);
 
-            case ONGOING -> createScoreArray(translateGameScore(score1), translateGameScore(score2));
+            case ONGOING -> handleStandardCase(score1, score2);
 
             case TIE_BREAK -> createScoreArray(TIE_BREAK.symbol + score1, TIE_BREAK.symbol + score2);
 
@@ -50,6 +51,16 @@ public enum StarPresentation {
 
             case FINISHED -> handleFinishedCase(GAME_WINNER.symbol, score1, score2);
         };
+    }
+
+    private static String[] handleStandardCase(int score1, int score2) {
+        if (score1 == 4) {
+            return createScoreArray(translateGameScore(score1), DISADVANTAGE.symbol);
+        }
+        if (score2 == 4) {
+            return createScoreArray(DISADVANTAGE.symbol, translateGameScore(score2));
+        }
+        return createScoreArray(translateGameScore(score1), translateGameScore(score2));
     }
 
     private static String[] translateSetScores(List<ScoreRecord> records) {
