@@ -8,13 +8,10 @@ import com.aleos.match.creation.StageFactory;
 import com.aleos.match.model.enums.MatchEvent;
 import com.aleos.match.stage.TennisMatch;
 import com.aleos.model.MatchScore;
+import com.aleos.model.dto.in.*;
 import com.aleos.model.entity.Match;
 import com.aleos.model.entity.MatchInfo;
 import com.aleos.model.entity.Player;
-import com.aleos.model.dto.in.MatchFilterCriteria;
-import com.aleos.model.dto.in.MatchPayload;
-import com.aleos.model.dto.in.MatchUuidPayload;
-import com.aleos.model.dto.in.PageableInfo;
 import com.aleos.model.dto.out.ActiveMatchDto;
 import com.aleos.model.dto.out.ConcludedMatchDto;
 import com.aleos.model.dto.out.MatchDto;
@@ -83,7 +80,7 @@ public class MatchService implements PropertyChangeListener {
         boolean hasNext = pageable.getPageNumber() < totalPages;
         boolean hasPrevious = pageable.getPageNumber() > 1;
 
-        return new MatchesDto(allMatches,
+        return MatchesDto.of(allMatches,
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
                 totalPages,
@@ -105,6 +102,12 @@ public class MatchService implements PropertyChangeListener {
 
         return matchRepository.findConcluded(uuidPayload.id())
                 .map(mapper::toDto);
+    }
+
+
+    public void scorePoint(MatchUuidPayload matchUuidPayload, PlayerNamePayload playerNamePayload) {
+        Optional<TennisMatch> ongoingOpt = matchRepository.findOngoing(matchUuidPayload.id());
+        ongoingOpt.ifPresent(match -> match.scorePoint(playerNamePayload.name()));
     }
 
     @Override
