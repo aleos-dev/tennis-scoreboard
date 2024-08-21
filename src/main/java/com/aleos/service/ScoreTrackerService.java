@@ -25,7 +25,21 @@ public class ScoreTrackerService implements PropertyChangeListener {
 
     public void trackMatch(TennisMatch match) {
         match.addPropertyChangeListener(new WeakReference<>(this).get());
-        scores.put(match.getId(), new MatchScore(match.getId(), match.getPlayerOneName(), match.getPlayerTwoName()));
+        MatchScore matchScore = new MatchScore(match.getId(), match.getPlayerOneName(), match.getPlayerTwoName());
+        initMatchScore(matchScore, match);
+        scores.put(match.getId(), matchScore);
+    }
+
+    private void initMatchScore(MatchScore matchScore, TennisMatch match) {
+        matchScore.setScoreSets(match.getScoreManager().getScoresPresentation(StarPresentation::translateScores));
+
+        match.getChildStage().ifPresent(set -> {
+
+            matchScore.setScoreGames(set.getScoreManager().getScoresPresentation(StarPresentation::translateScores));
+
+            set.getChildStage().ifPresent(game -> matchScore.setScorePoints(
+                    game.getScoreManager().getScoresPresentation(StarPresentation::translateScores)));
+        });
     }
 
 
