@@ -4,6 +4,7 @@ import com.aleos.configuration.AppContextAttribute;
 import com.aleos.model.MatchScore;
 import com.aleos.model.dto.in.MatchUuidPayload;
 import com.aleos.model.dto.in.PlayerNamePayload;
+import com.aleos.model.dto.out.ConcludedMatchDto;
 import com.aleos.service.MatchService;
 import com.aleos.service.ScoreTrackerService;
 import com.aleos.servicelocator.ServiceLocator;
@@ -14,7 +15,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.util.Optional;
+import java.util.function.Consumer;
 
 @WebServlet("/match-scores/*")
 public class ScoreServlet extends HttpServlet {
@@ -23,7 +24,6 @@ public class ScoreServlet extends HttpServlet {
 
     private transient ScoreTrackerService trackerService;
 
-
     @Override
     public void init(ServletConfig config) {
         var locator = (ServiceLocator) config.getServletContext().getAttribute(AppContextAttribute.BEAN_FACTORY.name());
@@ -31,19 +31,16 @@ public class ScoreServlet extends HttpServlet {
         trackerService = (ScoreTrackerService) locator.getBean("scoreTrackerService");
     }
 
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         var uuidPayload = (MatchUuidPayload) req.getAttribute("matchUuidPayload");
 
-        Optional<MatchScore> scoreById = trackerService.findById(uuidPayload.id());
-        scoreById.ifPresent(score -> req.setAttribute("matchScore", score));
-
         trackerService.findById(uuidPayload.id())
-                .flatMap(MatchScore::pollNotification)
-                .ifPresent(message -> req.setAttribute("notification", message));
+                .ifPresentOrElse(
+                        handleOngoingMatch(req, resp),
+                        () -> handleConcludedMatch(req, resp, uuidPayload)
+                );
 
-        ServletUtil.forwardToJsp(req, resp, "control/activeMatch");
     }
 
     @Override
@@ -55,5 +52,22 @@ public class ScoreServlet extends HttpServlet {
 
 
         ServletUtil.redirect(req, resp, matchUuidPayload.id().toString());
+    }
+
+    private Consumer<MatchScore> handleOngoingMatch(HttpServletRequest req, HttpServletResponse resp) {
+        return score -> {
+            req.setAttribute("matchScore", score);
+            req.setAttribute("notifications", score.getNotifications());
+            ServletUtil.forwardToJsp(req, resp, "control/live-match");
+        };
+    }
+
+    private void handleConcludedMatch(HttpServletRequest req, HttpServletResponse resp, MatchUuidPayload uuidPayload) {
+        matchService.findById(uuidPayload)
+                .filter(ConcludedMatchDto.class::isInstance)
+                .map(ConcludedMatchDto.class::cast)
+                .ifPresent(concludedMatch -> req.setAttribute("concludedMatch", concludedMatch));
+
+        ServletUtil.forwardToJsp(req, resp, "display/completed-match");
     }
 }

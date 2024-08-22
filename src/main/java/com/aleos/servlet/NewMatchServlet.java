@@ -11,6 +11,6 @@ public class NewMatchServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        ServletUtil.forwardToJsp(req, resp, "control/createMatch");
+        ServletUtil.forwardToJsp(req, resp, "control/create-match");
     }
 }

@@ -1,44 +1,51 @@
 package com.aleos.service;
 
-import com.aleos.match.model.enums.MatchEvent;
-import com.aleos.match.model.enums.Player;
-import com.aleos.match.model.enums.StarPresentation;
+import com.aleos.match.model.ScoreRecord;
+import com.aleos.match.model.enums.*;
 import com.aleos.match.scoremanager.ScoreManager;
+import com.aleos.match.stage.Stage;
+import com.aleos.match.stage.StandardMatch;
 import com.aleos.match.stage.TennisMatch;
+import com.aleos.match.stage.TennisSet;
 import com.aleos.model.MatchScore;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.WeakReference;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 
 public class ScoreTrackerService implements PropertyChangeListener {
 
     private final Map<UUID, MatchScore> scores = new ConcurrentHashMap<>();
 
     public Optional<MatchScore> findById(UUID id) {
-        return Optional.of(scores.get(id));
+        return Optional.ofNullable(scores.get(id));
     }
 
     public void trackMatch(TennisMatch match) {
         match.addPropertyChangeListener(new WeakReference<>(this).get());
         MatchScore matchScore = new MatchScore(match.getId(), match.getPlayerOneName(), match.getPlayerTwoName());
-        initMatchScore(matchScore, match);
+        initMatchScore(matchScore, match, StarPresentation::translateScores);
         scores.put(match.getId(), matchScore);
     }
 
-    private void initMatchScore(MatchScore matchScore, TennisMatch match) {
-        matchScore.setScoreSets(match.getScoreManager().getScoresPresentation(StarPresentation::translateScores));
+    private void initMatchScore(MatchScore matchScore,
+                                TennisMatch match,
+                                BiFunction<StageType, List<ScoreRecord>, String[]> converter
+    ) {
+        matchScore.setScoreSets(match.getScoreManager().getScoresPresentation(converter));
 
         match.getChildStage().ifPresent(set -> {
 
-            matchScore.setScoreGames(set.getScoreManager().getScoresPresentation(StarPresentation::translateScores));
+            matchScore.setScoreGames(set.getScoreManager().getScoresPresentation(converter));
 
             set.getChildStage().ifPresent(game -> matchScore.setScorePoints(
-                    game.getScoreManager().getScoresPresentation(StarPresentation::translateScores)));
+                    game.getScoreManager().getScoresPresentation(converter)));
         });
     }
 
@@ -74,26 +81,67 @@ public class ScoreTrackerService implements PropertyChangeListener {
         MatchScore matchScore = scores.get(matchId);
 
         switch (event) {
-            case GAME_SCORES -> matchScore.setScorePoints(newRecord);
+            case GAME_SCORES -> {
+                matchScore.getNotifications().clear();
+                matchScore.setScorePoints(newRecord);
+            }
             case SET_SCORES -> matchScore.setScoreGames(newRecord);
             case MATCH_SCORES -> matchScore.setScoreSets(newRecord);
             default -> throw new IllegalStateException("Unexpected value: " + event);
         }
     }
 
-    private void handleWinnerEvent(PropertyChangeEvent evt, MatchEvent event) {
+    private void handleWinnerEvent(PropertyChangeEvent evt, MatchEvent matchEvent) {
+        UUID matchId = getMatchId(evt);
+        MatchScore matchScore = scores.get(matchId);
 
-        String wonStage = switch (event) {
+        addWinnerNotification(evt, matchEvent, matchScore);
+
+        switch (matchEvent) {
+            case SET_WINNER -> addSetScoresHistory(evt, matchScore);
+            case MATCH_WINNER -> untrackMatch(matchId);
+            default -> { /*do nothing*/ }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addSetScoresHistory(PropertyChangeEvent evt, MatchScore matchScore) {
+        var source = (StandardMatch<TennisSet>) evt.getSource();
+        Stage setStage = source.getChildStage().orElseThrow();
+        ScoreManager setScoreManager = setStage.getScoreManager();
+
+        StringBuffer scoreState = matchScore.getScoreSnapshot();
+
+        if (!scoreState.isEmpty()) {
+            scoreState.append(",");
+        }
+
+        scoreState.append(setScoreManager.getScore(Player.ONE))
+                .append(":")
+                .append(setScoreManager.getScore(Player.TWO));
+
+        handleTieBreakScoreRecord(matchScore, scoreState);
+    }
+
+    private String resolvePlayerName(Player player, MatchScore matchScore) {
+        return player == Player.ONE ? matchScore.getPlayerOneName() : matchScore.getPlayerTwoName();
+    }
+
+    private void addWinnerNotification(PropertyChangeEvent evt, MatchEvent matchEvent, MatchScore matchScore) {
+        String wonStage = getWonStage(matchEvent);
+        Player player = (Player) evt.getNewValue();
+        String playerName = resolvePlayerName(player, matchScore);
+
+        matchScore.addNotification("%s wins %s".formatted(playerName, wonStage));
+    }
+
+    private String getWonStage(MatchEvent event) {
+        return switch (event) {
             case GAME_WINNER -> "the game!";
             case SET_WINNER -> "the set!";
             case MATCH_WINNER -> "the match!";
             default -> throw new IllegalStateException("Unexpected event: " + event);
         };
-
-        MatchScore matchScore = scores.get(getMatchId(evt));
-        Player player = (Player) evt.getNewValue();
-        String playerName = player == Player.ONE ? matchScore.getPlayerOneName() : matchScore.getPlayerTwoName();
-        matchScore.addNotification("%s wins %s".formatted(playerName, wonStage));
     }
 
     private ScoreManager getScoreManager(PropertyChangeEvent evt) {
@@ -102,5 +150,21 @@ public class ScoreTrackerService implements PropertyChangeListener {
 
     private UUID getMatchId(PropertyChangeEvent evt) {
         return ((TennisMatch) evt.getSource()).getId();
+    }
+
+    private void handleTieBreakScoreRecord(MatchScore matchScore, StringBuffer scoreState) {
+        if (isTieBreakRecordFormat(matchScore.getScoreGames())) {
+            int playerOneLastScoreIdx = Math.max(scoreState.lastIndexOf(",") + 1, 0);
+            int separatorIdx = scoreState.lastIndexOf(":");
+            int playerTwoLastScoreIdx = separatorIdx + 1;
+            scoreState.insert(playerOneLastScoreIdx, "6(");
+            scoreState.insert(separatorIdx, ")");
+            scoreState.insert(playerTwoLastScoreIdx, "6(");
+            scoreState.insert(scoreState.length() - 1, ")");
+        }
+    }
+
+    private boolean isTieBreakRecordFormat(String[] gamesScore) {
+        return gamesScore[0].split("\\D").length > 1;
     }
 }
