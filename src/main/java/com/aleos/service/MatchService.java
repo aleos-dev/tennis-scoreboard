@@ -158,6 +158,7 @@ public class MatchService implements PropertyChangeListener {
                 new IllegalStateException("Match %s must not be started with unregistered player %s"
                         .formatted(tennisMatch.getId(), tennisMatch.getPlayerTwoName())));
 
+        match.setId(tennisMatch.getId());
         match.setPlayerOne(playerOne);
         match.setPlayerTwo(playerTwo);
         match.setWinner(playerOne.getName().equalsIgnoreCase(winnerName) ? playerOne : playerTwo);

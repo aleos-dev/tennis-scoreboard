@@ -5,7 +5,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -22,7 +21,6 @@ import java.util.UUID;
 public class Match {
 
     @Id
-    @UuidGenerator
     private UUID id;
 
     @ManyToOne(optional = false)
