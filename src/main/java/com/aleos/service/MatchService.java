@@ -121,7 +121,7 @@ public class MatchService implements PropertyChangeListener {
     private void registerNewMatch(TennisMatch newMatch) {
         if (matchRepository.findOngoing(newMatch.getId()).isEmpty()) {
 
-            newMatch.addPropertyChangeListener(new WeakReference<>(scoreTrackerService).get());
+            newMatch.addPropertyChangeListener(new WeakReference<>(this).get());
             matchRepository.cacheOngoing(newMatch);
             scoreTrackerService.trackMatch(newMatch);
         }
