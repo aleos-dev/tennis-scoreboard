@@ -1,0 +1,13 @@
+.notification {
+    display: none; /* Initially hidden */
+    position: fixed;
+    top: 20%; /* Center the message vertically */
+    left: 50%; /* Center the message horizontally */
+    transform: translateX(-50%);
+    background-color: #f4f4f4;
+    border: 1px solid #d3d3d3;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000; /* Make sure it's on top of other content */
+}
