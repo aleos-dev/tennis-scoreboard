@@ -9,13 +9,13 @@ import com.aleos.match.model.enums.MatchEvent;
 import com.aleos.match.stage.TennisMatch;
 import com.aleos.model.MatchScore;
 import com.aleos.model.dto.in.*;
-import com.aleos.model.entity.Match;
-import com.aleos.model.entity.MatchInfo;
-import com.aleos.model.entity.Player;
 import com.aleos.model.dto.out.ActiveMatchDto;
 import com.aleos.model.dto.out.ConcludedMatchDto;
 import com.aleos.model.dto.out.MatchDto;
 import com.aleos.model.dto.out.MatchesDto;
+import com.aleos.model.entity.Match;
+import com.aleos.model.entity.MatchInfo;
+import com.aleos.model.entity.Player;
 import com.aleos.repository.MatchRepository;
 import com.aleos.repository.PlayerDao;
 import lombok.RequiredArgsConstructor;
@@ -95,7 +95,6 @@ public class MatchService implements PropertyChangeListener {
                 .map(mapper::toDto)
                 .map(MatchDto.class::cast);
 
-
         if (dtoOptional.isPresent()) {
             return dtoOptional;
         }
@@ -103,7 +102,6 @@ public class MatchService implements PropertyChangeListener {
         return matchRepository.findConcluded(uuidPayload.id())
                 .map(mapper::toDto);
     }
-
 
     public void scorePoint(MatchUuidPayload matchUuidPayload, PlayerNamePayload playerNamePayload) {
         Optional<TennisMatch> ongoingOpt = matchRepository.findOngoing(matchUuidPayload.id());
@@ -139,8 +137,6 @@ public class MatchService implements PropertyChangeListener {
         Match matchEntity = convertToMatchEntity(finishedMatch);
 
         matchRepository.removeOngoingFromCache(finishedMatch.getId());
-        scoreTrackerService.untrackMatch(finishedMatch.getId());
-
         matchRepository.saveConcluded(matchEntity);
     }
 
@@ -169,6 +165,7 @@ public class MatchService implements PropertyChangeListener {
         MatchInfo matchInfo = new MatchInfo();
         matchInfo.setFormat(tennisMatch.getMatchFormat().name());
         matchInfo.getHistoryEntries().addAll(matchScore.getHistoryEntries());
+        matchInfo.setFinalScoreRecord(matchScore.getScoreSnapshot().toString());
         match.setInfo(matchInfo);
 
         return match;

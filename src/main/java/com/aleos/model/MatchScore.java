@@ -32,17 +32,17 @@ public class MatchScore {
     @Getter
     private final List<String> historyEntries = new ArrayList<>();
 
+    @Getter
     private final Deque<String> notifications = new LinkedList<>();
+
+    @Getter
+    private final StringBuffer scoreSnapshot = new StringBuffer();
 
 
     public MatchScore(UUID matchID, String playerOneName, String playerTwoName) {
         this.matchID = matchID;
         this.playerOneName = playerOneName;
         this.playerTwoName = playerTwoName;
-    }
-
-    public Optional<String> pollNotification() {
-        return Optional.ofNullable(notifications.poll());
     }
 
     public void addNotification(String message) {
