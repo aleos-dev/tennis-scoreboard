@@ -35,6 +35,7 @@ public class MatchServlet extends HttpServlet {
                     req.setAttribute("match", matchDto);
                     if (matchDto.getStatus() == MatchStatus.ONGOING) {
                         ServletUtil.forwardToJsp(req, resp, "control/live-match");
+                        return;
                     }
                     ServletUtil.forwardToJsp(req, resp, "display/completed-match");
                 });
