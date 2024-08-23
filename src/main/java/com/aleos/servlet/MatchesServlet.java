@@ -47,6 +47,6 @@ public class MatchesServlet extends HttpServlet {
 
         UUID matchId = matchService.createMatch(payload);
 
-        ServletUtil.redirect(req, resp, "/match-scores/%s".formatted(matchId));
+        ServletUtil.redirect(req, resp, "/matches/%s".formatted(matchId));
     }
 }
