@@ -1,5 +1,6 @@
-<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
+
 <jsp:useBean id="matchesDto" scope="request" type="com.aleos.model.dto.out.MatchesDto"/>
 
 <!DOCTYPE html>
@@ -7,6 +8,8 @@
 
 <head>
     <title>Matches</title>
+    <%@ include file="../common/head.jsp" %>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/matches.css">
 </head>
 
 <body>
@@ -15,7 +18,7 @@
 <div class="div-matches-section">
 
     <c:if test="${empty matchesDto.content}">
-        <div class="no-matches"><span>No Content</span></div>
+        <div class="no-matches"><span>There is no any matches</span></div>
     </c:if>
 
     <section class="matches-section">
