@@ -1,0 +1,145 @@
+body {
+    background: url('/static/images/completed-match-background.webp') no-repeat center center/cover;
+    background-position: center;
+}
+
+.completed-header {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+    text-transform: uppercase;
+    padding: 24px;
+    background-color: #0a0a23;
+    color: #fff;
+    border-bottom: 4px solid #fdb347;
+}
+
+.completed-date, .match-id, .match-announce {
+    font-size: 24px;
+    width: 100%;
+    margin: 10px auto;
+}
+.match-id-value, .date-value {
+    color: yellow;
+}
+.match-announce {
+    font-size: 36px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.completed-match-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+}
+
+.scoreboard-container {
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.player {
+    width: 400px;
+    height: 400px;
+    background: lightgrey;
+    margin: 0 100px;
+}
+
+.scoreboard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin: 20px auto;
+    padding: 20px 10px;
+    max-width: 600px;
+    font-family: sans-serif;
+    background: rgba(229, 241, 241, 0.8);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.scoreboard .score-entry {
+    display: flex;
+    justify-content: space-between; /* Distributes space between title and scores */
+    align-items: center;
+    width: 100%;
+    max-width: 500px;
+    height: 80px;
+    margin: 10px auto;
+    background: lightgrey;
+    border-radius: 10px;
+}
+
+.title {
+    font-weight: bolder;
+    padding: 20px;
+    width: 300px;
+    font-size: 24px;
+    color: #333;
+}
+
+.scores {
+    display: flex;
+    justify-content: center;
+    max-width: 100%;
+    width: 300px;
+    height: 65px;
+    align-items: center;
+    box-shadow: 0 3px 5px rgba(6, 6, 6, 0.5);
+}
+
+.score, .score-divider {
+    display: flex;
+    justify-content: center;
+    font-size: 32px;
+    align-items: center;
+    width: 70px;
+}
+
+.score {
+    padding: 0 5px;
+}
+
+.vs-icon img {
+    width: 150px;
+    opacity: 0.8;
+    align-items: center;
+    border-radius: 15px;
+}
+
+
+
+.player1, .player2 {
+    font-weight: bold;
+}
+
+.player1 {
+    padding: 5px;
+    border: 2px solid #145cab;
+    color: #145cab;
+}
+
+.player2 {
+    padding: 5px;
+    border: 2px solid #921729;
+    color: #921729;
+}
+
+/*@media (max-width: 600px) {*/
+/*    .player img {*/
+/*        width: 50px; !* Smaller icons on smaller screens *!*/
+/*    }*/
+/*    */
+/*    .versus-label {*/
+/*        font-size: 16px; !* Slightly smaller text on smaller screens *!*/
+/*        width: 30px;*/
+/*        height: 30px;*/
+/*    }*/
+/*}*/

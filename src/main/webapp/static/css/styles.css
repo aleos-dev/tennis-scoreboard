@@ -5,15 +5,6 @@
     box-sizing: border-box;
 }
 
-/* General Styles */
-body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
-    margin: 0;
-    padding: 0;
-}
-
 /* Header Styles */
 .site-header {
     background-color: #333;
@@ -48,6 +39,7 @@ body {
 
 .hero-section {
     background: url('/static/images/tennis-scoreboard-main-background.webp') no-repeat center center/cover;
+    background-position: center;
     color: white;
     text-align: center;
     padding: 100px 20px;
@@ -83,72 +75,6 @@ body {
     background-color: rgba(192, 57, 43, 0.9);
 }
 
-
-/* Section Styles */
-.main-section {
-    padding: 20px;
-}
-
-.main-section h2 {
-    font-size: 1.8em;
-    margin-bottom: 10px;
-    color: #2c3e50;
-}
-
-.view-all-link {
-    color: #2980b9;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s ease;
-}
-
-.view-all-link:hover {
-    color: #3498db;
-}
-
-/* Footer */
-.site-footer {
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    padding: 10px 20px;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-}
-
-
-
-/* Main Content Area */
-.matches-section {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.match-container {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.match-item {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 3px;
-}
-
-.match-item.ongoing {
-    background-color: #d4edda;
-}
-
-.match-item.completed {
-    background-color: #f8d7da;
-}
-
 /* Pagination */
 .pagination-section {
     text-align: center;
@@ -170,13 +96,13 @@ body {
 
 /* Footer */
 .site-footer {
-    background: #333;
+    margin: 0 auto;
+    background-color: #333;
     color: #fff;
-    padding: 10px 0;
     text-align: center;
+    padding: 10px 20px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
 }
 
-.footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
-}
