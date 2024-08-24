@@ -1,7 +1,9 @@
-<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<jsp:useBean id="matchScore" scope="request" type="com.aleos.model.MatchScore"/>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
+<jsp:useBean id="match" scope="request" type="com.aleos.model.dto.out.ActiveMatchDto"/>
+<c:set var="matchScore" scope="request" value="${match.score}"/>
 
+<c:set var="matchId" value="${matchScore.matchID}" scope="request"/>
 <c:set var="p1Name" value="${matchScore.playerOneName}" scope="request"/>
 <c:set var="p2Name" value="${matchScore.playerTwoName}" scope="request"/>
 
@@ -11,23 +13,41 @@
     <%@ include file="../common/head.jsp" %>
     <title>Match Control</title>
     <link rel="stylesheet" type="text/css"
-          href="${pageContext.request.contextPath}/static/css/active-match-notification.css">
+          href="${pageContext.request.contextPath}/static/css/live-match-notification.css">
+    <link rel="stylesheet" type="text/css"
+          href="${pageContext.request.contextPath}/static/css/live-match.css">
     <script src="${pageContext.request.contextPath}/static/js/submitScore.js"></script>
+    <script src="${pageContext.request.contextPath}/static/js/liveTime.js"></script>
+
 </head>
+
 <body>
+<%@ include file="../common/header.jsp" %>
 
-<h5>Match ID: ${matchScore.matchID}</h5>
-
+<div class="live-header">
+    <div class="live-time">LIVE: <span id="live-time">1:32:51 PM</span></div>
+    <div class="match-id">Match ID: <span>${matchId}</span></div>
+</div>
 
 <%@ include file="../display/live-match-scoreboard.jsp" %>
 
-<form action="${pageContext.request.contextPath}/match-scores/${matchScore.matchID}" method="post">
-    <input type="hidden" name="pointWinner" id="pointWinner" value="">
-    <button type="button" onclick="submitScore('${p1Name}')">A point to ${p1Name}</button>
-    <button type="button" onclick="submitScore('${p2Name}')">A point to ${p2Name}</button>
-</form>
+<div class="control-panel">
 
-<%@ include file="../common/footer.jsp"%>
+    <div class="score-label">Award Point</div>
+
+    <form action="${pageContext.request.contextPath}/match-scores/${matchScore.matchID}" method="post">
+        <input type="hidden" name="pointWinner" id="pointWinner" value="">
+        <div class="left-button">
+            <button type="button" onclick="submitScore('${p1Name}')">${p1Name}</button>
+        </div>
+
+        <div class="right-button">
+            <button type="button" onclick="submitScore('${p2Name}')">${p2Name}</button>
+        </div>
+    </form>
+</div>
+
+<%@ include file="../common/footer.jsp" %>
 
 <c:if test="${not empty requestScope.notifications}">
     <%@ include file="../common/notification.jsp" %>
