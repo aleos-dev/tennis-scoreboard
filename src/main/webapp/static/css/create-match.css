@@ -1,0 +1,24 @@
+input, label, fieldset, #format-id {
+    font-size: 1.1em;
+    margin: 5px;
+    margin-left: 20px;
+}
+
+legend {
+    font-size: 1.3em;
+    font-weight: bold;
+    padding-bottom: 10px;
+    margin-left: 10px;
+    text-align: center;
+    align-self: center;
+}
+
+.cta-button {
+    align-self: center;
+    margin-top: 15px;
+}
+
+
+.content {
+    margin: 50px;
+}

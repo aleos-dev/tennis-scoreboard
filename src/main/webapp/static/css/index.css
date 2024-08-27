@@ -1,0 +1,17 @@
+h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+p {
+    font-size: 1.4em;
+    margin-bottom: 20px;
+}
+
+.cta-button {
+    font-size: 1.4em;
+    margin-top: 50px;
+}
+
+
