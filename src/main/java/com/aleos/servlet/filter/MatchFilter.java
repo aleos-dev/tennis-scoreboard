@@ -8,7 +8,6 @@ import com.aleos.model.dto.in.PageableInfo;
 import com.aleos.util.PropertiesUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -19,7 +18,6 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@WebFilter("/matches")
 public class MatchFilter extends AbstractEndpointFilter {
 
     private static final Logger logger = Logger.getLogger(MatchFilter.class.getName());
@@ -30,27 +28,26 @@ public class MatchFilter extends AbstractEndpointFilter {
 
         switch (req.getMethod()) {
 
-            case "GET" -> handleGetMethodPayload(req, resp);
+            case "GET" -> handleGetMethodPayload(req);
 
-            case "POST" -> handlePostMethodPayload(req, resp);
+            case "POST" -> handlePostMethodPayload(req);
 
             default -> {/* do nothing */}
         }
 
-        if (req.getAttribute("violations") == null) {
-            chain.doFilter(req, resp);
-        } else {
-
+        if (req.getAttribute("violations") != null) {
             logger.log(Level.SEVERE, req.getAttribute("violations").toString());
         }
+
+        chain.doFilter(req, resp);
     }
 
-    private void handleGetMethodPayload(HttpServletRequest req, HttpServletResponse resp) {
+    private void handleGetMethodPayload(HttpServletRequest req) {
         if (isRequestForMainPath(req)) {
 
             // -> /matches
-            extractPageablePayloadToReqContext(req, resp);
-            extractMatchFilterCriteriaToReqContext(req, resp);
+            extractPageablePayloadToReqContext(req);
+            extractMatchFilterCriteriaToReqContext(req);
 
         } else {
 
@@ -59,8 +56,8 @@ public class MatchFilter extends AbstractEndpointFilter {
         }
     }
 
-    private void handlePostMethodPayload(HttpServletRequest req, HttpServletResponse resp) {
-        extractMatchPayloadToReqContext(req, resp);
+    private void handlePostMethodPayload(HttpServletRequest req) {
+        extractMatchPayloadToReqContext(req);
     }
 
     private void extractMatchUuidPayloadToReqContext(HttpServletRequest req) {
@@ -68,28 +65,28 @@ public class MatchFilter extends AbstractEndpointFilter {
         req.setAttribute("matchUuidPayload", matchUuidPayload);
     }
 
-    private void extractMatchFilterCriteriaToReqContext(HttpServletRequest req, HttpServletResponse resp) {
+    private void extractMatchFilterCriteriaToReqContext(HttpServletRequest req) {
         var matchFilterCriteria = getMatchFilterCriteria(req);
 
         validatePayload(matchFilterCriteria).ifPresentOrElse(
-                violations -> handlePayloadViolations(req, resp, violations),
+                violations -> handlePayloadViolations(req, violations),
                 () -> req.setAttribute("matchFilterCriteria", matchFilterCriteria));
     }
 
 
-    private void extractPageablePayloadToReqContext(HttpServletRequest req, HttpServletResponse resp) {
+    private void extractPageablePayloadToReqContext(HttpServletRequest req) {
         var pageablePayload = getPageablePayload(req);
 
         validatePayload(pageablePayload).ifPresentOrElse(
-                violations -> handlePayloadViolations(req, resp, violations),
+                violations -> handlePayloadViolations(req, violations),
                 () -> req.setAttribute("pageablePayload", pageablePayload));
     }
 
-    private void extractMatchPayloadToReqContext(HttpServletRequest req, HttpServletResponse resp) {
+    private void extractMatchPayloadToReqContext(HttpServletRequest req) {
         MatchPayload matchPayload = getMatchPayload(req);
 
         validatePayload(matchPayload).ifPresentOrElse(
-                violations -> handlePayloadViolations(req, resp, violations),
+                violations -> handlePayloadViolations(req, violations),
                 () -> req.setAttribute("matchPayload", matchPayload)
         );
     }
@@ -131,10 +128,11 @@ public class MatchFilter extends AbstractEndpointFilter {
     }
 
     private MatchFilterCriteria getMatchFilterCriteria(HttpServletRequest req) {
+        var name = req.getParameter("playerName");
         return new MatchFilterCriteria(
                 Optional.ofNullable(req.getParameter("status"))
                         .orElseGet(() -> PropertiesUtil.get("filter.default.matchStatus").orElse(null)),
-                req.getParameter("playerName"),
+                name != null && name.isBlank() ? null : name,
                 Optional.ofNullable(req.getParameter("before"))
                         .map(this::toInstant)
                         .orElse(Instant.now())
