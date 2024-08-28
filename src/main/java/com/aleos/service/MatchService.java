@@ -57,13 +57,14 @@ public class MatchService implements PropertyChangeListener {
         int remainingLimit = pageable.getPageSize() - ongoingMatches.size();
 
         if (remainingLimit > 0) {
-            int offsetCorrection = totalOngoingCount > 0 ? Math.max(pageable.getOffset() - totalOngoingCount, 0) : 0;
+            int offsetCorrection = -totalOngoingCount;
 
             concludedMatches = matchRepository.findAllConcludedByCriteria(
                             pageable,
                             filterCriteria,
                             offsetCorrection
                     ).stream()
+                    .limit(remainingLimit)
                     .map(mapper::toDto)
                     .toList();
         }
