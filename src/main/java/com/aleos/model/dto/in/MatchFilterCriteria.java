@@ -12,7 +12,7 @@ public record MatchFilterCriteria(
         @ValidMatchStatus(allowedValues = {"ongoing", "finished", "any"})
         String status,
 
-        @Size(min = 3, max = 50, message = "The name must be between {min} and {max}.")
+        @Size( max = 50, message = "The name must not exceed {max}.")
         String playerName,
 
         @PastOrPresent(message = "Timestamp must be in the past or present.")
