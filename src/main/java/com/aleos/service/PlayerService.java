@@ -9,30 +9,32 @@ import com.aleos.model.dto.in.PlayerPayload;
 import com.aleos.model.dto.out.PlayerDto;
 import com.aleos.model.dto.out.PlayersDto;
 import com.aleos.model.entity.Player;
+import com.aleos.repository.MatchRepository;
 import com.aleos.repository.PlayerRepository;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 public class PlayerService {
 
-    private final PlayerRepository repository;
+    private final PlayerRepository playerRepository;
 
     private final PlayerMapper mapper;
 
     public PlayerDto createPlayer(PlayerPayload payload) {
         Player entity = mapper.toEntity(payload);
-        repository.createPlayer(entity);
+        playerRepository.createPlayer(entity);
 
         return mapper.toDto(entity);
     }
 
     public PlayersDto findAll(PageableInfo pageable, PlayerFilterCriteria filterCriteria) {
 
-        var totalCount = repository.getCount(filterCriteria);
+        var totalCount = playerRepository.getCount(filterCriteria);
 
-        var playerDtos = repository.findAll(pageable, filterCriteria).stream()
+        var playerDtos = playerRepository.findAll(pageable, filterCriteria).stream()
                 .map(mapper::toDto)
                 .toList();
 
@@ -43,7 +45,7 @@ public class PlayerService {
         boolean hasNext = pageable.getPageNumber() < totalPages;
         boolean hasPrevious = pageable.getPageNumber() > 1;
 
-        return new PlayersDto(
+        return PlayersDto.of(
                 playerDtos,
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
@@ -55,11 +57,11 @@ public class PlayerService {
     }
 
     public Optional<PlayerDto> findByName(PlayerNamePayload payload) {
-        return repository.findByName(payload.name()).map(mapper::toDto);
+        return playerRepository.findByName(payload.name()).map(mapper::toDto);
     }
 
     public void update(PlayerNamePayload identifier, PlayerPayload payload) {
         Player entity = mapper.toEntity(payload);
-        repository.update(identifier.name(), entity);
+        playerRepository.update(identifier.name(), entity);
     }
 }
