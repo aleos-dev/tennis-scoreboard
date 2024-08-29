@@ -29,7 +29,7 @@
             <span class="match-id"> Match ID: <span class="match-id-value">${matchId}</span></span>
         </div>
     </div>
-    <span class="match-announce"><span class="player1">${p1Name} </span><span class="player2">${p2Name}</span>
+    <span class="match-announce"><span class="player1">${p1Name} </span><span class="player2">${p2Name}</span></span>
 </div>
 
 <div class="completed-match-container">
@@ -44,7 +44,7 @@
             <img src="${pageContext.request.contextPath}/static/images/vs-element.webp" alt="VS">
         </div>
 
-        <%@ include file="completed-match-scoreboard.jsp" %>
+        <%@ include file="../fragment/completed-match-scoreboard.jsp" %>
     </div>
 
     <div class="player player-container-2">
