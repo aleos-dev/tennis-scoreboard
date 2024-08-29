@@ -7,7 +7,7 @@ import com.aleos.model.dto.in.PlayerPayload;
 import com.aleos.model.dto.out.PlayersDto;
 import com.aleos.service.PlayerService;
 import com.aleos.servicelocator.ServiceLocator;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.aleos.util.ServletUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
@@ -16,8 +16,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.StringJoiner;
 
 @WebServlet("/players")
 public class PlayersServlet extends HttpServlet {
@@ -36,25 +36,21 @@ public class PlayersServlet extends HttpServlet {
     }
 
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) {
-        try {
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) {
+        var pageable = (PageableInfo) req.getAttribute("pageablePayload");
+        var filterCriteria = (PlayerFilterCriteria) req.getAttribute("playerFilterCriteria");
 
-            var pageable = (PageableInfo) request.getAttribute("pageablePayload");
-            var filterCriteria = (PlayerFilterCriteria) request.getAttribute("playerFilterCriteria");
+        PlayersDto playersDto = playerService.findAll(pageable, filterCriteria);
+        req.setAttribute("playersDto", playersDto);
+        req.setAttribute("filterCriteria", filterCriteria);
+        req.setAttribute("pageable", pageable);
+        req.setAttribute("countryCodes", List.of("EN", "UA", "RU"));
 
-            PlayersDto all = playerService.findAll(pageable, filterCriteria);
+        // Build the query parameters (excluding pagination)
+        req.setAttribute("queryParam", buildQueryString(filterCriteria));
+        req.setAttribute("baseUrl", req.getContextPath() + req.getServletPath());
 
-            String asString = objectMapper.writeValueAsString(all);
-            response.getWriter().write(asString);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        response.setContentType("application/json");
-        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-
+        ServletUtil.forwardToJsp(req, resp, "control/players");
     }
 
     @Override
@@ -64,8 +60,23 @@ public class PlayersServlet extends HttpServlet {
 
             playerService.createPlayer(payload);
 
-        } catch(Exception e ) {
+        } catch (Exception e) {
 
         }
+    }
+
+    public static String buildQueryString(PlayerFilterCriteria filterCriteria) {
+        StringJoiner queryParams = new StringJoiner("&", "?", "");
+
+        if (filterCriteria.name() != null && !filterCriteria.name().isEmpty()) {
+            queryParams.add("name=" + filterCriteria.name());
+        }
+        if (filterCriteria.country() != null) {
+            queryParams.add("country=" + filterCriteria.country());
+        }
+
+        queryParams.add("before=" + ServletUtil.formatInstantAsLocalDateTime(filterCriteria.before()));
+
+        return queryParams.toString();
     }
 }
