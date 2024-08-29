@@ -15,8 +15,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -49,7 +47,6 @@ public class MatchesServlet extends HttpServlet {
         req.setAttribute("filterCriteria", filterCriteria);
         req.setAttribute("pageable", pageable);
 
-        // Build the query parameters (excluding pagination)
         req.setAttribute("baseUrl", req.getContextPath() + req.getServletPath());
         req.setAttribute("queryParam", buildQueryString(filterCriteria));
 
@@ -79,14 +76,9 @@ public class MatchesServlet extends HttpServlet {
             queryParams.add("status=" + filterCriteria.status());
         }
 
-        queryParams.add("before=" + getBeforeDateAttribute(filterCriteria));
+        queryParams.add("before=" + ServletUtil.formatInstantAsLocalDateTime(filterCriteria.before()));
 
         return queryParams.toString();
     }
 
-    private String getBeforeDateAttribute(MatchFilterCriteria filterCriteria) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
-                .withZone(ZoneId.systemDefault());
-        return formatter.format(filterCriteria.before());
-    }
 }
