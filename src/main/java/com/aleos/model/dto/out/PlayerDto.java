@@ -13,6 +13,8 @@ public record PlayerDto(
         String countryImageUrl,
 
         @JsonProperty("matches")
-        String matchesEndpoint
+        String matchesEndpoint,
+
+        String ongoingMatchUuid
 ) {
 }
