@@ -1,18 +1,18 @@
 package com.aleos.servlet.filter;
 
 import com.aleos.configuration.AppContextAttribute;
-import com.aleos.exception.JspForwardingException;
 import com.aleos.servicelocator.ServiceLocator;
 import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpFilter;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 
-import java.io.IOException;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Optional;
 import java.util.Set;
@@ -38,7 +38,10 @@ public abstract class AbstractEndpointFilter extends HttpFilter {
 
     protected Instant toInstant(String before) {
         try {
-            return Instant.parse(before);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+            LocalDateTime localDateTime = LocalDateTime.parse(before, formatter);
+
+            return localDateTime.atZone(ZoneId.systemDefault()).toInstant();
         } catch (DateTimeParseException e) {
             return null;
         }
@@ -53,17 +56,15 @@ public abstract class AbstractEndpointFilter extends HttpFilter {
     }
 
     protected <T> void handlePayloadViolations(HttpServletRequest req,
-                                               HttpServletResponse resp,
                                                Set<ConstraintViolation<T>> violations
     ) {
         req.setAttribute("violations", violations);
-        req.setAttribute("errorMessage", "Validation errors occurred. Please correct them and submit again.");
-        try {
-            req.getRequestDispatcher("/errorPage.jsp").forward(req, resp);
-        } catch (ServletException | IOException e) {
-            throw new JspForwardingException("Error occurred while dispatching request '/originPage.jsp'. " +
-                                             "The target resource could not be reached.", e);
-        }
+        var messages = violations.stream()
+                .map(ConstraintViolation::getMessage)
+                .sorted()
+                .toList();
+
+        req.setAttribute("errorMessages", messages);
     }
 
     protected boolean isRequestForMainPath(HttpServletRequest req) {
