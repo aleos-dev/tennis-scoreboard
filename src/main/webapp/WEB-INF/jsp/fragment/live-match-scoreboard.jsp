@@ -6,7 +6,7 @@
 <c:set var="p1SetScore" value="${matchScore.scoreSets[0]}" scope="request"/>
 <c:set var="p2SetScore" value="${matchScore.scoreSets[1]}" scope="request"/>
 
-<div class="scoreboard">
+<div class="content scoreboard">
     <div class="score-entry">
         <div class="title">Point Score:</div>
         <div class="scores">

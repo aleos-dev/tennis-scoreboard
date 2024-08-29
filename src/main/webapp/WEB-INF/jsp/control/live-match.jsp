@@ -24,34 +24,34 @@
 <body>
 <%@ include file="../common/header.jsp" %>
 
-<div class="live-header">
-    <div class="live-time">LIVE: <span id="live-time">1:32:51 PM</span></div>
+<div class="info-header">
     <div class="match-id">Match ID: <span>${matchId}</span></div>
+    <div class="live-time">LIVE: <span id="live-time"></span></div>
 </div>
 
-<%@ include file="../display/live-match-scoreboard.jsp" %>
+<div class="content horizontal-center">
+    <%@ include file="../fragment/live-match-scoreboard.jsp" %>
 
-<div class="control-panel">
 
     <div class="score-label">Award Point</div>
 
-    <form action="${pageContext.request.contextPath}/match-scores/${matchScore.matchID}" method="post">
+    <form class="score-control" action="${pageContext.request.contextPath}/match-scores/${matchScore.matchID}" method="post">
         <input type="hidden" name="pointWinner" id="pointWinner" value="">
-        <div class="left-button">
+        <div class="button">
             <button type="button" onclick="submitScore('${p1Name}')">${p1Name}</button>
         </div>
 
-        <div class="right-button">
+        <div class="button">
             <button type="button" onclick="submitScore('${p2Name}')">${p2Name}</button>
         </div>
     </form>
 </div>
 
-<%@ include file="../common/footer.jsp" %>
-
 <c:if test="${not empty requestScope.notifications}">
     <%@ include file="../common/notification.jsp" %>
 </c:if>
+
+<%@ include file="../common/footer.jsp" %>
 
 </body>
 </html>
