@@ -7,6 +7,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.experimental.UtilityClass;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 @UtilityClass
 public class ServletUtil {
@@ -27,4 +30,9 @@ public class ServletUtil {
         }
     }
 
+    public static String formatInstantAsLocalDateTime(Instant instant) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
+                .withZone(ZoneId.systemDefault());
+        return formatter.format(instant);
+    }
 }
