@@ -117,6 +117,10 @@ public class MatchService implements PropertyChangeListener {
         }
     }
 
+    public Optional<UUID> findOngoingMatchIdByPlayerName(String playerName) {
+        return matchRepository.findOngoingMatchIdByPlayerName(playerName);
+    }
+
     private void registerNewMatch(TennisMatch newMatch) {
         if (matchRepository.findOngoing(newMatch.getId()).isEmpty()) {
 

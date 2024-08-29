@@ -132,8 +132,8 @@ public class MatchRepository {
 
     private boolean isPlayerNameMatchingCriteria(TennisMatch match, MatchFilterCriteria filterCriteria) {
         return filterCriteria.playerName() == null
-               || match.getPlayerOneName().toLowerCase().contains(filterCriteria.playerName())
-               || match.getPlayerTwoName().toLowerCase().contains(filterCriteria.playerName());
+               || match.getPlayerOneName().equalsIgnoreCase(filterCriteria.playerName())
+               || match.getPlayerTwoName().equalsIgnoreCase(filterCriteria.playerName());
 
     }
 
@@ -150,6 +150,10 @@ public class MatchRepository {
 
     public boolean isPlayerInOngoingMatch(String playerName) {
         return ongoingMatchCache.checkCurrentParticipant(playerName);
+    }
+
+    public Optional<UUID> findOngoingMatchIdByPlayerName(String playerName) {
+        return ongoingMatchCache.findOngoingMatchIdByPlayerName(playerName);
     }
 
 

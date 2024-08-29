@@ -1,6 +1,7 @@
 package com.aleos.repository;
 
 import com.aleos.match.stage.TennisMatch;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -68,6 +69,7 @@ public class TennisMatchCache implements InMemoryStorage<TennisMatch, UUID> {
         }
     }
 
+    @Override
     public boolean checkCurrentParticipant(String name) {
         lock.readLock().lock();
         try {
@@ -75,6 +77,14 @@ public class TennisMatchCache implements InMemoryStorage<TennisMatch, UUID> {
         } finally {
             lock.readLock().unlock();
         }
+    }
+
+    @Override
+    public Optional<UUID> findOngoingMatchIdByPlayerName(@NotNull String name) {
+        return getAll().stream()
+                .filter(match -> name.equals(match.getPlayerOneName()) || name.equals(match.getPlayerTwoName()))
+                .map(TennisMatch::getId)
+                .findAny();
     }
 
     private void validateParticipant(TennisMatch match) {

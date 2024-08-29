@@ -94,17 +94,18 @@ public class AppConfiguration {
     @Bean
     public PlayerMapper playerMapper(
             @Bean(name = "modelMapper") ModelMapper mapper,
-            @Bean(name = "imageService") ImageService imageService
+            @Bean(name = "imageService") ImageService imageService,
+            @Bean(name = "matchService") MatchService matchService
     ) {
-        return new PlayerMapper(mapper, imageService);
+        return new PlayerMapper(mapper, imageService, matchService);
     }
 
     @Bean
     public PlayerService playerService(
-            @Bean(name = "playerRepository") PlayerRepository repository,
+            @Bean(name = "playerRepository") PlayerRepository playerRepository,
             @Bean(name = "playerMapper") PlayerMapper mapper
     ) {
-        return new PlayerService(repository, mapper);
+        return new PlayerService(playerRepository, mapper);
     }
 
     @Bean

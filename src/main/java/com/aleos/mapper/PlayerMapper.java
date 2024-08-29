@@ -4,10 +4,12 @@ import com.aleos.ImageService;
 import com.aleos.model.entity.Player;
 import com.aleos.model.dto.in.PlayerPayload;
 import com.aleos.model.dto.out.PlayerDto;
+import com.aleos.service.MatchService;
 import org.modelmapper.ModelMapper;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 public class PlayerMapper {
 
@@ -15,9 +17,12 @@ public class PlayerMapper {
 
     private final ImageService imageService;
 
-    public PlayerMapper(ModelMapper mapper, ImageService imageService) {
+    private final MatchService matchService;
+
+    public PlayerMapper(ModelMapper mapper, ImageService imageService, MatchService matchService) {
         this.mapper = mapper;
         this.imageService = imageService;
+        this.matchService = matchService;
         configureMappings();
     }
 
@@ -47,13 +52,17 @@ public class PlayerMapper {
                     String matchesEndpoint = String.format("/matches?playerName=%s", encodedName);
                     String avatarImageUrl = source.getImagePath();
                     String countryImageUrl = imageService.resolveImageUrlForCountry(source.getCountry());
+                    String ongoingMatchUuid = matchService.findOngoingMatchIdByPlayerName(source.getName())
+                            .map(UUID::toString)
+                            .orElse(null);
 
                     return new PlayerDto(
                             source.getName(),
                             source.getCountry(),
                             avatarImageUrl,
                             countryImageUrl,
-                            matchesEndpoint
+                            matchesEndpoint,
+                            ongoingMatchUuid
                     );
                 });
     }
