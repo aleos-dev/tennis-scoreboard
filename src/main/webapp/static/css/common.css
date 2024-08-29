@@ -101,7 +101,6 @@ body {
 .pagination-controls {
     display: flex;
     justify-content: center;
-
     flex-direction: row;
     width: 500px;
 }
