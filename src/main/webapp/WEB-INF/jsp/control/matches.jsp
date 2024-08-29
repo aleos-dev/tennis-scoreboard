@@ -1,8 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 
-<jsp:useBean id="matchesDto" scope="request" type="com.aleos.model.dto.out.MatchesDto"/>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,24 +13,38 @@
 <body>
 <%@ include file="../common/header.jsp" %>
 
-<div class="div-matches-section">
+<c:if test="${not empty requestScope.errorMessages}">
+    <div class="error content">
+        <ul>
+            <c:forEach items="${requestScope.errorMessages}" var="message">
+                <li>${message}</li>
+            </c:forEach>
+        </ul>
+    </div>
+</c:if>
 
-    <c:if test="${empty matchesDto.content}">
-        <div class="no-matches"><span>There is no any matches</span></div>
-    </c:if>
+<c:if test="${not empty requestScope.matchesDto}">
 
-    <section class="matches-section">
-        <div class="matches-list">`
-            <%@ include file="../display/all-matches.jsp" %>
-        </div>
-    </section>
+    <jsp:useBean id="matchesDto" scope="request" type="com.aleos.model.dto.out.MatchesDto"/>
 
-    <section class="pagination-section">
-        <div class="pagination-controls">
+    <div class="div-matches-section">
+        <%@ include file="../fragment/matchFilterCriteria.jsp" %>
+
+        <c:if test="${empty matchesDto.content}">
+            <div class="no-matches"><span>There is no any match</span></div>
+        </c:if>
+
+        <section class="matches-section">
+                <%@ include file="../fragment/matches-display.jsp" %>
+        </section>
+
+        <section class="content horizontal-center pagination-section">
+
+            <c:set var="dto" value="${matchesDto}" scope="request"/>
             <%@ include file="../common/pagination.jsp" %>
-        </div>
-    </section>
-</div>
+        </section>
+    </div>
+</c:if>
 
 <%@ include file="../common/footer.jsp" %>
 
