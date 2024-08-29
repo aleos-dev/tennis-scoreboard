@@ -28,44 +28,44 @@ public class PlayerFilter extends AbstractEndpointFilter {
 
         switch (req.getMethod()) {
 
-            case "GET" -> handleGetMethodPayload(req, resp);
+            case "GET" -> handleGetMethodPayload(req);
 
-            case "POST" -> handlePostMethodPayload(req, resp);
+            case "POST" -> handlePostMethodPayload(req);
 
-            case "PUT" -> handlePutMethodPayload(req, resp);
+            case "PUT" -> handlePutMethodPayload(req);
 
             default -> {/* do nothing */}
         }
 
-        if (req.getAttribute("violations") == null) {
-            chain.doFilter(req, resp);
-        } else {
+        if (req.getAttribute("violations") != null) {
             logger.log(Level.SEVERE, req.getAttribute("violations").toString());
         }
+
+        chain.doFilter(req, resp);
     }
 
-    private void handleGetMethodPayload(HttpServletRequest req, HttpServletResponse resp) {
+    private void handleGetMethodPayload(HttpServletRequest req) {
         if (isRequestForMainPath(req)) {
 
-            extractPageablePayloadToReqContext(req, resp);
-            extractFilterCriteriaToReqContext(req, resp);
+            extractPageablePayloadToReqContext(req);
+            extractFilterCriteriaToReqContext(req);
 
         } else {
-            extractPlayerNamePayloadToReqContext(req, resp);
+            extractPlayerNamePayloadToReqContext(req);
         }
     }
 
-    private void handlePostMethodPayload(HttpServletRequest req, HttpServletResponse resp) {
-        extractPlayerPayloadToReqContext(req, resp);
+    private void handlePostMethodPayload(HttpServletRequest req) {
+        extractPlayerPayloadToReqContext(req);
     }
 
-    private void handlePutMethodPayload(HttpServletRequest req, HttpServletResponse resp) {
-        extractPlayerIdentifierToReqContext(req, resp);
-        extractPlayerPayloadToReqContext(req, resp);
+    private void handlePutMethodPayload(HttpServletRequest req) {
+        extractPlayerIdentifierToReqContext(req);
+        extractPlayerPayloadToReqContext(req);
 
     }
 
-    private void extractPlayerIdentifierToReqContext(HttpServletRequest req, HttpServletResponse resp) {
+    private void extractPlayerIdentifierToReqContext(HttpServletRequest req) {
         if (req.getPathInfo() == null) {
             throw new InvalidPathInfo("The path info must contain UUID match identifier.");
         }
@@ -73,42 +73,42 @@ public class PlayerFilter extends AbstractEndpointFilter {
         int skipSlash = 1;
         var payload = new PlayerNamePayload(req.getPathInfo().substring(skipSlash));
         validatePayload(payload).ifPresentOrElse(
-                violations -> handlePayloadViolations(req, resp, violations),
+                violations -> handlePayloadViolations(req, violations),
                 () -> req.setAttribute("playerNamePayload", payload)
         );
         req.setAttribute("playerNamePayload", payload);
     }
 
-    private void extractPlayerNamePayloadToReqContext(HttpServletRequest req, HttpServletResponse resp) {
+    private void extractPlayerNamePayloadToReqContext(HttpServletRequest req) {
         PlayerNamePayload payload = getPlayerNamePayload(req);
 
         validatePayload(payload).ifPresentOrElse(
-                violations -> handlePayloadViolations(req, resp, violations),
+                violations -> handlePayloadViolations(req, violations),
                 () -> req.setAttribute("playerNamePayload", payload)
         );
     }
 
-    private void extractFilterCriteriaToReqContext(HttpServletRequest req, HttpServletResponse resp) {
+    private void extractFilterCriteriaToReqContext(HttpServletRequest req) {
         var playerFilterCriteria = getPlayerFilterCriteria(req);
 
 
         validatePayload(playerFilterCriteria).ifPresentOrElse(
-                violations -> handlePayloadViolations(req, resp, violations),
+                violations -> handlePayloadViolations(req, violations),
                 () -> req.setAttribute("playerFilterCriteria", playerFilterCriteria));
     }
 
-    private void extractPageablePayloadToReqContext(HttpServletRequest req, HttpServletResponse resp) {
+    private void extractPageablePayloadToReqContext(HttpServletRequest req) {
         var pageablePayload = getPageablePayload(req);
         validatePayload(pageablePayload).ifPresentOrElse(
-                violations -> handlePayloadViolations(req, resp, violations),
+                violations -> handlePayloadViolations(req, violations),
                 () -> req.setAttribute("pageablePayload", pageablePayload));
     }
 
-    private void extractPlayerPayloadToReqContext(HttpServletRequest req, HttpServletResponse resp) {
+    private void extractPlayerPayloadToReqContext(HttpServletRequest req) {
         PlayerPayload payload = getPlayerPayload(req);
 
         validatePayload(payload).ifPresentOrElse(
-                violations -> handlePayloadViolations(req, resp, violations),
+                violations -> handlePayloadViolations(req, violations),
                 () -> req.setAttribute("playerPayload", payload)
         );
     }
@@ -131,12 +131,13 @@ public class PlayerFilter extends AbstractEndpointFilter {
 
     private PlayerFilterCriteria getPlayerFilterCriteria(HttpServletRequest req) {
         var country = req.getParameter("country");
+        var name = req.getParameter("name");
+        var beforeDate = req.getParameter("before");
+
         return new PlayerFilterCriteria(
                 country != null ? country.toUpperCase() : null,
-                req.getParameter("name"),
-                Optional.ofNullable(req.getParameter("before"))
-                        .map(this::toInstant)
-                        .orElse(Instant.now())
+                name != null && name.isBlank() ? null : name,
+                Optional.ofNullable(beforeDate).map(this::toInstant).orElse(Instant.now())
         );
     }
 
