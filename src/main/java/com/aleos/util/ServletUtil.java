@@ -1,6 +1,7 @@
 package com.aleos.util;
 
 import com.aleos.exception.JspForwardingException;
+import com.aleos.exception.ServletForwardingException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,6 +14,14 @@ import java.time.format.DateTimeFormatter;
 
 @UtilityClass
 public class ServletUtil {
+
+    public static void forward(HttpServletRequest req, HttpServletResponse resp, String servletContext) {
+        try {
+            req.getRequestDispatcher(servletContext).forward(req, resp);
+        } catch (ServletException | IOException e) {
+            throw new ServletForwardingException("Error forwarding to the servlet %s".formatted(servletContext), e);
+        }
+    }
 
     public static void forwardToJsp(HttpServletRequest req, HttpServletResponse resp, String jspName) {
         try {
@@ -34,5 +43,13 @@ public class ServletUtil {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
                 .withZone(ZoneId.systemDefault());
         return formatter.format(instant);
+    }
+
+    public static boolean checkErrors(HttpServletRequest req, HttpServletResponse resp, String jspName) {
+        if (req.getAttribute("errorMessages") != null) {
+            ServletUtil.forwardToJsp(req, resp, jspName);
+            return true;
+        }
+        return false;
     }
 }
