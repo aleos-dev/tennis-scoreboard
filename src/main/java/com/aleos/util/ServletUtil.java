@@ -40,7 +40,7 @@ public class ServletUtil {
     }
 
     public static String formatInstantAsLocalDateTime(Instant instant) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS")
                 .withZone(ZoneId.systemDefault());
         return formatter.format(instant);
     }
