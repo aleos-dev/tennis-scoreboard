@@ -22,19 +22,21 @@
         <fieldset class="horizontal-center">
             <legend>Player Information</legend>
             <label for="playerOneNameId">Player One Name:
-                <input type="text" name="playerOneName" id="playerOneNameId">
+                <input type="text" name="playerOneName" id="playerOneNameId"
+                       value="${matchPayload != null ? matchPayload.playerOneName() : ""}">
             </label><br>
 
             <label for="playerTwoNameId">Player Two Name:
-                <input type="text" name="playerTwoName" id="playerTwoNameId">
+                <input type="text" name="playerTwoName" id="playerTwoNameId"
+                       value="${matchPayload != null ? matchPayload.playerTwoName() : ""}">
             </label><br>
         </fieldset>
         <fieldset>
             <legend>Match Information</legend>
             <label for="format-id" class="format-label">Format:
                 <select name="matchFormat" id="format-id" required>
-                    <option value="bo3" selected>BO3</option>
-                    <option value="bo5">BO5</option>
+                    <option value="bo3" ${matchPayload != null && 'bo3'.equalsIgnoreCase(matchPayload.format()) ? 'selected' : ''}>BO3</option>
+                    <option value="bo5" ${matchPayload != null && 'bo5'.equalsIgnoreCase(matchPayload.format()) ? 'selected' : ''}>BO5</option>
                 </select>
             </label><br>
         </fieldset>
