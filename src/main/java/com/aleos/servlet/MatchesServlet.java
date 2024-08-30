@@ -33,14 +33,12 @@ public class MatchesServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        if (req.getAttribute("violations") != null) {
-            ServletUtil.forwardToJsp(req, resp, "control/matches");
+        if (ServletUtil.checkErrors(req, resp, "control/matches")) {
             return;
         }
 
         var pageable = (PageableInfo) req.getAttribute("pageablePayload");
         var filterCriteria = (MatchFilterCriteria) req.getAttribute("matchFilterCriteria");
-
 
         MatchesDto matchesDto = matchService.findAll(pageable, filterCriteria);
         req.setAttribute("matchesDto", matchesDto);
@@ -49,14 +47,14 @@ public class MatchesServlet extends HttpServlet {
 
         req.setAttribute("baseUrl", req.getContextPath() + req.getServletPath());
         req.setAttribute("queryParam", buildQueryString(filterCriteria));
+        req.setAttribute("formattedBefore", ServletUtil.formatInstantAsLocalDateTime(filterCriteria.before()).substring(0, 16));
 
         ServletUtil.forwardToJsp(req, resp, "control/matches");
     }
 
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) {
-        if (req.getAttribute("violations") != null) {
-            ServletUtil.forwardToJsp(req, resp, "control/create-match");
+        if (ServletUtil.checkErrors(req, resp, "control/create-match")) {
             return;
         }
 
@@ -80,5 +78,4 @@ public class MatchesServlet extends HttpServlet {
 
         return queryParams.toString();
     }
-
 }
