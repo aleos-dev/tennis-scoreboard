@@ -1,12 +1,12 @@
-INSERT INTO player (id, name, country, image_path)
-VALUES (NEXTVAL('player_seq_gen'), 'Serena Williams', 'US', NULL),
-       (NEXTVAL('player_seq_gen'), 'Roger Federer', 'CH', NULL),
-       (NEXTVAL('player_seq_gen'), 'Naomi Osaka', 'JP', NULL),
-       (NEXTVAL('player_seq_gen'), 'Rafael Nadal', 'ES', NULL),
-       (NEXTVAL('player_seq_gen'), 'Simona Halep', 'RO', NULL),
-       (NEXTVAL('player_seq_gen'), 'Novak Djokovic', 'RS', NULL),
-       (NEXTVAL('player_seq_gen'), 'Ashleigh Barty', 'AU', NULL),
-       (NEXTVAL('player_seq_gen'), 'Dominic Thiem', 'AT', NULL),
-       (NEXTVAL('player_seq_gen'), 'Venus Williams', 'US', NULL),
-       (NEXTVAL('player_seq_gen'), 'Andy Murray', 'GB', NULL),
-       (NEXTVAL('player_seq_gen'), 'Maria Sharapova', 'RU', NULL);
+INSERT INTO player (id, name, country)
+VALUES (NEXTVAL('player_seq_gen'), 'Serena Williams', 'US'),
+       (NEXTVAL('player_seq_gen'), 'Roger Federer', 'CH'),
+       (NEXTVAL('player_seq_gen'), 'Naomi Osaka', 'JP'),
+       (NEXTVAL('player_seq_gen'), 'Rafael Nadal', 'ES'),
+       (NEXTVAL('player_seq_gen'), 'Simona Halep', 'RO'),
+       (NEXTVAL('player_seq_gen'), 'Novak Djokovic', 'RS'),
+       (NEXTVAL('player_seq_gen'), 'Ashleigh Barty', 'AU'),
+       (NEXTVAL('player_seq_gen'), 'Dominic Thiem', 'AT'),
+       (NEXTVAL('player_seq_gen'), 'Venus Williams', 'US'),
+       (NEXTVAL('player_seq_gen'), 'Andy Murray', 'GB'),
+       (NEXTVAL('player_seq_gen'), 'Maria Sharapova', 'RU');

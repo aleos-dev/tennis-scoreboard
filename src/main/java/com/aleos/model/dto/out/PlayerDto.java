@@ -8,10 +8,6 @@ public record PlayerDto(
 
         String country,
 
-        String playerImageUrl,
-
-        String countryImageUrl,
-
         @JsonProperty("matches")
         String matchesEndpoint,
 
