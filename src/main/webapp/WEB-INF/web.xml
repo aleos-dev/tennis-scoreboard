@@ -19,17 +19,26 @@
         <filter-name>PlayerFilter</filter-name>
         <filter-class>com.aleos.servlet.filter.PlayerFilter</filter-class>
     </filter>
-    <filter-mapping>
-        <filter-name>MatchFilter</filter-name>
-        <url-pattern>/matches/*</url-pattern>
-    </filter-mapping>
+    <filter>
+        <filter-name>AvatarFilter</filter-name>
+        <filter-class>com.aleos.servlet.filter.AvatarFilter</filter-class>
+    </filter>
     <filter-mapping>
         <filter-name>ExceptionHandlingFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
+        <filter-name>MatchFilter</filter-name>
+        <url-pattern>/matches/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
         <filter-name>PlayerFilter</filter-name>
         <url-pattern>/players/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>AvatarFilter</filter-name>
+        <url-pattern>/avatars/*</url-pattern>
     </filter-mapping>
 
     <servlet-mapping>
