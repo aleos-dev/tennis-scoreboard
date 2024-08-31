@@ -27,6 +27,6 @@ public class MatchInfo {
 
 
     @NonNull
-    @Column(name = "final_score_record", nullable = false)
+    @Column(nullable = false)
     protected String finalScoreRecord;  // Store scores as string like "6:3,5(4):7(6),4:6" etc.
 }

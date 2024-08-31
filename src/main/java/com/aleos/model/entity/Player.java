@@ -1,9 +1,6 @@
 package com.aleos.model.entity;
 
-import com.aleos.ImageService;
 import com.aleos.validation.BasicGroup;
-import com.aleos.validation.ExtendedGroup;
-import com.aleos.validation.ValidFilePath;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -34,14 +31,10 @@ public class Player {
     @Size(min = 5, max = 50, groups = BasicGroup.class, message = "The name must be between {min} and {max}.")
     private String name;
 
-    @Size(min = 2, max = 30, groups = BasicGroup.class, message = "The name must be between {min} and {max}.")
+    @Size(min = 2, max = 2, groups = BasicGroup.class, message = "The country code must be exactly {min} characters.")
     private String country = DEFAULT_COUNTRY;
 
-    @ValidFilePath(message = "The path to the image file is invalid.", groups = ExtendedGroup.class)
-    @Column(name = "image_path")
-    private String imagePath = ImageService.DEFAULT_PLAYER_IMAGE_PATH;
-
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
+    @Column(updatable = false)
     private Instant createdAt = now();
 }

@@ -18,16 +18,20 @@
             <property name="hibernate.default_schema" value="public"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
 
-<!--            <property name="hibernate.hbm2ddl.import_files" value="META-INF/script.sql"/>-->
+            <!-- Set the session context class to 'thread' -->
+            <property name="hibernate.current_session_context_class" value="thread"/>
+
+            <!-- Additional properties as needed -->
+            <property name="hibernate.physical_naming_strategy"
+                      value="org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy"/>
+
+            <!--            <property name="hibernate.hbm2ddl.import_files" value="META-INF/script.sql"/>-->
 
             <!--            <property name="hibernate.show_sql" value="true"/>-->
             <property name="hibernate.format_sql" value="true"/>
             <property name="hibernate.use_sql_comments" value="true"/>
             <property name="hibernate.hbm2ddl.auto" value="validate"/>
 
-            <!-- Additional properties as needed -->
-            <property name="hibernate.physical_naming_strategy"
-                      value="org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl"/>
             <property name="hibernate.session.events.log.LOG_QUERIES_SLOWER_THAN_MS" value="20"/>
 
             <!-- Enable Hibernate statistics -->
@@ -40,7 +44,6 @@
             <property name="hibernate.hikari.idleTimeout" value="300000"/>
             <property name="hibernate.hikari.maxLifetime" value="1800000"/>
         </properties>
-
 
 
     </persistence-unit>
@@ -58,7 +61,7 @@
             <property name="hibernate.default_schema" value="public"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
 
-<!--            <property name="hibernate.hbm2ddl.import_files" value="META-INF/script.sql"/>-->
+            <!--            <property name="hibernate.hbm2ddl.import_files" value="META-INF/script.sql"/>-->
 
             <!--            <property name="hibernate.show_sql" value="true"/>-->
             <property name="hibernate.format_sql" value="true"/>

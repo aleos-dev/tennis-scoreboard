@@ -36,7 +36,7 @@ public class Match {
     private Player winner;
 
     @CreationTimestamp
-    @Column(name = "concluded_at", updatable = false)
+    @Column(updatable = false)
     private Instant concludedAt;
 
     @Embedded
