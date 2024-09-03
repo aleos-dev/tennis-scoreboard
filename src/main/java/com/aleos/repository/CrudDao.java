@@ -1,6 +1,7 @@
 package com.aleos.repository;
 
 import com.aleos.exception.DaoOperationException;
+import com.aleos.exception.UniqueConstraintViolationException;
 import com.aleos.model.entity.Match;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -58,6 +59,13 @@ public abstract class CrudDao<E, K> {
             em.getTransaction().commit();
         } catch (Exception e) {
             em.getTransaction().rollback();
+
+            String uniqueConstraintViolationCode = "23505";
+
+            String message = e.getCause() != null ? e.getCause().getMessage() : "";
+            if (message.contains(uniqueConstraintViolationCode)) {
+                throw new UniqueConstraintViolationException(message, e);
+            }
             throw new DaoOperationException(e.getMessage() == null ? "Transaction is rolled back." : e.getMessage(), e);
         } finally {
             em.close();
