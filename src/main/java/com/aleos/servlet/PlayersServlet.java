@@ -1,14 +1,13 @@
 package com.aleos.servlet;
 
 import com.aleos.configuration.AppContextAttribute;
+import com.aleos.exception.UniqueConstraintViolationException;
 import com.aleos.model.dto.in.PageableInfo;
 import com.aleos.model.dto.in.PlayerFilterCriteria;
 import com.aleos.model.dto.in.PlayerPayload;
-import com.aleos.model.dto.out.PlayersDto;
 import com.aleos.service.PlayerService;
 import com.aleos.servicelocator.ServiceLocator;
 import com.aleos.util.ServletUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -24,48 +23,49 @@ public class PlayersServlet extends HttpServlet {
 
     private transient PlayerService playerService;
 
-    private transient ObjectMapper objectMapper;
-
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         ServiceLocator locator = (ServiceLocator) config.getServletContext()
                 .getAttribute(AppContextAttribute.BEAN_FACTORY.toString());
         playerService = (PlayerService) locator.getBean("playerService");
-        objectMapper = (ObjectMapper) locator.getBean("objectMapper");
     }
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
+        if (ServletUtil.checkErrors(req, resp, "control/players")) {
+            return;
+        }
+
         var pageable = (PageableInfo) req.getAttribute("pageablePayload");
         var filterCriteria = (PlayerFilterCriteria) req.getAttribute("playerFilterCriteria");
 
-        PlayersDto playersDto = playerService.findAll(pageable, filterCriteria);
-        req.setAttribute("playersDto", playersDto);
+        req.setAttribute("playersDto", playerService.findAll(pageable, filterCriteria));
+        req.setAttribute("countryCodes", playerService.getCountryCodes());
         req.setAttribute("filterCriteria", filterCriteria);
         req.setAttribute("pageable", pageable);
-        req.setAttribute("countryCodes", List.of("EN", "UA", "RU"));
-
-        // Build the query parameters (excluding pagination)
-        req.setAttribute("queryParam", buildQueryString(filterCriteria));
         req.setAttribute("baseUrl", req.getContextPath() + req.getServletPath());
+
+        // The query parameters (excluding pagination)
+        req.setAttribute("queryParam", buildQueryString(filterCriteria));
 
         ServletUtil.forwardToJsp(req, resp, "control/players");
     }
 
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) {
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) {
+        PlayerPayload payload = (PlayerPayload) req.getAttribute("playerPayload");
         try {
-            var payload = (PlayerPayload) request.getAttribute("playerPayload");
-
             playerService.createPlayer(payload);
 
-        } catch (Exception e) {
+        } catch (UniqueConstraintViolationException e) {
 
+            req.setAttribute("errorMessages", List.of("Player with name: %s already exists".formatted(payload.name())));
+            ServletUtil.forwardToJsp(req, resp, "control/create-player");
         }
     }
 
-    public static String buildQueryString(PlayerFilterCriteria filterCriteria) {
+    private String buildQueryString(PlayerFilterCriteria filterCriteria) {
         StringJoiner queryParams = new StringJoiner("&", "?", "");
 
         if (filterCriteria.name() != null && !filterCriteria.name().isEmpty()) {
