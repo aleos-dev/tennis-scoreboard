@@ -1,0 +1,38 @@
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
+
+<div class=" content player-info horizontal-center">
+    <img src="${pageContext.request.contextPath}/avatars/${requestScope.playerDto.name()}" alt="Player"
+         class="player-image">
+
+    <c:if test="${editMode}">
+        <div class="form-group">
+            <label for="image-input">Upload New Image: </label>
+            <input type="file" id="image-input" name="image">
+        </div>
+    </c:if>
+
+    <c:choose>
+        <c:when test="${editMode}">
+            <div class="form-group">
+                <label for="country-id">Enter Country Code: </label>
+                <input type="text" id="country-id" name="country" maxlength="2"
+                       value="${requestScope.playerDto.country()}">
+            </div>
+        </c:when>
+        <c:otherwise>
+            <p>Country: ${requestScope.playerDto.country()}</p>
+            <span class="fi fi-${requestScope.playerDto.country().toLowerCase()}"></span>
+        </c:otherwise>
+    </c:choose>
+
+
+    <c:if test="${!editMode}">
+        <a class="edit-mode-trigger"
+           href="${pageContext.request.contextPath}/players/${requestScope.playerDto.name()}?editMode=${true}">✏️
+            Edit
+            profile</a><br>
+    </c:if>
+
+</div>
+
+
