@@ -1,14 +1,13 @@
 package com.aleos.repository;
 
 import com.aleos.exception.EntityNotFoundDbException;
-import com.aleos.model.entity.Player;
 import com.aleos.model.dto.in.Pageable;
 import com.aleos.model.dto.in.PlayerFilterCriteria;
+import com.aleos.model.entity.Player;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.TypeMap;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -47,42 +46,6 @@ public class PlayerRepository {
         });
     }
 
-    public List<Player> findByCriteria(PlayerFilterCriteria filterCriteria) {
-        StringBuilder queryBuilder = new StringBuilder("FROM Player WHERE 1=1");
-
-        if (filterCriteria.name() != null) {
-            queryBuilder.append(" AND name LIKE :name");
-        }
-
-        if (filterCriteria.country() != null) {
-            queryBuilder.append(" AND country = :country");
-        }
-
-        if (filterCriteria.before() != null) {
-            queryBuilder.append(" AND createdAt < :before");
-        }
-
-        String query = queryBuilder.toString();
-
-        return playerDao.runWithinTxAndReturn(entityManager -> {
-            var jpaQuery = entityManager.createQuery(query, Player.class);
-
-            if (filterCriteria.name() != null) {
-                jpaQuery.setParameter("name", "%" + filterCriteria.name() + "%");
-            }
-
-            if (filterCriteria.country() != null) {
-                jpaQuery.setParameter("country", filterCriteria.country().toUpperCase());
-            }
-
-            if (filterCriteria.before() != null) {
-                jpaQuery.setParameter("before", filterCriteria.before());
-            }
-
-            return jpaQuery.getResultList();
-        });
-    }
-
     public Optional<Player> findByName(String name) {
         return playerDao.findByName(name);
     }
@@ -97,9 +60,16 @@ public class PlayerRepository {
                 playerToUpdate.setId(foundedPlayer.getId());
                 entityManager.merge(playerToUpdate);
             } catch (NoResultException e) {
-                  throw new EntityNotFoundDbException("Player: %s not found.".formatted(nameIdentifier));
+                throw new EntityNotFoundDbException("Player: %s not found.".formatted(nameIdentifier));
             }
         });
+    }
+
+    public List<String> getCountryCodes() {
+        return playerDao.runWithinTxAndReturn(em -> em.createQuery("SELECT DISTINCT country FROM Player", String.class)
+                .getResultList().stream()
+                .sorted()
+                .toList());
     }
 
     public long getCount(PlayerFilterCriteria filterCriteria) {
@@ -125,7 +95,8 @@ public class PlayerRepository {
     private Order buildSortOrder(CriteriaBuilder cb, Root<Player> playerRoot, Pageable pageable) {
         String nameAttribute = "name";
         String sortBy = pageable.getSortBy().orElse(nameAttribute);
-        return pageable.getSortDirection().equalsIgnoreCase("ASC")
+
+        return pageable.getSortDirection().equalsIgnoreCase("DESC")
                 ? cb.desc(playerRoot.get(sortBy))
                 : cb.asc(playerRoot.get(sortBy));
     }
@@ -134,9 +105,14 @@ public class PlayerRepository {
         List<Predicate> predicates = new ArrayList<>();
 
         if (filterCriteria.name() != null) {
-            String nameCriteria = "%" + filterCriteria.name() + "%";
+            var nameCriteria = "%" + filterCriteria.name() + "%";
+            var nameWithTitleLetter = "%" + Character.toUpperCase(filterCriteria.name().charAt(0)) + filterCriteria.name().substring(1) + "%";
+
             Predicate namePredicate = cb.like(playerRoot.get("name"), nameCriteria);
-            predicates.add(namePredicate);
+            Predicate nameWithTitleLetterPredicate = cb.like(playerRoot.get("name"), nameWithTitleLetter);
+
+            Predicate combinedPredicate = cb.or(namePredicate, nameWithTitleLetterPredicate);
+            predicates.add(combinedPredicate);
         }
 
         if (filterCriteria.country() != null) {
