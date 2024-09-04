@@ -7,12 +7,10 @@ import jakarta.validation.constraints.Size;
 public record PlayerPayload(
 
         @NotNull(message = "Name cannot be null.")
-        @Size(min = 5, max = 50, message = "The name must be between {min} and {max}.")
+        @Size(min = 5, max = 50, message = "The name length must be between {min} and {max}.")
         String name,
 
         @ValidCountryCode
-        String country,
-
-        String imageUrl
+        String country
 ) {
 }
