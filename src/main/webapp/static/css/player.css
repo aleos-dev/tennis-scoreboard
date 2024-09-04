@@ -1,0 +1,129 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
+
+h1 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 28px;
+}
+
+p {
+    margin:5px;
+}
+
+.error-messages {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border: 1px solid #f5c6cb;
+    margin-bottom: 20px;
+}
+
+.content {
+    border: 1px solid #ddd;
+    padding: 25px;
+    border-radius: 8px;
+    background-color: rgba(202, 223, 202, 0.5);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.player-info {
+    background: rgba(6, 6, 6, 0.1);
+}
+
+.player-image {
+    width: 150px;
+    height: 150px;
+    margin-right: 20px;
+    border-radius: 50%;
+    border: 2px solid rgba(224, 189, 5, 0.3);
+    object-fit: cover;
+}
+
+.fi {
+    width: 80px;
+    height: 48px;
+    display: inline-block;
+    background-size: cover; /* Ensure the flag scales properly */
+    margin-bottom: 20px;
+    margin-top:10px;
+}
+
+.player-info p {
+    font-size: 24px;
+    font-weight: 500;
+    align-items: center;
+}
+
+.ongoing-match {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+a {
+    font-size: 20px;
+    color: #232627;
+    text-decoration: none;
+    transition: color 0.3s;
+    font-weight: 600;
+}
+
+a:hover {
+    color: #011655;
+    text-decoration: underline;
+}
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 400px;
+    padding: 20px;
+    background-color: rgba(6, 6, 6, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    align-items: center;
+}
+
+#player-name {
+    font-size: 20px;
+}
+
+label[for="image-input"] {
+    font-size: 15px;
+}
+
+label[for="country-id"] {
+    font-size: 15px;
+}
+
+#image-input {
+    font-size: 15px;
+    width:100px;
+}
+
+#country-id{
+    font-size: 15px;
+    width:100px;
+}
+
+
+.matches-link {
+    display: inline-block;
+    margin-top: 10px;
+    background-color: #3498db;
+    color: #ffffff;
+    padding: 10px 15px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.matches-link:hover {
+    background-color: #2980b9;
+}
