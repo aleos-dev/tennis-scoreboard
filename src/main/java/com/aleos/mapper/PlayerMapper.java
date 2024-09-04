@@ -1,9 +1,8 @@
 package com.aleos.mapper;
 
-import com.aleos.ImageService;
-import com.aleos.model.entity.Player;
 import com.aleos.model.dto.in.PlayerPayload;
 import com.aleos.model.dto.out.PlayerDto;
+import com.aleos.model.entity.Player;
 import com.aleos.service.MatchService;
 import org.modelmapper.ModelMapper;
 
@@ -15,13 +14,10 @@ public class PlayerMapper {
 
     private final ModelMapper mapper;
 
-    private final ImageService imageService;
-
     private final MatchService matchService;
 
-    public PlayerMapper(ModelMapper mapper, ImageService imageService, MatchService matchService) {
+    public PlayerMapper(ModelMapper mapper, MatchService matchService) {
         this.mapper = mapper;
-        this.imageService = imageService;
         this.matchService = matchService;
         configureMappings();
     }
@@ -34,7 +30,6 @@ public class PlayerMapper {
         Player player = new Player();
         player.setName(payload.name());
         player.setCountry(payload.country());
-        player.setImagePath(payload.imageUrl());
 
         return player;
     }
@@ -50,8 +45,6 @@ public class PlayerMapper {
 
                     String encodedName = URLEncoder.encode(source.getName(), StandardCharsets.UTF_8);
                     String matchesEndpoint = String.format("/matches?playerName=%s", encodedName);
-                    String avatarImageUrl = source.getImagePath();
-                    String countryImageUrl = imageService.resolveImageUrlForCountry(source.getCountry());
                     String ongoingMatchUuid = matchService.findOngoingMatchIdByPlayerName(source.getName())
                             .map(UUID::toString)
                             .orElse(null);
@@ -59,8 +52,6 @@ public class PlayerMapper {
                     return new PlayerDto(
                             source.getName(),
                             source.getCountry(),
-                            avatarImageUrl,
-                            countryImageUrl,
                             matchesEndpoint,
                             ongoingMatchUuid
                     );
