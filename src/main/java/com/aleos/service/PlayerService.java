@@ -1,6 +1,6 @@
 package com.aleos.service;
 
-import com.aleos.exceptions.InvalidPageableRequest;
+import com.aleos.exception.InvalidPageableRequest;
 import com.aleos.mapper.PlayerMapper;
 import com.aleos.model.dto.in.PageableInfo;
 import com.aleos.model.dto.in.PlayerFilterCriteria;
@@ -9,12 +9,11 @@ import com.aleos.model.dto.in.PlayerPayload;
 import com.aleos.model.dto.out.PlayerDto;
 import com.aleos.model.dto.out.PlayersDto;
 import com.aleos.model.entity.Player;
-import com.aleos.repository.MatchRepository;
 import com.aleos.repository.PlayerRepository;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 public class PlayerService {
@@ -63,5 +62,9 @@ public class PlayerService {
     public void update(PlayerNamePayload identifier, PlayerPayload payload) {
         Player entity = mapper.toEntity(payload);
         playerRepository.update(identifier.name(), entity);
+    }
+
+    public List<String> getCountryCodes() {
+        return playerRepository.getCountryCodes();
     }
 }
