@@ -29,14 +29,17 @@
             <span class="match-id"> Match ID: <span class="match-id-value">${matchId}</span></span>
         </div>
     </div>
-    <span class="match-announce"><span class="player1">${p1Name} </span><span class="player2">${p2Name}</span></span>
+    <span class="match-announce">
+    <span class="player1 ${winner.equalsIgnoreCase(p1Name) ? 'winner-glow' : 'loser-fade'}">${p1Name}</span>
+    vs
+    <span class="player2 ${winner.equalsIgnoreCase(p2Name) ? 'winner-glow' : 'loser-fade'}">${p2Name}</span>
+    </span>
 </div>
 
 <div class="completed-match-container">
-    <div class="player player-container-1">
-        <jsp:include page="../fragment/playerRepresentation.jsp">
-            <jsp:param name="name" value="${p1Name}"/>
-        </jsp:include>
+    <div class="player ${winner.equalsIgnoreCase(p1Name) ? 'player-winner' : 'player-loser'}">
+        <img src="${pageContext.request.contextPath}/avatars/${p1Name}" alt="Player"
+             class="player-image">
     </div>
 
     <div class="scoreboard-container">
@@ -44,13 +47,12 @@
             <img src="${pageContext.request.contextPath}/static/images/vs-element.webp" alt="VS">
         </div>
 
-        <%@ include file="../fragment/completed-match-scoreboard.jsp" %>
+        <%@ include file="../fragment/completed-match-scoreboard.jspf" %>
     </div>
 
-    <div class="player player-container-2">
-        <jsp:include page="../fragment/playerRepresentation.jsp">
-            <jsp:param name="name" value="${p2Name}"/>
-        </jsp:include>
+    <div class="player ${winner.equalsIgnoreCase(p2Name) ? 'player-winner' : 'player-loser'}">
+        <img src="${pageContext.request.contextPath}/avatars/${p2Name}" alt="Player"
+             class="player-image">
     </div>
 </div>
 
