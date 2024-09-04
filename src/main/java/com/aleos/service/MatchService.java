@@ -1,6 +1,5 @@
 package com.aleos.service;
 
-import com.aleos.ImageService;
 import com.aleos.exception.PlayerRegistrationException;
 import com.aleos.exception.UnknownMatchFormat;
 import com.aleos.mapper.MatchMapper;
@@ -88,7 +87,7 @@ public class MatchService implements PropertyChangeListener {
                 totalItems,
                 hasNext,
                 hasPrevious
-                );
+        );
     }
 
     public Optional<MatchDto> findById(MatchUuidPayload uuidPayload) {
@@ -181,8 +180,6 @@ public class MatchService implements PropertyChangeListener {
                 .orElseGet(() -> {
                     Player player = new Player();
                     player.setName(name);
-                    player.setImagePath(ImageService.DEFAULT_PLAYER_IMAGE_PATH);
-
                     playerDao.save(player);
                     return player;
                 });

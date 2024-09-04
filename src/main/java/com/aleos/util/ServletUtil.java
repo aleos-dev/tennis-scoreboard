@@ -33,7 +33,7 @@ public class ServletUtil {
 
     public static void redirect(HttpServletRequest req, HttpServletResponse resp, String path) {
         try {
-            resp.sendRedirect(req.getContextPath() + path);
+            resp.sendRedirect(req.getContextPath() + (path.startsWith("/") ? path : "/" + path));
         } catch (IOException e) {
             throw new JspForwardingException("Error redirection to the %s ".formatted(path), e);
         }

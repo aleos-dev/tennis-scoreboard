@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -35,8 +34,8 @@ public class MatchFilter extends AbstractEndpointFilter {
             default -> {/* do nothing */}
         }
 
-        if (req.getAttribute("violations") != null) {
-            logger.log(Level.SEVERE, req.getAttribute("violations").toString());
+        if (req.getAttribute("errorMessages") != null) {
+            logger.log(Level.SEVERE, () -> req.getAttribute("errorMessages").toString());
         }
 
         chain.doFilter(req, resp);
@@ -129,13 +128,12 @@ public class MatchFilter extends AbstractEndpointFilter {
 
     private MatchFilterCriteria getMatchFilterCriteria(HttpServletRequest req) {
         var name = req.getParameter("playerName");
+        var before = req.getParameter("before");
         return new MatchFilterCriteria(
                 Optional.ofNullable(req.getParameter("status"))
                         .orElseGet(() -> PropertiesUtil.get("filter.default.matchStatus").orElse(null)),
-                name != null && name.isBlank() ? null : name,
-                Optional.ofNullable(req.getParameter("before"))
-                        .map(this::toInstant)
-                        .orElse(Instant.now())
+                name == null || name.isBlank() ? null : name,
+                before == null || before.isBlank() ? null : toInstant(before)
         );
     }
 }

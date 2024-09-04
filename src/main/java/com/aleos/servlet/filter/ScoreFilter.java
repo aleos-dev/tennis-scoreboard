@@ -27,26 +27,25 @@ public class ScoreFilter extends AbstractEndpointFilter {
 
             case "GET" -> handleGetMethodPayload(req);
 
-            case "POST" -> handlePostMethodPayload(req, resp);
+            case "POST" -> handlePostMethodPayload(req);
 
             default -> {/* do nothing */}
         }
 
-        if (req.getAttribute("violations") == null) {
-            chain.doFilter(req, resp);
-        } else {
-
-            logger.log(Level.SEVERE, req.getAttribute("violations").toString());
+        if (req.getAttribute("violations") != null) {
+            logger.log(Level.SEVERE, () -> req.getAttribute("violations").toString());
         }
+
+        chain.doFilter(req, resp);
     }
 
     private void handleGetMethodPayload(HttpServletRequest req) {
         extractMatchUuidPayloadToReqContext(req);
     }
 
-    private void handlePostMethodPayload(HttpServletRequest req, HttpServletResponse resp) {
+    private void handlePostMethodPayload(HttpServletRequest req) {
         extractMatchUuidPayloadToReqContext(req);
-        extractPlayerNamePayloadToReqContext(req, resp);
+        extractPlayerNamePayloadToReqContext(req);
     }
 
     private void extractMatchUuidPayloadToReqContext(HttpServletRequest req) {
@@ -70,11 +69,11 @@ public class ScoreFilter extends AbstractEndpointFilter {
         }
     }
 
-    private void extractPlayerNamePayloadToReqContext(HttpServletRequest req, HttpServletResponse resp) {
+    private void extractPlayerNamePayloadToReqContext(HttpServletRequest req) {
         PlayerNamePayload payload = getPlayerNamePayload(req);
 
         validatePayload(payload).ifPresentOrElse(
-                violations -> handlePayloadViolations(req, resp, violations),
+                violations -> handlePayloadViolations(req, violations),
                 () -> req.setAttribute("playerNamePayload", payload)
         );
     }

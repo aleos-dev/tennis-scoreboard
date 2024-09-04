@@ -20,7 +20,6 @@ public class PageableInfo implements Pageable {
     int pageSize;
 
     @NotBlank(message = "Sort by field cannot be blank.")
-//        @ValidSortBy(allowedValues = {"timestamp, name"})
     String sortBy;
 
     @Pattern(regexp = "(?i)asc|desc", message = "Sort direction must be either 'asc' or 'desc'.")
@@ -39,7 +38,7 @@ public class PageableInfo implements Pageable {
 
     @Override
     public int getOffset() {
-        return (pageNumber -1) * pageSize;
+        return (pageNumber - 1) * pageSize;
     }
 
     @Override
