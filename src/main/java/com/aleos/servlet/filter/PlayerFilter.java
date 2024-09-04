@@ -32,13 +32,11 @@ public class PlayerFilter extends AbstractEndpointFilter {
 
             case "POST" -> handlePostMethodPayload(req);
 
-            case "PUT" -> handlePutMethodPayload(req);
-
-            default -> {/* do nothing */}
+            default -> { /*do nothing*/}
         }
 
-        if (req.getAttribute("violations") != null) {
-            logger.log(Level.SEVERE, req.getAttribute("violations").toString());
+        if (req.getAttribute("errorMessages") != null) {
+            logger.log(Level.SEVERE, () -> req.getAttribute("errorMessages").toString());
         }
 
         chain.doFilter(req, resp);
@@ -56,13 +54,10 @@ public class PlayerFilter extends AbstractEndpointFilter {
     }
 
     private void handlePostMethodPayload(HttpServletRequest req) {
+        if (!isRequestForMainPath(req)) {
+            extractPlayerIdentifierToReqContext(req);
+        }
         extractPlayerPayloadToReqContext(req);
-    }
-
-    private void handlePutMethodPayload(HttpServletRequest req) {
-        extractPlayerIdentifierToReqContext(req);
-        extractPlayerPayloadToReqContext(req);
-
     }
 
     private void extractPlayerIdentifierToReqContext(HttpServletRequest req) {
@@ -72,11 +67,11 @@ public class PlayerFilter extends AbstractEndpointFilter {
 
         int skipSlash = 1;
         var payload = new PlayerNamePayload(req.getPathInfo().substring(skipSlash));
+
         validatePayload(payload).ifPresentOrElse(
                 violations -> handlePayloadViolations(req, violations),
                 () -> req.setAttribute("playerNamePayload", payload)
         );
-        req.setAttribute("playerNamePayload", payload);
     }
 
     private void extractPlayerNamePayloadToReqContext(HttpServletRequest req) {
@@ -107,17 +102,15 @@ public class PlayerFilter extends AbstractEndpointFilter {
     private void extractPlayerPayloadToReqContext(HttpServletRequest req) {
         PlayerPayload payload = getPlayerPayload(req);
 
-        validatePayload(payload).ifPresentOrElse(
-                violations -> handlePayloadViolations(req, violations),
-                () -> req.setAttribute("playerPayload", payload)
-        );
+        req.setAttribute("playerPayload", payload);
+        validatePayload(payload).ifPresent(violations -> handlePayloadViolations(req, violations));
     }
 
     private PlayerPayload getPlayerPayload(HttpServletRequest req) {
+        String country = req.getParameter("country");
         return new PlayerPayload(
                 req.getParameter("name"),
-                req.getParameter("country").toUpperCase(),
-                req.getParameter("imageUrl")
+                country == null ? null : country.toUpperCase()
         );
     }
 
@@ -135,8 +128,8 @@ public class PlayerFilter extends AbstractEndpointFilter {
         var beforeDate = req.getParameter("before");
 
         return new PlayerFilterCriteria(
-                country != null ? country.toUpperCase() : null,
-                name != null && name.isBlank() ? null : name,
+                country == null || country.isBlank() ? null : country.toUpperCase(),
+                name == null || name.isBlank() ? null : name,
                 Optional.ofNullable(beforeDate).map(this::toInstant).orElse(Instant.now())
         );
     }
