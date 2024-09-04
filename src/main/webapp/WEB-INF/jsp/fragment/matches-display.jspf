@@ -20,8 +20,12 @@
                         </h3>
 
                         <div class="match-details">
-                            <p>Started at: <span class="match-date">${fn:substring(liveMatch.eventDateTime.toLocalTime().toString(), 0, 5)}</span></p>
-                            <p>Current Game Score: <span class="match-scores">${liveMatch.score.scorePoints[0]}<b> : </b>${liveMatch.score.scorePoints[1]}</span></p>
+                            <p>Started at: <span
+                                    class="match-date">${fn:substring(liveMatch.eventDateTime.toLocalTime().toString(), 0, 5)}</span>
+                            </p>
+                            <p>Current Game Score: <span
+                                    class="match-scores">${liveMatch.score.scorePoints[0]}<b> : </b>${liveMatch.score.scorePoints[1]}</span>
+                            </p>
                         </div>
 
                     </div>

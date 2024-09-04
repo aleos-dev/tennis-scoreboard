@@ -1,0 +1,28 @@
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
+
+<c:forEach var="playerDto" items="${requestScope.playersDto.content}">
+    <a href="${pageContext.request.contextPath}/players/${playerDto.name()}" class="player-details-ref">
+
+        <div class="player-item">
+            <h3>
+                <span class="player-name">${playerDto.name()}</span>
+                <span class="fi fi-${playerDto.country().toLowerCase()}"></span>
+            </h3>
+
+            <div class="player-content">
+                <c:if test="${not empty playerDto.ongoingMatchUuid()}">
+                    <a class="ongoing-match-ref"
+                       href="${pageContext.request.contextPath}/matches/${playerDto.ongoingMatchUuid()}">
+                        ongoing match
+                    </a>
+                </c:if>
+                <a class="matches-ref" href="${playerDto.matchesEndpoint()}&status=any">
+                    <span>match list</span>
+                </a>
+            </div>
+
+        </div>
+
+    </a>
+</c:forEach>

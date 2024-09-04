@@ -1,3 +1,4 @@
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <jsp:useBean id="filterCriteria" scope="request" type="com.aleos.model.dto.in.MatchFilterCriteria"/>
 
 <div class="filter-form">

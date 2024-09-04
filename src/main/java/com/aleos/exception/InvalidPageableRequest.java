@@ -1,4 +1,4 @@
-package com.aleos.exceptions;
+package com.aleos.exception;
 
 public class InvalidPageableRequest extends RuntimeException {
 
