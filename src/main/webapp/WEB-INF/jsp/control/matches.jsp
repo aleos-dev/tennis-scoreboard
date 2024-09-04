@@ -28,14 +28,14 @@
     <jsp:useBean id="matchesDto" scope="request" type="com.aleos.model.dto.out.MatchesDto"/>
 
     <div class="div-matches-section">
-        <%@ include file="../fragment/matchFilterCriteria.jsp" %>
+        <%@ include file="../fragment/matchFilterCriteria.jspf" %>
 
         <c:if test="${empty matchesDto.content}">
             <div class="no-matches"><span>There is no any match</span></div>
         </c:if>
 
         <section class="matches-section">
-                <%@ include file="../fragment/matches-display.jsp" %>
+            <%@ include file="../fragment/matches-display.jspf" %>
         </section>
 
         <section class="content horizontal-center pagination-section">

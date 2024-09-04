@@ -30,7 +30,7 @@
 </div>
 
 <div class="content horizontal-center">
-    <%@ include file="../fragment/live-match-scoreboard.jsp" %>
+    <%@ include file="../fragment/live-match-scoreboard.jspf" %>
 
 
     <div class="score-label">Award Point</div>

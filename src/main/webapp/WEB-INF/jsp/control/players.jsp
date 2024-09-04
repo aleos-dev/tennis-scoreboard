@@ -28,14 +28,14 @@
     <jsp:useBean id="playersDto" scope="request" type="com.aleos.model.dto.out.PlayersDto"/>
 
     <div class="div-players-section">
-        <%@ include file="../fragment/playerFilterCriteria.jsp" %>
+        <%@ include file="../fragment/playerFilterCriteria.jspf" %>
 
         <c:if test="${empty playersDto.content}">
             <div class="no-players"><span>There is no any player</span></div>
         </c:if>
 
         <section class="players-section">
-            <%@ include file="../fragment/players-display.jsp" %>
+            <%@ include file="../fragment/players-display.jspf" %>
         </section>
 
         <section class="content horizontal-center pagination-section">
