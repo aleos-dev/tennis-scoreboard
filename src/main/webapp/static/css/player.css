@@ -2,7 +2,6 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f4f4f4;
     margin: 0;
-    padding: 20px;
     color: #333;
 }
 
@@ -24,24 +23,27 @@ p {
     margin-bottom: 20px;
 }
 
-.content {
+.card {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
     border: 1px solid #ddd;
     padding: 25px;
     border-radius: 8px;
     background-color: rgba(202, 223, 202, 0.5);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    max-width: 800px;
-    margin: 0 auto;
+    margin: 20px auto;
 }
 
 .player-info {
     background: rgba(6, 6, 6, 0.1);
+    margin: 50px;
 }
 
 .player-image {
     width: 150px;
     height: 150px;
-    margin-right: 20px;
+    margin: 20px;
     border-radius: 50%;
     border: 2px solid rgba(224, 189, 5, 0.3);
     object-fit: cover;

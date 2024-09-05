@@ -13,19 +13,20 @@
     --cta-button-color: var(--primary-color);
     --cta-button-hover-color: #2E7D32;
     --nav-button-hover-color: #f39c12;
-
-    /*--input-border-color: var(--primary-color);*/
 }
 
 body {
     background: url('/static/images/tennis-scoreboard-main-background.webp') no-repeat center/cover;
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .content {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
+    flex: 1;
 }
 
 .vertical-center {
@@ -42,7 +43,6 @@ body {
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    /*background: #eeee90;*/
 }
 
 /* Header Styles */
@@ -129,9 +129,10 @@ body {
     color: #fff;
     text-align: center;
     padding: 10px 20px;
-    position: absolute;
+    position: sticky;
     bottom: 0;
     width: 100%;
+
 }
 
 /* Error Message Styling */
