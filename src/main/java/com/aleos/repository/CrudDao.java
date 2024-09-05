@@ -53,10 +53,10 @@ public abstract class CrudDao<E, K> {
     protected <T> T runWithinTxAndReturn(Function<EntityManager, T> eMFunc) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        T result;
         try {
-            result = eMFunc.apply(em);
+            T result = eMFunc.apply(em);
             em.getTransaction().commit();
+            return result;
         } catch (Exception e) {
             em.getTransaction().rollback();
 
@@ -70,7 +70,6 @@ public abstract class CrudDao<E, K> {
         } finally {
             em.close();
         }
-        return result;
     }
 
     protected void runWithinTx(Consumer<EntityManager> eMFunc) {
