@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 
-<div class=" content player-info horizontal-center">
+<div class="content player-info horizontal-center">
     <img src="${pageContext.request.contextPath}/avatars/${requestScope.playerDto.name()}" alt="Player"
          class="player-image">
 
