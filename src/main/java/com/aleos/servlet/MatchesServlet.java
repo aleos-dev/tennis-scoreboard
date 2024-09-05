@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.time.Instant;
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -47,9 +48,15 @@ public class MatchesServlet extends HttpServlet {
 
         req.setAttribute("baseUrl", req.getContextPath() + req.getServletPath());
         req.setAttribute("queryParam", buildQueryString(filterCriteria));
-        req.setAttribute("formattedBefore", ServletUtil.formatInstantAsLocalDateTime(filterCriteria.before()).substring(0, 16));
+        req.setAttribute("formattedBefore", formatInstantForHtmlForm(filterCriteria.before()));
 
         ServletUtil.forwardToJsp(req, resp, "control/matches");
+    }
+
+    private String formatInstantForHtmlForm(Instant before) {
+        return before != null
+                ? ServletUtil.formatInstantAsLocalDateTime(before).substring(0, 16)
+                : null;
     }
 
     @Override
@@ -74,7 +81,9 @@ public class MatchesServlet extends HttpServlet {
             queryParams.add("status=" + filterCriteria.status());
         }
 
-        queryParams.add("before=" + ServletUtil.formatInstantAsLocalDateTime(filterCriteria.before()));
+        if (filterCriteria.before() != null) {
+            queryParams.add("before=" + ServletUtil.formatInstantAsLocalDateTime(filterCriteria.before()));
+        }
 
         return queryParams.toString();
     }
