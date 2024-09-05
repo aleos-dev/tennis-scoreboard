@@ -22,29 +22,30 @@
         </ul>
     </div>
 </c:if>
+<div class="content">
+    <c:if test="${not empty requestScope.matchesDto}">
 
-<c:if test="${not empty requestScope.matchesDto}">
+        <jsp:useBean id="matchesDto" scope="request" type="com.aleos.model.dto.out.MatchesDto"/>
 
-    <jsp:useBean id="matchesDto" scope="request" type="com.aleos.model.dto.out.MatchesDto"/>
+        <div class="div-matches-section">
+            <%@ include file="../fragment/matchFilterCriteria.jspf" %>
 
-    <div class="div-matches-section">
-        <%@ include file="../fragment/matchFilterCriteria.jspf" %>
+            <c:if test="${empty matchesDto.content}">
+                <div class="no-matches"><span>There is no any match</span></div>
+            </c:if>
 
-        <c:if test="${empty matchesDto.content}">
-            <div class="no-matches"><span>There is no any match</span></div>
-        </c:if>
+            <section class="matches-section">
+                <%@ include file="../fragment/matches-display.jspf" %>
+            </section>
 
-        <section class="matches-section">
-            <%@ include file="../fragment/matches-display.jspf" %>
-        </section>
+            <section class="content horizontal-center pagination-section">
 
-        <section class="content horizontal-center pagination-section">
-
-            <c:set var="dto" value="${matchesDto}" scope="request"/>
-            <%@ include file="../common/pagination.jsp" %>
-        </section>
-    </div>
-</c:if>
+                <c:set var="dto" value="${matchesDto}" scope="request"/>
+                <%@ include file="../common/pagination.jsp" %>
+            </section>
+        </div>
+    </c:if>
+</div>
 
 <%@ include file="../common/footer.jsp" %>
 

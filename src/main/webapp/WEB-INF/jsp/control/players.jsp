@@ -23,27 +23,29 @@
     </div>
 </c:if>
 
-<c:if test="${not empty requestScope.playersDto}">
+<div class="content">
+    <c:if test="${not empty requestScope.playersDto}">
 
-    <jsp:useBean id="playersDto" scope="request" type="com.aleos.model.dto.out.PlayersDto"/>
+        <jsp:useBean id="playersDto" scope="request" type="com.aleos.model.dto.out.PlayersDto"/>
 
-    <div class="div-players-section">
-        <%@ include file="../fragment/playerFilterCriteria.jspf" %>
+        <div class="div-players-section">
+            <%@ include file="../fragment/playerFilterCriteria.jspf" %>
 
-        <c:if test="${empty playersDto.content}">
-            <div class="no-players"><span>There is no any player</span></div>
-        </c:if>
+            <c:if test="${empty playersDto.content}">
+                <div class="no-players"><span>There is no any player</span></div>
+            </c:if>
 
-        <section class="players-section">
-            <%@ include file="../fragment/players-display.jspf" %>
-        </section>
+            <section class="players-section">
+                <%@ include file="../fragment/players-display.jspf" %>
+            </section>
 
-        <section class="content horizontal-center pagination-section">
-            <c:set var="dto" value="${playersDto}" scope="request"/>
-            <%@ include file="../common/pagination.jsp" %>
-        </section>
-    </div>
-</c:if>
+            <section class="content horizontal-center pagination-section">
+                <c:set var="dto" value="${playersDto}" scope="request"/>
+                <%@ include file="../common/pagination.jsp" %>
+            </section>
+        </div>
+    </c:if>
+</div>
 
 <%@ include file="../common/footer.jsp" %>
 
