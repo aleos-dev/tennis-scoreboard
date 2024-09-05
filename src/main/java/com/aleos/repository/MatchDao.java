@@ -3,10 +3,12 @@ package com.aleos.repository;
 import com.aleos.model.entity.Match;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.TypedQuery;
+import lombok.NonNull;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.UUID;
 
 public class MatchDao extends CrudDao<Match, UUID> {
@@ -16,7 +18,7 @@ public class MatchDao extends CrudDao<Match, UUID> {
     }
 
     public List<Match> findByPlayerPatternBefore(String playerName, Instant before, int offset, int limit) {
-        String findByPlayerNameSql = """
+        String findByPlayerNameHql = """
                 FROM Match
                 WHERE   (LOWER(playerOne.name) LIKE :name
                             OR LOWER(playerTwo.name) LIKE :name)
@@ -25,7 +27,7 @@ public class MatchDao extends CrudDao<Match, UUID> {
                 """;
 
         return runWithinTxAndReturn(entityManager -> {
-            TypedQuery<Match> query = entityManager.createQuery(findByPlayerNameSql, Match.class);
+            TypedQuery<Match> query = entityManager.createQuery(findByPlayerNameHql, Match.class);
             query.setParameter("name", '%' + playerName.toLowerCase(Locale.ROOT) + '%');
             query.setParameter("before", before);
             query.setFirstResult(offset);
@@ -37,7 +39,7 @@ public class MatchDao extends CrudDao<Match, UUID> {
     }
 
     public List<Match> findAllBefore(Instant before, int offset, int limit) {
-        String findAllConcludedMatchesSql = """
+        String findAllConcludedMatchesHql = """
                 FROM Match
                 WHERE concludedAt < :before
                 ORDER by instant DESC
@@ -45,7 +47,7 @@ public class MatchDao extends CrudDao<Match, UUID> {
 
         return runWithinTxAndReturn(entityManager -> {
             TypedQuery<Match> query =
-                    entityManager.createQuery(findAllConcludedMatchesSql, Match.class);
+                    entityManager.createQuery(findAllConcludedMatchesHql, Match.class);
             query.setParameter("before", before);
             query.setFirstResult(offset);
             query.setMaxResults(limit);
@@ -55,14 +57,14 @@ public class MatchDao extends CrudDao<Match, UUID> {
     }
 
     public int countAllBefore(Instant instant) {
-        String countAllAfterSql = """
+        String countAllAfterHql = """
                 SELECT COUNT(m)
                 FROM Match m
                 WHERE concludedAt < :instant
                 """;
 
         return runWithinTxAndReturn(entityManager -> {
-            TypedQuery<Long> query = entityManager.createQuery(countAllAfterSql, Long.class);
+            TypedQuery<Long> query = entityManager.createQuery(countAllAfterHql, Long.class);
             query.setParameter("instant", instant);
 
             return query.getSingleResult().intValue();
@@ -70,18 +72,33 @@ public class MatchDao extends CrudDao<Match, UUID> {
     }
 
     public int countAllByIdBefore(Long playerId, Instant instant) {
-        String countAllAfterSql = """
+        String countAllAfterHql = """
                 SELECT COUNT(m)
                 FROM Match m
                 WHERE concludedAt < :instant AND (playerOne.id = :playerId OR playerTwo.id = :playerId)
                 """;
 
         return runWithinTxAndReturn(entityManager -> {
-            TypedQuery<Long> query = entityManager.createQuery(countAllAfterSql, Long.class);
+            TypedQuery<Long> query = entityManager.createQuery(countAllAfterHql, Long.class);
             query.setParameter("instant", instant);
             query.setParameter("playerId", playerId);
 
             return query.getSingleResult().intValue();
+        });
+    }
+
+    public Optional<Match> findByIdFetchHistory(@NonNull UUID id) {
+        String findByIdFetchHistoryHql = """
+                SELECT  m
+                FROM Match m
+                LEFT OUTER JOIN FETCH m.info.historyEntries
+                WHERE m.id = :id
+                """;
+        return runWithinTxAndReturn(entityManager -> {
+            TypedQuery<Match> query = entityManager.createQuery(findByIdFetchHistoryHql, Match.class);
+            query.setParameter("id", id);
+
+            return query.getResultList().stream().findFirst();
         });
     }
 }

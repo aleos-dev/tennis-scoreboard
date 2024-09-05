@@ -117,18 +117,13 @@ public class MatchRepository {
     }
 
     public Optional<Match> findConcluded(@NonNull UUID id) {
-        return matchDao.findById(id);
+        return matchDao.findByIdFetchHistory(id);
     }
 
 
     public void removeOngoingFromCache(UUID id) {
         ongoingMatchCache.remove(id);
     }
-
-    public void removeConcluded(UUID id) {
-        matchDao.delete(id);
-    }
-
 
     private boolean isPlayerNameMatchingCriteria(TennisMatch match, MatchFilterCriteria filterCriteria) {
         return filterCriteria.playerName() == null
