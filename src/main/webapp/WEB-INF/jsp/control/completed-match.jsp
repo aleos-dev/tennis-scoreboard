@@ -17,6 +17,7 @@
     <title>Match info</title>
     <link rel="stylesheet" type="text/css"
           href="${pageContext.request.contextPath}/static/css/completed-match.css">
+    <script src="${pageContext.request.contextPath}/static/js/toggleHistory.js"></script>
 </head>
 
 <body>
@@ -46,7 +47,6 @@
         <div class="vs-icon">
             <img src="${pageContext.request.contextPath}/static/images/vs-element.webp" alt="VS">
         </div>
-
         <%@ include file="../fragment/completed-match-scoreboard.jspf" %>
     </div>
 
@@ -54,6 +54,21 @@
         <img src="${pageContext.request.contextPath}/avatars/${p2Name}" alt="Player"
              class="player-image">
     </div>
+</div>
+
+
+<div class="button-container">
+    <button onclick="toggleHistory()" class="cta-button">Toggle History</button>
+</div>
+
+
+<div id="matchHistory" class="match-history" ">
+    <span>Match History: </span>
+    <ul>
+        <c:forEach var="entry" items="${match.info.historyEntries}">
+            <li>${entry}</li>
+        </c:forEach>
+    </ul>
 </div>
 
 
