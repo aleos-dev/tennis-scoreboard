@@ -1,10 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <c:set var="p1PointScore" value="${matchScore.scorePoints[0]}" scope="request"/>
 <c:set var="p2PointScore" value="${matchScore.scorePoints[1]}" scope="request"/>
 <c:set var="p1GameScore" value="${matchScore.scoreGames[0]}" scope="request"/>
 <c:set var="p2GameScore" value="${matchScore.scoreGames[1]}" scope="request"/>
 <c:set var="p1SetScore" value="${matchScore.scoreSets[0]}" scope="request"/>
 <c:set var="p2SetScore" value="${matchScore.scoreSets[1]}" scope="request"/>
+<c:set var="snapshot" value="${matchScore.scoreSnapshot}" scope="request"/>
 
 <div class="content scoreboard">
     <div class="score-entry">
@@ -24,11 +26,25 @@
         </div>
     </div>
     <div class="score-entry">
-        <div class="title">Set Score:</div>
+        <div class="title">Total Set Score:</div>
         <div class="scores">
             <div class="score player1">${p1SetScore}</div>
             <div class="score-divider">:</div>
             <div class="score player2">${p2SetScore}</div>
         </div>
+    </div>
+    <div class="played-sets">
+        <c:if test="${snapshot.length() > 0}">
+            <div class="score-entry">
+                <div class="title">PLAYED SETS</div>
+                <c:forEach var="playedSet" items="${fn:split(snapshot, ',')}">
+                    <div class="scores">
+                        <div class="score player1">${fn:split(playedSet, ':')[0]}</div>
+                        <div class="score-divider">:</div>
+                        <div class="score player2">${fn:split(playedSet, ':')[1]}</div>
+                    </div>
+                </c:forEach>
+            </div>
+        </c:if>
     </div>
 </div>
