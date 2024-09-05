@@ -98,7 +98,10 @@ public class ScoreTrackerService implements PropertyChangeListener {
         addWinnerNotification(evt, matchEvent, matchScore);
 
         switch (matchEvent) {
-            case SET_WINNER -> addSetScoresHistory(evt, matchScore);
+            case SET_WINNER -> {
+                addSetScoresHistory(evt, matchScore);
+                refreshPointsAndGames(matchScore);
+            }
             case MATCH_WINNER -> untrackMatch(matchId);
             default -> { /*do nothing*/ }
         }
@@ -121,6 +124,11 @@ public class ScoreTrackerService implements PropertyChangeListener {
                 .append(setScoreManager.getScore(Player.TWO));
 
         handleTieBreakScoreRecord(matchScore, scoreState);
+    }
+
+    private static void refreshPointsAndGames(MatchScore matchScore) {
+        matchScore.setScorePoints(new String[] {"",""});
+        matchScore.setScoreGames(new String[] {"",""});
     }
 
     private String resolvePlayerName(Player player, MatchScore matchScore) {
