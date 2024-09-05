@@ -6,6 +6,25 @@
          version="5.0">
 
     <display-name>Archetype Created Web Application</display-name>
+    <servlet>
+        <servlet-name>H2Console</servlet-name>
+        <servlet-class>org.h2.server.web.JakartaWebServlet</servlet-class>
+        <init-param>
+            <param-name>webAllowOthers</param-name>
+            <param-value></param-value>
+        </init-param>
+        <!--
+        <init-param>
+            <param-name>trace</param-name>
+            <param-value></param-value>
+        </init-param>
+        -->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>H2Console</servlet-name>
+        <url-pattern>/console/*</url-pattern>
+    </servlet-mapping>
 
     <filter>
         <filter-name>ExceptionHandlingFilter</filter-name>
@@ -45,4 +64,5 @@
         <servlet-name>default</servlet-name>
         <url-pattern>/static/*</url-pattern>
     </servlet-mapping>
+
 </web-app>
