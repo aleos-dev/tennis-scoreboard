@@ -35,7 +35,8 @@
 
     <div class="score-label">Award Point</div>
 
-    <form class="score-control" action="${pageContext.request.contextPath}/match-scores/${matchScore.matchID}" method="post">
+    <form class="score-control" action="${pageContext.request.contextPath}/match-scores/${matchScore.matchID}"
+          method="post">
         <input type="hidden" name="pointWinner" id="pointWinner" value="">
         <div class="button">
             <button type="button" onclick="submitScore('${p1Name}')">${p1Name}</button>
@@ -46,10 +47,8 @@
         </div>
     </form>
 </div>
-
-<c:if test="${not empty requestScope.notifications}">
-    <%@ include file="../common/notification.jsp" %>
-</c:if>
+<c:set var="notifications" scope="request" value="${matchScore.notifications}"/>
+<%@ include file="../common/notification.jsp" %>
 
 <%@ include file="../common/footer.jsp" %>
 
