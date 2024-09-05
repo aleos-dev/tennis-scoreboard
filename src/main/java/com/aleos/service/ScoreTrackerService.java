@@ -163,12 +163,12 @@ public class ScoreTrackerService implements PropertyChangeListener {
     private void handleTieBreakScoreRecord(MatchScore matchScore, StringBuffer scoreState) {
         if (isTieBreakRecordFormat(matchScore.getScoreGames())) {
             int playerOneLastScoreIdx = Math.max(scoreState.lastIndexOf(",") + 1, 0);
-            int separatorIdx = scoreState.lastIndexOf(":");
-            int playerTwoLastScoreIdx = separatorIdx + 1;
             scoreState.insert(playerOneLastScoreIdx, "6(");
+            int separatorIdx = scoreState.lastIndexOf(":");
             scoreState.insert(separatorIdx, ")");
+            int playerTwoLastScoreIdx = separatorIdx + 2;
             scoreState.insert(playerTwoLastScoreIdx, "6(");
-            scoreState.insert(scoreState.length() - 1, ")");
+            scoreState.insert(scoreState.length(), ")");
         }
     }
 
