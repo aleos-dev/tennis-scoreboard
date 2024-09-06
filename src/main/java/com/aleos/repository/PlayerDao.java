@@ -1,6 +1,5 @@
 package com.aleos.repository;
 
-
 import com.aleos.model.entity.Player;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.TypedQuery;
@@ -32,8 +31,6 @@ public class PlayerDao extends CrudDao<Player, Long> {
                     : Optional.of(resultList.getFirst());
         });
     }
-
-
 
     public List<Long> findIdsByNamePattern(@NonNull String namePattern) {
         String findByPlayerNameSql = """

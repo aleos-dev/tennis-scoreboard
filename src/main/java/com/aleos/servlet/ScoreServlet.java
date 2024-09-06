@@ -18,7 +18,6 @@ public class ScoreServlet extends HttpServlet {
 
     private transient MatchService matchService;
 
-
     @Override
     public void init(ServletConfig config) {
         var locator = (ServiceLocator) config.getServletContext().getAttribute(AppContextAttribute.BEAN_FACTORY.name());

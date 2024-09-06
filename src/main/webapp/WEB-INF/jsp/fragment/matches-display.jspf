@@ -42,9 +42,9 @@
                     <div class="match-item">
 
                         <h3>
-                            <span class="player-name">${completedMatch.playerOne}</span>
+                            <span class="player-name ${completedMatch.winner.equalsIgnoreCase(completedMatch.playerOne) ? 'player-winner' : 'player-loser'}">${completedMatch.playerOne}</span>
                             <span class="vs-icon">versus</span>
-                            <span class="player-name">${completedMatch.playerTwo}</span>
+                            <span class="player-name ${completedMatch.winner.equalsIgnoreCase(completedMatch.playerTwo) ? 'player-winner' : 'player-loser'}">${completedMatch.playerTwo}</span>
                         </h3>
 
                         <div class="match-details">

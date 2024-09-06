@@ -37,15 +37,14 @@ public class MatchesServlet extends HttpServlet {
         if (ServletUtil.checkErrors(req, resp, "control/matches")) {
             return;
         }
-
         var pageable = (PageableInfo) req.getAttribute("pageablePayload");
         var filterCriteria = (MatchFilterCriteria) req.getAttribute("matchFilterCriteria");
 
         MatchesDto matchesDto = matchService.findAll(pageable, filterCriteria);
+
         req.setAttribute("matchesDto", matchesDto);
         req.setAttribute("filterCriteria", filterCriteria);
         req.setAttribute("pageable", pageable);
-
         req.setAttribute("baseUrl", req.getContextPath() + req.getServletPath());
         req.setAttribute("queryParam", buildQueryString(filterCriteria));
         req.setAttribute("formattedBefore", formatInstantForHtmlForm(filterCriteria.before()));
@@ -65,8 +64,9 @@ public class MatchesServlet extends HttpServlet {
             return;
         }
 
-        var payload = (MatchPayload) req.getAttribute("matchPayload");
-        UUID matchId = matchService.createMatch(payload);
+        UUID matchId = matchService.createMatch(
+                (MatchPayload) req.getAttribute("matchPayload")
+        );
 
         ServletUtil.redirect(req, resp, "/matches/%s".formatted(matchId));
     }

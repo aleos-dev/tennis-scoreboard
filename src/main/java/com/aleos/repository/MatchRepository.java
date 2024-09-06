@@ -81,11 +81,13 @@ public class MatchRepository {
 
     public long getOngoingCount(MatchFilterCriteria filterCriteria) {
         if (isMatchingStatusCriteria(filterCriteria, "ongoing")) {
+
             return ongoingMatchCache.getAll().stream()
                     .filter(match -> isBeforeInstant(match.getCreatedAt(), filterCriteria))
                     .filter(match -> isPlayerNameMatchingCriteria(match, filterCriteria))
                     .count();
         }
+
         return 0;
     }
 
@@ -109,6 +111,7 @@ public class MatchRepository {
                         return query.getSingleResult();
                     });
         }
+
         return 0;
     }
 
@@ -134,6 +137,7 @@ public class MatchRepository {
 
     private boolean isMatchingStatusCriteria(MatchFilterCriteria filterCriteria, String... validStatuses) {
         String status = filterCriteria.status();
+
         return status == null || "any".equalsIgnoreCase(status) || Arrays.stream(validStatuses).anyMatch(status::equalsIgnoreCase);
     }
 
@@ -155,6 +159,7 @@ public class MatchRepository {
     private Order buildSortOrder(CriteriaBuilder cb, Root<Match> matchRoot, Pageable pageable) {
         String timestamp = "concludedAt";
         String sortBy = pageable.getSortBy().orElse(timestamp);
+
         return pageable.getSortDirection().equalsIgnoreCase("DESC")
                 ? cb.desc(matchRoot.get(sortBy))
                 : cb.asc(matchRoot.get(sortBy));
@@ -188,7 +193,7 @@ public class MatchRepository {
 
     private void applyPagination(TypedQuery<Match> query, Pageable pageable, int offsetCorrection) {
         int offset = Math.max(pageable.getOffset() + offsetCorrection, 0);
-        if (offset >  0) {
+        if (offset > 0) {
             query.setFirstResult(offset);
         }
 

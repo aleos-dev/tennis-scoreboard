@@ -1,17 +1,14 @@
 package com.aleos.configuration;
 
-import com.aleos.ImageService;
 import com.aleos.annotation.Bean;
 import com.aleos.mapper.MatchMapper;
 import com.aleos.mapper.PlayerMapper;
 import com.aleos.repository.*;
+import com.aleos.service.ImageService;
 import com.aleos.service.MatchService;
 import com.aleos.service.PlayerService;
 import com.aleos.service.ScoreTrackerService;
 import com.aleos.util.PropertiesUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.validation.Validation;
@@ -74,12 +71,12 @@ public class AppConfiguration {
 
     @Bean
     public EntityManagerFactory entityManagerFactory() {
-        Flyway flyway = Flyway.configure()
-                .dataSource(
-                        PropertiesUtil.get("database.url").orElseThrow(),
-                        PropertiesUtil.get("database.user").orElseThrow(),
-                        PropertiesUtil.get("database.password").orElseThrow()
-                ).load();
+        Flyway flyway = Flyway.configure().dataSource(
+                PropertiesUtil.get("database.url").orElseThrow(),
+                PropertiesUtil.get("database.user").orElseThrow(),
+                PropertiesUtil.get("database.password").orElseThrow()
+        ).load();
+
         flyway.migrate();
 
         return Persistence.createEntityManagerFactory(
@@ -110,15 +107,6 @@ public class AppConfiguration {
     @Bean
     public PlayerRepository playerRepository(@Bean(name = "playerDao") PlayerDao playerDao) {
         return new PlayerRepository(playerDao);
-    }
-
-    @Bean
-    public ObjectMapper objectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-        return objectMapper;
     }
 }
 

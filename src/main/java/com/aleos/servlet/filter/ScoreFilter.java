@@ -53,7 +53,6 @@ public class ScoreFilter extends AbstractEndpointFilter {
         req.setAttribute("matchUuidPayload", matchUuidPayload);
     }
 
-
     private MatchUuidPayload getMatchUuidPayload(HttpServletRequest req) {
         try {
             String pathInfo = req.getPathInfo();

@@ -20,6 +20,7 @@ public class TennisMatchCache implements InMemoryStorage<TennisMatch, UUID> {
         lock.readLock().lock();
         try {
             return Optional.ofNullable(cache.get(id));
+
         } finally {
             lock.readLock().unlock();
         }
@@ -30,6 +31,7 @@ public class TennisMatchCache implements InMemoryStorage<TennisMatch, UUID> {
         lock.readLock().lock();
         try {
             return new ArrayList<>(cache.values());
+
         } finally {
             lock.readLock().unlock();
         }
@@ -44,6 +46,7 @@ public class TennisMatchCache implements InMemoryStorage<TennisMatch, UUID> {
             UUID id = match.getId();
             cache.put(id, match);
             addParticipants(match);
+
         } finally {
             lock.writeLock().unlock();
         }
@@ -51,9 +54,12 @@ public class TennisMatchCache implements InMemoryStorage<TennisMatch, UUID> {
 
     @Override
     public void remove(UUID id) {
+
         lock.writeLock().lock();
         try {
+            get(id).ifPresent(this::removeMatchParticipants);
             cache.remove(id);
+
         } finally {
             lock.writeLock().unlock();
         }
@@ -64,6 +70,7 @@ public class TennisMatchCache implements InMemoryStorage<TennisMatch, UUID> {
         lock.readLock().lock();
         try {
             return cache.size();
+
         } finally {
             lock.readLock().unlock();
         }
@@ -74,6 +81,7 @@ public class TennisMatchCache implements InMemoryStorage<TennisMatch, UUID> {
         lock.readLock().lock();
         try {
             return participants.contains(name);
+
         } finally {
             lock.readLock().unlock();
         }
@@ -97,5 +105,10 @@ public class TennisMatchCache implements InMemoryStorage<TennisMatch, UUID> {
     private void addParticipants(TennisMatch match) {
         participants.add(match.getPlayerOneName());
         participants.add(match.getPlayerTwoName());
+    }
+
+    private void removeMatchParticipants(TennisMatch match) {
+        participants.remove(match.getPlayerOneName());
+        participants.remove(match.getPlayerTwoName());
     }
 }

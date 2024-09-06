@@ -22,15 +22,14 @@ public class PlayerService {
 
     private final PlayerMapper mapper;
 
-    public PlayerDto createPlayer(PlayerPayload payload) {
+    public void createPlayer(PlayerPayload payload) {
         Player entity = mapper.toEntity(payload);
         playerRepository.createPlayer(entity);
 
-        return mapper.toDto(entity);
+        mapper.toDto(entity);
     }
 
     public PlayersDto findAll(PageableInfo pageable, PlayerFilterCriteria filterCriteria) {
-
         var totalCount = playerRepository.getCount(filterCriteria);
 
         var playerDtos = playerRepository.findAll(pageable, filterCriteria).stream()
@@ -39,8 +38,9 @@ public class PlayerService {
 
         int totalPages = (int) Math.ceil(totalCount * 1.0 / pageable.getPageSize());
         if (totalPages != 0 && pageable.getPageNumber() > totalPages) {
-            throw new InvalidPageableRequest("There are only %d total pages".formatted(totalPages));
+            throw new InvalidPageableRequest("There are only %d total pages for page size %s".formatted(totalPages, pageable.getPageSize()));
         }
+
         boolean hasNext = pageable.getPageNumber() < totalPages;
         boolean hasPrevious = pageable.getPageNumber() > 1;
 

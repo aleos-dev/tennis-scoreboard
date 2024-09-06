@@ -15,7 +15,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.util.List;
 import java.util.StringJoiner;
 
 @WebServlet("/players")
@@ -36,7 +35,6 @@ public class PlayersServlet extends HttpServlet {
         if (ServletUtil.checkErrors(req, resp, "control/players")) {
             return;
         }
-
         var pageable = (PageableInfo) req.getAttribute("pageablePayload");
         var filterCriteria = (PlayerFilterCriteria) req.getAttribute("playerFilterCriteria");
 
@@ -55,12 +53,13 @@ public class PlayersServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) {
         PlayerPayload payload = (PlayerPayload) req.getAttribute("playerPayload");
+
         try {
             playerService.createPlayer(payload);
 
         } catch (UniqueConstraintViolationException e) {
 
-            req.setAttribute("errorMessages", List.of("Player with name: %s already exists".formatted(payload.name())));
+            ServletUtil.setErrors(req, "Player with name: %s already exists".formatted(payload.name()));
             ServletUtil.forwardToJsp(req, resp, "control/create-player");
         }
     }

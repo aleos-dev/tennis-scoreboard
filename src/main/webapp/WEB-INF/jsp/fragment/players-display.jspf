@@ -14,14 +14,13 @@
                 <c:if test="${not empty playerDto.ongoingMatchUuid()}">
                     <a class="ongoing-match-ref"
                        href="${pageContext.request.contextPath}/matches/${playerDto.ongoingMatchUuid()}">
-                        ongoing match
+                        View Ongoing Match
                     </a>
                 </c:if>
                 <a class="matches-ref" href="${playerDto.matchesEndpoint()}&status=any">
-                    <span>match list</span>
+                    <span>View All Matches</span>
                 </a>
             </div>
-
         </div>
 
     </a>

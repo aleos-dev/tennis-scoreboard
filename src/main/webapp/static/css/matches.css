@@ -119,6 +119,14 @@
     padding: 0 5px;
 }
 
+.player-winner {
+    border: 1px solid #e1ad01;
+    box-shadow: 0 0 3px 2px rgba(241, 196, 15, 0.5);
+    position: relative;
+    background-repeat: no-repeat;
+    background-position: top right;
+    background-size: 50px 50px;
+}
 
 .match-details p {
     color: #666;

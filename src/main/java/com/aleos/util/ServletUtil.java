@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @UtilityClass
 public class ServletUtil {
@@ -51,5 +52,9 @@ public class ServletUtil {
             return true;
         }
         return false;
+    }
+
+    public static void setErrors(HttpServletRequest req, String ... errors) {
+        req.setAttribute("errorMessages", List.of(errors));
     }
 }

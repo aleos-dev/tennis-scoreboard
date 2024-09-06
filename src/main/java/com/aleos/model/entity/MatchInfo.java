@@ -25,7 +25,6 @@ public class MatchInfo {
     @Column(name = "entry")
     protected List<String> historyEntries = new ArrayList<>();
 
-
     @NonNull
     @Column(nullable = false)
     protected String finalScoreRecord;  // Store scores as string like "6:3,5(4):7(6),4:6" etc.

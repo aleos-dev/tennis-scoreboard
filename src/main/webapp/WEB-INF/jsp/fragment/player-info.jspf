@@ -7,7 +7,7 @@
     <c:if test="${editMode}">
         <div class="form-group">
             <label for="image-input">Upload New Image: </label>
-            <input type="file" id="image-input" name="image">
+            <input type="file" id="image-input" name="image" accept="image/*">
         </div>
     </c:if>
 
@@ -15,7 +15,7 @@
         <c:when test="${editMode}">
             <div class="form-group">
                 <label for="country-id">Enter Country Code: </label>
-                <input type="text" id="country-id" name="country" maxlength="2"
+                <input type="text" id="country-id" name="country" minlength="2" maxlength="2" required
                        value="${requestScope.playerDto.country()}">
             </div>
         </c:when>
@@ -28,11 +28,8 @@
 
     <c:if test="${!editMode}">
         <a class="edit-mode-trigger"
-           href="${pageContext.request.contextPath}/players/${requestScope.playerDto.name()}?editMode=${true}">✏️
-            Edit
-            profile</a><br>
+           href="${pageContext.request.contextPath}/players/${fn:escapeXml(requestScope.playerDto.name())}?editMode=true">✏️ Edit profile</a><br>
     </c:if>
-
 </div>
 
 

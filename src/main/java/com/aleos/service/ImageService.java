@@ -1,4 +1,4 @@
-package com.aleos;
+package com.aleos.service;
 
 import com.aleos.exception.ImageServiceException;
 import com.aleos.util.PropertiesUtil;
@@ -15,8 +15,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ImageService {
+
+    private static final Logger logger = Logger.getLogger(ImageService.class.getName());
 
     private static final String AVATARS_DEFAULT_URL = PropertiesUtil.get("image.player.avatar.default.url").orElseThrow();
 
@@ -24,8 +28,9 @@ public class ImageService {
 
     private static final String IMAGE_FORMAT = ".webp";
 
+
     static {
-        // Ensure WebP plugin is registered
+        // Ensure the WebP plugin is registered
         ImageIO.scanForPlugins();
     }
 
@@ -66,7 +71,7 @@ public class ImageService {
             return Optional.of(defaultAvatarUrl.toURL().openStream());
 
         } catch (IOException e) {
-            // log
+            logger.log(Level.SEVERE, "IO problems with getting input stream", e);
             return Optional.empty();
         }
     }

@@ -1,6 +1,6 @@
 function toggleHistory() {
-    var historyDiv = document.getElementById('matchHistory');
-    var footer = document.querySelector('.site-footer');
+    let historyDiv = document.getElementById('matchHistory');
+    let footer = document.querySelector('.site-footer');
     if (footer.style.position !== 'sticky') {
         footer.style.position = 'sticky';
         footer.style.bottom = '0';

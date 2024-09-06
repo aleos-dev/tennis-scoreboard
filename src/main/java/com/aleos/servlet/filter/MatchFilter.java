@@ -44,13 +44,11 @@ public class MatchFilter extends AbstractEndpointFilter {
     private void handleGetMethodPayload(HttpServletRequest req) {
         if (isRequestForMainPath(req)) {
 
-            // -> /matches
             extractPageablePayloadToReqContext(req);
             extractMatchFilterCriteriaToReqContext(req);
 
         } else {
 
-            // -> /matches/{uuid}
             extractMatchUuidPayloadToReqContext(req);
         }
     }
@@ -129,6 +127,7 @@ public class MatchFilter extends AbstractEndpointFilter {
     private MatchFilterCriteria getMatchFilterCriteria(HttpServletRequest req) {
         var name = req.getParameter("playerName");
         var before = req.getParameter("before");
+
         return new MatchFilterCriteria(
                 Optional.ofNullable(req.getParameter("status"))
                         .orElseGet(() -> PropertiesUtil.get("filter.default.matchStatus").orElse(null)),

@@ -34,17 +34,18 @@ public class MatchServlet extends HttpServlet {
         var uuidPayload = req.getAttribute("matchUuidPayload");
 
         Optional<MatchDto> matchDtoOptional = matchService.findById((MatchUuidPayload) uuidPayload);
-        if (matchDtoOptional.isPresent()) {
-            MatchDto matchDto = matchDtoOptional.get();
-            req.setAttribute("match", matchDto);
-            if (matchDto.getStatus() == MatchStatus.ONGOING) {
-                ServletUtil.forwardToJsp(req, resp, "control/live-match");
-            } else {
-                ServletUtil.forwardToJsp(req, resp, "control/completed-match");
-            }
-        } else {
-            req.setAttribute("errorMessages", "No match found");
-            ServletUtil.forwardToJsp(req, resp, "control/matches");
-        }
+
+        matchDtoOptional.ifPresentOrElse(
+                match -> {
+                    req.setAttribute("match", match);
+                    ServletUtil.forwardToJsp(req, resp, match.getStatus() == MatchStatus.ONGOING
+                            ? "control/live-match"
+                            : "control/completed-match");
+                }, () -> {
+                    ServletUtil.setErrors(req, "No match found");
+                    ServletUtil.forwardToJsp(req, resp, "control/matches");
+                }
+
+        );
     }
 }

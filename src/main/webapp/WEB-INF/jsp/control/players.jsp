@@ -12,27 +12,16 @@
 
 <body>
 <%@ include file="../common/header.jsp" %>
-
-<c:if test="${not empty requestScope.errorMessages}">
-    <div class="error content">
-        <ul>
-            <c:forEach items="${requestScope.errorMessages}" var="message">
-                <li>${message}</li>
-            </c:forEach>
-        </ul>
-    </div>
-</c:if>
+<%@ include file="../fragment/error-display.jspf" %>
 
 <div class="content">
     <c:if test="${not empty requestScope.playersDto}">
 
-        <jsp:useBean id="playersDto" scope="request" type="com.aleos.model.dto.out.PlayersDto"/>
-
         <div class="div-players-section">
             <%@ include file="../fragment/playerFilterCriteria.jspf" %>
 
-            <c:if test="${empty playersDto.content}">
-                <div class="no-players"><span>There is no any player</span></div>
+            <c:if test="${empty requestScope.playersDto.content}">
+                <div class="no-players"><span>No players found</span></div>
             </c:if>
 
             <section class="players-section">
@@ -40,7 +29,7 @@
             </section>
 
             <section class="content horizontal-center pagination-section">
-                <c:set var="dto" value="${playersDto}" scope="request"/>
+                <c:set var="dto" value="${requestScope.playersDto}" scope="request"/>
                 <%@ include file="../common/pagination.jsp" %>
             </section>
         </div>
@@ -48,6 +37,5 @@
 </div>
 
 <%@ include file="../common/footer.jsp" %>
-
 </body>
 </html>

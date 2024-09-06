@@ -12,26 +12,16 @@
 
 <body>
 <%@ include file="../common/header.jsp" %>
+<%@ include file="../fragment/error-display.jspf" %>
 
-<c:if test="${not empty requestScope.errorMessages}">
-    <div class="error content">
-        <ul>
-            <c:forEach items="${requestScope.errorMessages}" var="message">
-                <li>${message}</li>
-            </c:forEach>
-        </ul>
-    </div>
-</c:if>
 <div class="content">
     <c:if test="${not empty requestScope.matchesDto}">
-
-        <jsp:useBean id="matchesDto" scope="request" type="com.aleos.model.dto.out.MatchesDto"/>
 
         <div class="div-matches-section">
             <%@ include file="../fragment/matchFilterCriteria.jspf" %>
 
-            <c:if test="${empty matchesDto.content}">
-                <div class="no-matches"><span>There is no any match</span></div>
+            <c:if test="${empty requestScope.matchesDto.content}">
+                <div class="no-matches"><span>There are no matches</span></div>
             </c:if>
 
             <section class="matches-section">
@@ -40,7 +30,7 @@
 
             <section class="content horizontal-center pagination-section">
 
-                <c:set var="dto" value="${matchesDto}" scope="request"/>
+                <c:set var="dto" value="${requestScope.matchesDto}" scope="request"/>
                 <%@ include file="../common/pagination.jsp" %>
             </section>
         </div>
@@ -48,6 +38,5 @@
 </div>
 
 <%@ include file="../common/footer.jsp" %>
-
 </body>
 </html>

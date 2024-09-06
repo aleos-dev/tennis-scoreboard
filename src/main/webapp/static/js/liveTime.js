@@ -1,7 +1,6 @@
 function updateTime() {
     const now = new Date();
-    const timeString = now.toLocaleTimeString();
-    document.getElementById('live-time').textContent = timeString;
+    document.getElementById('live-time').textContent = now.toLocaleTimeString();
 }
 
 setInterval(updateTime, 1000);

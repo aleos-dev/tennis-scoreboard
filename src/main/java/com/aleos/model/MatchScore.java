@@ -1,43 +1,33 @@
 package com.aleos.model;
 
-
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.*;
 
+@Getter
 public class MatchScore {
 
-    @Getter
     private final UUID matchID;
 
-    @Getter
     private final String playerOneName;
 
-    @Getter
     private final String playerTwoName;
 
-    @Getter
+    private final List<String> historyEntries = new ArrayList<>();
+
+    private final Deque<String> notifications = new LinkedList<>();
+
+    private final StringBuffer scoreSnapshot = new StringBuffer();
+
     @Setter
     private String[] scorePoints;
 
-    @Getter
     @Setter
     private String[] scoreGames;
 
-    @Getter
     @Setter
     private String[] scoreSets;
-
-    @Getter
-    private final List<String> historyEntries = new ArrayList<>();
-
-    @Getter
-    private final Deque<String> notifications = new LinkedList<>();
-
-    @Getter
-    private final StringBuffer scoreSnapshot = new StringBuffer();
-
 
     public MatchScore(UUID matchID, String playerOneName, String playerTwoName) {
         this.matchID = matchID;

@@ -4,6 +4,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <%@ include file="../common/head.jsp" %>
     <title>Player profile</title>
@@ -14,66 +15,68 @@
 <body>
 <%@ include file="../common/header.jsp" %>
 
-<c:set var="editMode" value="${param.editMode == null ? requestScope.editMode : param.editMode}"/>
+<c:set var="editMode" value="${not empty param.editMode ? param.editMode : requestScope.editMode}"/>
 
 <div class="content">
-    <div class="card horizontal-center vertical-center">
-        <c:choose>
-            <c:when test="${editMode}">
 
-                <form action="${pageContext.request.contextPath}/players/${requestScope.playerDto.name()}" method="post"
-                      enctype="multipart/form-data">
+    <c:choose>
+        <c:when test="${empty requestScope.errorMessages}">
 
-                    <input type="hidden" name="_method" value="PATCH">
+            <div class="card horizontal-center vertical-center">
+                <c:choose>
 
-                    <div class="form-group">
-                        <label for="player-name">Name:</label>
-                        <input type="text" id="player-name" name="name" value="${requestScope.playerDto.name()}"
-                               required>
-                    </div>
+                    <c:when test="${editMode}">
 
-                    <%@ include file="../fragment/player-info.jspf" %>
+                        <form action="${pageContext.request.contextPath}/players/${requestScope.playerDto.name()}"
+                              method="post"
+                              enctype="multipart/form-data">
 
-                    <button type="submit">Save Changes</button>
-                    <a href="${pageContext.request.contextPath}/players/${requestScope.playerDto.name()}">Cancel</a>
-                </form>
-            </c:when>
-            <c:otherwise>
-                <c:if test="${not empty requestScope.playerDto}">
+                            <input type="hidden" name="_method" value="PATCH">
 
-                    <h1>${requestScope.playerDto.name()}</h1>
+                            <div class="form-group">
+                                <label for="player-name">Name:</label>
+                                <input type="text" id="player-name" name="name" value="${requestScope.playerDto.name()}"
+                                       required minlength="5">
+                            </div>
 
-                    <%@ include file="../fragment/player-info.jspf" %>
+                            <%@ include file="../fragment/player-info.jspf" %>
 
-                    <c:if test="${not empty requestScope.playerDto.ongoingMatchUuid()}">
-                        <div class="ongoing-match">
-                            <p>
-                                <a href="${pageContext.request.contextPath}/matches/${requestScope.playerDto.ongoingMatchUuid()}"
-                                   class="matches-link">Check ongoing match</a>
-                            </p>
-                        </div>
-                    </c:if>
+                            <button type="submit" class="cta-button">Save Changes</button>
+                            <a href="${pageContext.request.contextPath}/players/${requestScope.playerDto.name()}">Cancel</a>
+                        </form>
+                    </c:when>
 
-                    <div class="refs">
-                        <p><a href="${requestScope.playerDto.matchesEndpoint()}">View Player's Matches</a></p>
+                    <c:otherwise>
+                        <c:if test="${not empty requestScope.playerDto}">
 
-                        <p><a href="${pageContext.request.contextPath}/players">Back to Player Search</a></p>
-                    </div>
-                </c:if>
-            </c:otherwise>
-        </c:choose>
+                            <h1>${requestScope.playerDto.name()}</h1>
+                            <%@ include file="../fragment/player-info.jspf" %>
 
-    </div>
+                            <c:if test="${not empty requestScope.playerDto.ongoingMatchUuid()}">
+                                <div class="ongoing-match">
+                                    <p>
+                                        <a href="${pageContext.request.contextPath}/matches/${requestScope.playerDto.ongoingMatchUuid()}"
+                                           class="matches-link">Check ongoing match</a>
+                                    </p>
+                                </div>
+                            </c:if>
 
-    <c:if test="${not empty requestScope.errorMessages}">
-        <div class="error content">
-            <ul>
-                <c:forEach items="${requestScope.errorMessages}" var="message">
-                    <li>${message}</li>
-                </c:forEach>
-            </ul>
-        </div>
-    </c:if>
+
+                            <div class="refs">
+                                <p><a href="${requestScope.playerDto.matchesEndpoint()}">View Player's Matches</a></p>
+
+                                <p><a href="${pageContext.request.contextPath}/players">Back to Player Search</a></p>
+                            </div>
+                        </c:if>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+        </c:when>
+        <c:otherwise>
+            <%@ include file="../fragment/error-display.jspf" %>
+        </c:otherwise>
+
+    </c:choose>
 
 </div>
 

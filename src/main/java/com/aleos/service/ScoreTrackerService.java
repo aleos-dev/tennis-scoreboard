@@ -28,10 +28,29 @@ public class ScoreTrackerService implements PropertyChangeListener {
     }
 
     public void trackMatch(TennisMatch match) {
-        match.addPropertyChangeListener(new WeakReference<>(this).get());
+        registerMatchListener(match);
         MatchScore matchScore = new MatchScore(match.getId(), match.getPlayerOneName(), match.getPlayerTwoName());
         initMatchScore(matchScore, match, StarPresentation::translateScores);
         scores.put(match.getId(), matchScore);
+    }
+
+    public void untrackMatch(UUID id) {
+        scores.remove(id);
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        Optional<MatchEvent> eventOpt = MatchEvent.fromEventName(evt.getPropertyName());
+
+        eventOpt.ifPresent(matchEvent -> {
+
+            if (isScoreEvent(matchEvent)) {
+                handleScoreEvent(evt, matchEvent);
+
+            } else if (isWinnerEvent(matchEvent)) {
+                handleWinnerEvent(evt, matchEvent);
+            }
+        });
     }
 
     private void initMatchScore(MatchScore matchScore,
@@ -46,24 +65,6 @@ public class ScoreTrackerService implements PropertyChangeListener {
 
             set.getChildStage().ifPresent(game -> matchScore.setScorePoints(
                     game.getScoreManager().getScoresPresentation(converter)));
-        });
-    }
-
-
-    public void untrackMatch(UUID id) {
-        scores.remove(id);
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        Optional<MatchEvent> eventOpt = MatchEvent.fromEventName(evt.getPropertyName());
-
-        eventOpt.ifPresent(matchEvent -> {
-            if (isScoreEvent(matchEvent)) {
-                handleScoreEvent(evt, matchEvent);
-            } else if (isWinnerEvent(matchEvent)) {
-                handleWinnerEvent(evt, matchEvent);
-            }
         });
     }
 
@@ -126,9 +127,9 @@ public class ScoreTrackerService implements PropertyChangeListener {
         handleTieBreakScoreRecord(matchScore, scoreState);
     }
 
-    private static void refreshPointsAndGames(MatchScore matchScore) {
-        matchScore.setScorePoints(new String[] {"",""});
-        matchScore.setScoreGames(new String[] {"",""});
+    private void refreshPointsAndGames(MatchScore matchScore) {
+        matchScore.setScorePoints(new String[]{"", ""});
+        matchScore.setScoreGames(new String[]{"", ""});
     }
 
     private String resolvePlayerName(Player player, MatchScore matchScore) {
@@ -164,15 +165,22 @@ public class ScoreTrackerService implements PropertyChangeListener {
         if (isTieBreakRecordFormat(matchScore.getScoreGames())) {
             int playerOneLastScoreIdx = Math.max(scoreState.lastIndexOf(",") + 1, 0);
             scoreState.insert(playerOneLastScoreIdx, "6(");
+
             int separatorIdx = scoreState.lastIndexOf(":");
             scoreState.insert(separatorIdx, ")");
+
             int playerTwoLastScoreIdx = separatorIdx + 2;
             scoreState.insert(playerTwoLastScoreIdx, "6(");
+
             scoreState.insert(scoreState.length(), ")");
         }
     }
 
     private boolean isTieBreakRecordFormat(String[] gamesScore) {
         return gamesScore[0].split("\\D").length > 1;
+    }
+
+    private void registerMatchListener(TennisMatch match) {
+        match.addPropertyChangeListener(new WeakReference<>(this).get());
     }
 }

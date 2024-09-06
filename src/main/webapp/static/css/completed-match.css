@@ -54,16 +54,14 @@ body {
     border-radius: 50%;
 }
 
-
 .player-winner {
     background: linear-gradient(135deg, #f1c40f, #f39c12);
     border: 5px solid #e1ad01;
     box-shadow: 0 0 15px 5px rgba(241, 196, 15, 0.5);
-    position: relative; /* Required for absolute positioning */
-    /*background-image: url('path/to/trophy.png'); !* Replace with actual path *!*/
+    position: relative;
     background-repeat: no-repeat;
     background-position: top right;
-    background-size: 50px 50px; /* Adjust size as needed */
+    background-size: 50px 50px;
 }
 
 .player-loser {
@@ -94,7 +92,7 @@ body {
 
 .scoreboard .score-entry {
     display: flex;
-    justify-content: space-between; /* Distributes space between title and scores */
+    justify-content: space-between;
     align-items: center;
     width: 100%;
     max-width: 500px;
@@ -182,7 +180,7 @@ body {
     background-color: #f9f9f9;
     border: 1px solid #ccc;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .match-history span {

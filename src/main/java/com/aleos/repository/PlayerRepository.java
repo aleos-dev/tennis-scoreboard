@@ -59,6 +59,7 @@ public class PlayerRepository {
 
                 playerToUpdate.setId(foundedPlayer.getId());
                 entityManager.merge(playerToUpdate);
+
             } catch (NoResultException e) {
                 throw new EntityNotFoundDbException("Player: %s not found.".formatted(nameIdentifier));
             }
