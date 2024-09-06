@@ -1,5 +1,6 @@
 package com.aleos.service;
 
+import com.aleos.exception.InvalidPageableRequest;
 import com.aleos.exception.PlayerRegistrationException;
 import com.aleos.exception.UnknownMatchFormat;
 import com.aleos.mapper.MatchMapper;
@@ -44,7 +45,6 @@ public class MatchService implements PropertyChangeListener {
     }
 
     public MatchesDto findAll(PageableInfo pageable, MatchFilterCriteria filterCriteria) {
-
         int totalOngoingCount = (int) matchRepository.getOngoingCount(filterCriteria);
 
         List<ActiveMatchDto> ongoingMatches = matchRepository
@@ -53,17 +53,17 @@ public class MatchService implements PropertyChangeListener {
                 .toList();
 
         List<ConcludedMatchDto> concludedMatches = Collections.emptyList();
-        int remainingLimit = pageable.getPageSize() - ongoingMatches.size();
+        int remainingMatchCount = pageable.getPageSize() - ongoingMatches.size();
 
-        if (remainingLimit > 0) {
+        if (remainingMatchCount > 0) {
             int offsetCorrection = -totalOngoingCount;
 
             concludedMatches = matchRepository.findAllConcludedByCriteria(
                             pageable,
                             filterCriteria,
-                            offsetCorrection
-                    ).stream()
-                    .limit(remainingLimit)
+                            offsetCorrection)
+                    .stream()
+                    .limit(remainingMatchCount)
                     .map(mapper::toDto)
                     .toList();
         }
@@ -77,8 +77,13 @@ public class MatchService implements PropertyChangeListener {
 
         int totalItems = totalConcludedCount + totalOngoingCount;
         int totalPages = (int) Math.ceil(totalItems * 1.0 / pageable.getPageSize());
+
         boolean hasNext = pageable.getPageNumber() < totalPages;
         boolean hasPrevious = pageable.getPageNumber() > 1;
+
+        if (totalPages != 0 && pageable.getPageNumber() > totalPages) {
+            throw new InvalidPageableRequest("There are only %d total pages for page size %s".formatted(totalPages, pageable.getPageSize()));
+        }
 
         return MatchesDto.of(allMatches,
                 pageable.getPageNumber(),
@@ -145,7 +150,6 @@ public class MatchService implements PropertyChangeListener {
     }
 
     private Match convertToMatchEntity(TennisMatch tennisMatch) {
-
         Match match = new Match();
         String winnerName = tennisMatch.getMatchWinner().orElseThrow(() ->
                 new IllegalStateException("Match should be concluded, id: %s".formatted(tennisMatch.getId())));
@@ -158,19 +162,14 @@ public class MatchService implements PropertyChangeListener {
                 new IllegalStateException("Match %s must not be started with unregistered player %s"
                         .formatted(tennisMatch.getId(), tennisMatch.getPlayerTwoName())));
 
+        MatchScore matchScore = scoreTrackerService.findById(tennisMatch.getId())
+                .orElseThrow(() -> new IllegalStateException("Match must be tracked until it does not persisted."));
+
         match.setId(tennisMatch.getId());
         match.setPlayerOne(playerOne);
         match.setPlayerTwo(playerTwo);
         match.setWinner(playerOne.getName().equalsIgnoreCase(winnerName) ? playerOne : playerTwo);
-
-        MatchScore matchScore = scoreTrackerService.findById(tennisMatch.getId())
-                .orElseThrow(() -> new IllegalStateException("Match must be tracked until it does not persisted."));
-
-        MatchInfo matchInfo = new MatchInfo();
-        matchInfo.setFormat(tennisMatch.getMatchFormat().name());
-        matchInfo.getHistoryEntries().addAll(matchScore.getHistoryEntries());
-        matchInfo.setFinalScoreRecord(matchScore.getScoreSnapshot().toString());
-        match.setInfo(matchInfo);
+        match.setInfo(createMatchInfo(tennisMatch, matchScore));
 
         return match;
     }
@@ -203,5 +202,13 @@ public class MatchService implements PropertyChangeListener {
             throw new PlayerRegistrationException(
                     "One or both players are already participating in an ongoing match.");
         }
+    }
+
+    private MatchInfo createMatchInfo(TennisMatch tennisMatch, MatchScore matchScore) {
+        MatchInfo matchInfo = new MatchInfo();
+        matchInfo.setFormat(tennisMatch.getMatchFormat().name());
+        matchInfo.getHistoryEntries().addAll(matchScore.getHistoryEntries());
+        matchInfo.setFinalScoreRecord(matchScore.getScoreSnapshot().toString());
+        return matchInfo;
     }
 }
