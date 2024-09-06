@@ -1,0 +1,9 @@
+<c:if test="${not empty requestScope.errorMessages}">
+    <div class="error">
+        <ul>
+            <c:forEach items="${requestScope.errorMessages}" var="message">
+                <li>${message}</li>
+            </c:forEach>
+        </ul>
+    </div>
+</c:if>
