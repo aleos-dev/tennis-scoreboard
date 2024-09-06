@@ -1,7 +1,7 @@
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 
-<c:forEach var="match" items="${matchesDto.content}">
+<c:forEach var="match" items="${requestScope.matchesDto.content}">
     <c:choose>
 
         <c:when test="${match.status == 'ONGOING'}">
