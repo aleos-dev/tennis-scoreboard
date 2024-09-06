@@ -1,7 +1,8 @@
 package com.aleos.servlet;
 
-import com.aleos.ImageService;
+import com.aleos.service.ImageService;
 import com.aleos.configuration.AppContextAttribute;
+import com.aleos.exception.ImageServiceException;
 import com.aleos.model.dto.in.PlayerNamePayload;
 import com.aleos.servicelocator.ServiceLocator;
 import jakarta.servlet.ServletConfig;
@@ -14,10 +15,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @WebServlet("/avatars/*")
 public class AvatarServlet extends HttpServlet {
+
+    private static final Logger logger = Logger.getLogger(AvatarServlet.class.getName());
 
     private transient ImageService imageService;
 
@@ -48,7 +52,8 @@ public class AvatarServlet extends HttpServlet {
                 }
 
             } catch (IOException e) {
-                resp.setStatus(404);
+                logger.log(Level.SEVERE, e.getMessage(), e);
+                throw new ImageServiceException("Error processing the avatar with name: %s".formatted(playerNamePayload.name()), e);
             }
         } else {
             resp.setStatus(404);
