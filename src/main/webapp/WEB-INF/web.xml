@@ -11,14 +11,9 @@
         <servlet-class>org.h2.server.web.JakartaWebServlet</servlet-class>
         <init-param>
             <param-name>webAllowOthers</param-name>
-            <param-value></param-value>
+            <param-value/>
         </init-param>
-        <!--
-        <init-param>
-            <param-name>trace</param-name>
-            <param-value></param-value>
-        </init-param>
-        -->
+
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
