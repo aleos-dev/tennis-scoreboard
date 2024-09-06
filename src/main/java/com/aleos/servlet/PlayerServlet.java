@@ -1,6 +1,6 @@
 package com.aleos.servlet;
 
-import com.aleos.ImageService;
+import com.aleos.service.ImageService;
 import com.aleos.configuration.AppContextAttribute;
 import com.aleos.exception.ImageServiceException;
 import com.aleos.exception.UniqueConstraintViolationException;
@@ -19,11 +19,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @WebServlet("/players/*")
 @MultipartConfig
 public class PlayerServlet extends HttpServlet {
+
+    private static final Logger logger = Logger.getLogger(PlayerServlet.class.getName());
 
     private transient PlayerService playerService;
 
@@ -60,35 +63,39 @@ public class PlayerServlet extends HttpServlet {
         var playerDto = playerService.findByName(payload);
         playerDto.ifPresentOrElse(
                 player -> req.setAttribute("playerDto", player),
-                () -> req.setAttribute("errorMessages", List.of("Player with name %s not exist".formatted(payload.name())))
-        );
+                () -> ServletUtil.setErrors(req, "Player with name %s not exist".formatted(payload.name())));
 
         ServletUtil.forwardToJsp(req, resp, CONTROL_PLAYER_JSP_REFERENCE);
     }
 
-
     private void doPatch(HttpServletRequest req, HttpServletResponse resp) {
-        var identifier = (PlayerNamePayload) req.getAttribute("playerNamePayload");
-        var payload = (PlayerPayload) req.getAttribute("playerPayload");
-
-        try {
-            playerService.update(identifier, payload);
-
-        } catch (UniqueConstraintViolationException e) {
-
-            req.setAttribute("errorMessages", List.of("Player with name: %s already exists".formatted(payload.name())));
-            req.setAttribute("editMode", true);
-            req.setAttribute("playerDto", playerService.findByName(identifier).orElse(null));
-
-            ServletUtil.forwardToJsp(req, resp, CONTROL_PLAYER_JSP_REFERENCE);
+        if (ServletUtil.checkErrors(req, resp, CONTROL_PLAYER_JSP_REFERENCE)) {
             return;
         }
 
-        String oldName = identifier.name();
-        String newName = payload.name();
-        saveUploadedImage(extractImagePart(req), newName, oldName);
+        var identifier = (PlayerNamePayload) req.getAttribute("playerNamePayload");
+        var payload = (PlayerPayload) req.getAttribute("playerPayload");
 
-        ServletUtil.redirect(req, resp, "/players/" + payload.name());
+        // not atomic
+        try {
+            playerService.update(identifier, payload);
+
+            String oldName = identifier.name();
+            String newName = payload.name();
+            saveUploadedImage(extractImagePart(req), newName, oldName);
+
+            ServletUtil.redirect(req, resp, "/players/" + payload.name());
+
+        } catch (UniqueConstraintViolationException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+            ServletUtil.setErrors(req, "Player with name: %s already exists".formatted(payload.name()));
+            ServletUtil.forwardToJsp(req, resp, CONTROL_PLAYER_JSP_REFERENCE);
+
+        } catch (ImageServiceException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+            ServletUtil.setErrors(req, "The image can't be loaded");
+            ServletUtil.forwardToJsp(req, resp, CONTROL_PLAYER_JSP_REFERENCE);
+        }
     }
 
     private Part extractImagePart(HttpServletRequest req) {
@@ -107,6 +114,8 @@ public class PlayerServlet extends HttpServlet {
             if (contentType.startsWith("image/")) {
                 imageService.saveAvatarAsWebPImage(imagePart.getInputStream(), newName);
                 imageService.remove(oldName);
+            } else if (imagePart.getSize() > 0) {
+                throw new ImageServiceException("Incorrect content type for the avatar: " + contentType);
             }
 
         } catch (IOException e) {
