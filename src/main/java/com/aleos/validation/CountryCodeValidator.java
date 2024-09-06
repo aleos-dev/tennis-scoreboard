@@ -10,7 +10,12 @@ import java.util.stream.Collectors;
 
 public class CountryCodeValidator implements ConstraintValidator<ValidCountryCode, String> {
 
-    private static final Set<String> ISO_COUNTRY_CODES = Arrays.stream(Locale.getISOCountries()).collect(Collectors.toSet());
+    private static final Set<String> COUNTRY_CODES;
+
+    static {
+        COUNTRY_CODES = Arrays.stream(Locale.getISOCountries()).collect(Collectors.toSet());
+        COUNTRY_CODES.add("XX");
+    }
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
@@ -18,6 +23,6 @@ public class CountryCodeValidator implements ConstraintValidator<ValidCountryCod
             return true;
         }
 
-        return ISO_COUNTRY_CODES.contains(value.trim().toUpperCase());
+        return COUNTRY_CODES.contains(value.trim().toUpperCase());
     }
 }
