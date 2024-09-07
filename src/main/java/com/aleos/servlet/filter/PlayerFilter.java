@@ -107,16 +107,17 @@ public class PlayerFilter extends AbstractEndpointFilter {
     }
 
     private PlayerPayload getPlayerPayload(HttpServletRequest req) {
+        String playerName = req.getParameter("name");
         String country = req.getParameter("country");
         return new PlayerPayload(
-                req.getParameter("name"),
-                country == null ? null : country.toUpperCase()
+                playerName == null ? null : playerName.trim(),
+                country == null ? null : country.trim().toUpperCase()
         );
     }
 
     private PlayerNamePayload getPlayerNamePayload(HttpServletRequest req) {
         var skipSlash = 1;
-        var name = req.getPathInfo().substring(skipSlash);
+        var name = req.getPathInfo().substring(skipSlash).trim();
         var decoded = URLDecoder.decode(name, StandardCharsets.UTF_8);
 
         return new PlayerNamePayload(decoded);
@@ -128,8 +129,8 @@ public class PlayerFilter extends AbstractEndpointFilter {
         var beforeDate = req.getParameter("before");
 
         return new PlayerFilterCriteria(
-                country == null || country.isBlank() ? null : country.toUpperCase(),
-                name == null || name.isBlank() ? null : name,
+                country == null || country.isBlank() ? null : country.trim().toUpperCase(),
+                name == null || name.isBlank() ? null : name.trim(),
                 Optional.ofNullable(beforeDate).map(this::toInstant).orElse(Instant.now())
         );
     }

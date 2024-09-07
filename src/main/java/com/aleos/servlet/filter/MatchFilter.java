@@ -104,9 +104,12 @@ public class MatchFilter extends AbstractEndpointFilter {
     }
 
     private MatchPayload getMatchPayload(HttpServletRequest req) {
+        var playerOneName = req.getParameter("playerOneName");
+        var playerTwoName = req.getParameter("playerTwoName");
+
         return new MatchPayload(
-                req.getParameter("playerOneName"),
-                req.getParameter("playerTwoName"),
+                playerOneName == null ? null : playerOneName.trim(),
+                playerTwoName == null ? null : playerTwoName.trim(),
                 req.getParameter("matchFormat")
         );
     }
@@ -131,7 +134,7 @@ public class MatchFilter extends AbstractEndpointFilter {
         return new MatchFilterCriteria(
                 Optional.ofNullable(req.getParameter("status"))
                         .orElseGet(() -> PropertiesUtil.get("filter.default.matchStatus").orElse(null)),
-                name == null || name.isBlank() ? null : name,
+                name == null || name.isBlank() ? null : name.trim(),
                 before == null || before.isBlank() ? null : toInstant(before)
         );
     }
