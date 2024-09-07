@@ -202,4 +202,8 @@ public class MatchRepository {
             query.setMaxResults(size);
         }
     }
+
+    public List<String> getPlayingPlayerNames() {
+        return ongoingMatchCache.getParticipants();
+    }
 }

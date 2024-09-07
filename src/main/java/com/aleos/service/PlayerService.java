@@ -67,4 +67,8 @@ public class PlayerService {
     public List<String> getCountryCodes() {
         return playerRepository.getCountryCodes();
     }
+
+    public List<String> getPlayerNamesForNextMatch(List<String> playingPlayers) {
+        return playerRepository.chooseRandomPlayersForNextMatch(playingPlayers);
+    }
 }

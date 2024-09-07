@@ -17,24 +17,26 @@ import com.aleos.model.entity.Match;
 import com.aleos.model.entity.MatchInfo;
 import com.aleos.model.entity.Player;
 import com.aleos.repository.MatchRepository;
-import com.aleos.repository.PlayerDao;
+import com.aleos.repository.PlayerRepository;
 import lombok.RequiredArgsConstructor;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.WeakReference;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 @RequiredArgsConstructor
 public class MatchService implements PropertyChangeListener {
 
     private final MatchRepository matchRepository;
 
-    private final PlayerDao playerDao;
+    private final PlayerRepository playerRepository;
 
     private final ScoreTrackerService scoreTrackerService;
 
     private final MatchMapper mapper;
+
 
     public UUID createMatch(MatchPayload payload) {
         TennisMatch newMatch = createNewMatch(payload.format());
@@ -125,6 +127,10 @@ public class MatchService implements PropertyChangeListener {
         return matchRepository.findOngoingMatchIdByPlayerName(playerName);
     }
 
+    public List<String> getPlayingPlayers() {
+        return matchRepository.getPlayingPlayerNames();
+    }
+
     private void registerNewMatch(TennisMatch newMatch) {
         if (matchRepository.findOngoing(newMatch.getId()).isEmpty()) {
 
@@ -132,6 +138,16 @@ public class MatchService implements PropertyChangeListener {
             matchRepository.cacheOngoing(newMatch);
             scoreTrackerService.trackMatch(newMatch);
         }
+    }
+
+    public void generateOngoingMatchExample() {
+        List<String> playersToExclude = getPlayingPlayers();
+        var players = playerRepository.chooseRandomPlayersForNextMatch(playersToExclude);
+
+        generateMatchPayload(players).ifPresent(payload -> {
+            UUID matchUuid = createMatch(payload);
+            generateMatchProcess(matchUuid, players);
+        });
     }
 
     private TennisMatch createNewMatch(String format) {
@@ -154,11 +170,11 @@ public class MatchService implements PropertyChangeListener {
         String winnerName = tennisMatch.getMatchWinner().orElseThrow(() ->
                 new IllegalStateException("Match should be concluded, id: %s".formatted(tennisMatch.getId())));
 
-        Player playerOne = playerDao.findByName(tennisMatch.getPlayerOneName()).orElseThrow(() ->
+        Player playerOne = playerRepository.findByName(tennisMatch.getPlayerOneName()).orElseThrow(() ->
                 new IllegalStateException("Match %s must not be started with unregistered player %s"
                         .formatted(tennisMatch.getId(), tennisMatch.getPlayerOneName())));
 
-        Player playerTwo = playerDao.findByName(tennisMatch.getPlayerTwoName()).orElseThrow(() ->
+        Player playerTwo = playerRepository.findByName(tennisMatch.getPlayerTwoName()).orElseThrow(() ->
                 new IllegalStateException("Match %s must not be started with unregistered player %s"
                         .formatted(tennisMatch.getId(), tennisMatch.getPlayerTwoName())));
 
@@ -175,11 +191,11 @@ public class MatchService implements PropertyChangeListener {
     }
 
     private Player getOrCreatePlayerByName(String name) {
-        return playerDao.findByName(name)
+        return playerRepository.findByName(name)
                 .orElseGet(() -> {
                     Player player = new Player();
                     player.setName(name);
-                    playerDao.save(player);
+                    playerRepository.createPlayer(player);
                     return player;
                 });
     }
@@ -210,5 +226,22 @@ public class MatchService implements PropertyChangeListener {
         matchInfo.getHistoryEntries().addAll(matchScore.getHistoryEntries());
         matchInfo.setFinalScoreRecord(matchScore.getScoreSnapshot().toString());
         return matchInfo;
+    }
+    private Optional<MatchPayload> generateMatchPayload(List<String> players) {
+        var matchFormat = ThreadLocalRandom.current().nextInt() % 3 < 2 ? "bo3" : "bo5";
+
+        return players.size() < 2
+                ? Optional.empty()
+                : Optional.of(new MatchPayload(players.getFirst(), players.getLast(), matchFormat));
+    }
+
+    private void generateMatchProcess(UUID matchUuid, List<String> players) {
+        var matchUuidPayload = new MatchUuidPayload(matchUuid);
+        int scorePointCount = 4 * 10;
+
+        for (int i = 0; i < scorePointCount; i++) {
+            var pointWinner = ThreadLocalRandom.current().nextInt() % 2 == 0 ? players.getFirst() : players.getLast();
+            scorePoint(matchUuidPayload, new PlayerNamePayload(pointWinner));
+        }
     }
 }

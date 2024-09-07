@@ -95,6 +95,16 @@ public class TennisMatchCache implements InMemoryStorage<TennisMatch, UUID> {
                 .findAny();
     }
 
+    @Override
+    public List<String> getParticipants() {
+        lock.readLock().lock();
+        try {
+            return new ArrayList<>(participants);
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
     private void validateParticipant(TennisMatch match) {
         if (checkCurrentParticipant(match.getPlayerOneName()) ||
             checkCurrentParticipant(match.getPlayerTwoName())) {

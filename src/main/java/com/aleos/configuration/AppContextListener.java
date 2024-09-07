@@ -13,6 +13,8 @@ public class AppContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         injectFactoryBean(sce);
+        generateOngoingMatchExample(sce);
+        copyInitialAvatars(sce);
     }
 
     private static void injectFactoryBean(ServletContextEvent sce) {

@@ -93,6 +93,25 @@ public class PlayerRepository {
         });
     }
 
+    public List<String> chooseRandomPlayersForNextMatch(List<String> playingPlayers) {
+        String getRandomPlayerNamesHql = """
+                SELECT name
+                FROM Player
+                WHERE name NOT IN (:playingPlayers)
+                ORDER BY RAND()
+                """;
+
+        // placeholder due to H2's issues. It will ignore all results for empty list
+        playingPlayers.add("");
+
+        return playerDao.runWithinTxAndReturn(entityManager -> {
+            TypedQuery<String> query = entityManager.createQuery(getRandomPlayerNamesHql, String.class);
+            query.setParameter("playingPlayers", playingPlayers);
+            query.setMaxResults(2);
+            return query.getResultList();
+        });
+    }
+
     private Order buildSortOrder(CriteriaBuilder cb, Root<Player> playerRoot, Pageable pageable) {
         String nameAttribute = "name";
         String sortBy = pageable.getSortBy().orElse(nameAttribute);
