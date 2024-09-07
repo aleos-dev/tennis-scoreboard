@@ -42,10 +42,10 @@ public class AppConfiguration {
 
     @Bean
     public MatchService matchService(@Bean(name = "matchRepository") MatchRepository matchRepository,
-                                     @Bean(name = "playerDao") PlayerDao playerDao,
+                                     @Bean(name = "playerRepository") PlayerRepository playerRepository,
                                      @Bean(name = "scoreTrackerService") ScoreTrackerService scoreTrackerService,
                                      @Bean(name = "matchMapper") MatchMapper matchMapper) {
-        return new MatchService(matchRepository, playerDao, scoreTrackerService, matchMapper);
+        return new MatchService(matchRepository, playerRepository, scoreTrackerService, matchMapper);
     }
 
     @Bean
