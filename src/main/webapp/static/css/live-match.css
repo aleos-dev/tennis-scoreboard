@@ -22,7 +22,8 @@ body {
     padding: 20px;
     max-width: 800px;
     font-family: sans-serif;
-    max-height: 450px;
+    flex-grow: 1;
+    max-height: 500px;
     background: rgba(229, 241, 241, 0.8);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
