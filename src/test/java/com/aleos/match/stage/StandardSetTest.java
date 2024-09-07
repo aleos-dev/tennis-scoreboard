@@ -74,6 +74,7 @@ class StandardSetTest {
     @Test
     void scorePoint_shouldSetWinnerInTieBreak_whenPlayerWinsByTwoAndHaveMin7() {
         set.setState(StageState.TIE_BREAK);
+        set.getChildStage().ifPresent(game -> game.setState(StageState.TIE_BREAK));
         player = Player.ONE;
         opponent = player.getOpponent();
 
