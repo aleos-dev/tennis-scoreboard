@@ -203,19 +203,3 @@ body {
     background-color: #fff;
     border: 1px;
 }
-
-.site-footer {
-    position: absolute;
-}
-
-/*@media (max-width: 600px) {*/
-/*    .player img {*/
-/*        width: 50px; !* Smaller icons on smaller screens *!*/
-/*    }*/
-/*    */
-/*    .versus-label {*/
-/*        font-size: 16px; !* Slightly smaller text on smaller screens *!*/
-/*        width: 30px;*/
-/*        height: 30px;*/
-/*    }*/
-/*}*/
