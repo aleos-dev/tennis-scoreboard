@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -102,9 +103,7 @@ public class ImageService {
                 try (var inputStream = classLoader.getResourceAsStream(STANDARD_AVATAR_PATH.resolve(avatar).toString())) {
                     if (inputStream != null) {
                         Path targetPath = targetDirectory.resolve(avatar);
-                        if (!Files.exists(targetPath)) {
-                            Files.copy(inputStream, targetPath);
-                        }
+                        Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
                     } else {
                         logger.warning(() -> "Standard avatar %s not found".formatted(avatar));
                     }
@@ -113,6 +112,22 @@ public class ImageService {
 
         } catch (Exception e) {
             logger.warning("The avatars deploying exception: " + e.getMessage());
+        }
+    }
+
+    public void renameAvatar(String newName, String oldName) {
+        try {
+            Path oldAvatarPath = Paths.get(AVATARS_STORAGE_PATH, oldName + IMAGE_FORMAT);
+            Path newAvatarPath = Paths.get(AVATARS_STORAGE_PATH, newName + IMAGE_FORMAT);
+
+            if (Files.exists(oldAvatarPath)) {
+                Files.move(oldAvatarPath, newAvatarPath, StandardCopyOption.REPLACE_EXISTING);
+                logger.info(() -> "Avatar renamed from " + oldName + " to " + newName);
+            } else {
+                getAvatarImageInputStream(newName).ifPresent(is -> saveAvatarAsWebPImage(is, newName));
+            }
+        } catch (IOException e) {
+            throw new ImageServiceException("Error renaming the avatar from %s to %s".formatted(oldName, newName), e);
         }
     }
 }
