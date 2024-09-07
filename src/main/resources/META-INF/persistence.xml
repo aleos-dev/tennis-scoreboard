@@ -5,7 +5,6 @@
              version="3.0">
 
     <persistence-unit name="default">
-        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
@@ -14,9 +13,10 @@
             <property name="jakarta.persistence.jdbc.user" value="sa"/>
             <property name="jakarta.persistence.jdbc.password" value=""/>
 
-            <!-- Hibernate properties -->
+            <!-- Specify HikariCP as the connection provider -->
+            <property name="hibernate.connection.provider_class" value="org.hibernate.hikaricp.internal.HikariCPConnectionProvider"/>
+
             <property name="hibernate.default_schema" value="public"/>
-            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
 
             <!-- Set the session context class to 'thread' -->
             <property name="hibernate.current_session_context_class" value="thread"/>
