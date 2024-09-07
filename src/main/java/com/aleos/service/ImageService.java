@@ -26,6 +26,8 @@ public class ImageService {
 
     private static final String AVATARS_STORAGE_PATH = PropertiesUtil.get("image.player.avatar.storage.path").orElseThrow();
 
+    private static final Path STANDARD_AVATAR_PATH = Path.of("images/avatars/");
+
     private static final String IMAGE_FORMAT = ".webp";
 
 
@@ -81,6 +83,36 @@ public class ImageService {
             Files.delete(Path.of(AVATARS_STORAGE_PATH, name + IMAGE_FORMAT));
         } catch (IOException e) {
             throw new ImageServiceException("Error removing the avatar with name: %s".formatted(name), e);
+        }
+    }
+
+    public void deployAvatarsFromResources() {
+        try {
+            Path targetDirectory = Path.of(AVATARS_STORAGE_PATH);
+            if (!Files.exists(targetDirectory)) {
+                Files.createDirectories(targetDirectory);
+            }
+
+            String[] avatars = {"Andy Murray.webp", "Ashleigh Barty.webp", "Dominic Thiem.webp", "Maria Sharapova.webp",
+                    "Naomi Osaka.webp", "Novak Djokovic.webp", "Rafael Nadal.webp", "Roger Federer.webp",
+                    "Serena Williams.webp", "Simona Halep.webp", "Venus Williams.webp"};
+            var classLoader = getClass().getClassLoader();
+
+            for (var avatar : avatars) {
+                try (var inputStream = classLoader.getResourceAsStream(STANDARD_AVATAR_PATH.resolve(avatar).toString())) {
+                    if (inputStream != null) {
+                        Path targetPath = targetDirectory.resolve(avatar);
+                        if (!Files.exists(targetPath)) {
+                            Files.copy(inputStream, targetPath);
+                        }
+                    } else {
+                        logger.warning(() -> "Standard avatar %s not found".formatted(avatar));
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            logger.warning("The avatars deploying exception: " + e.getMessage());
         }
     }
 }
