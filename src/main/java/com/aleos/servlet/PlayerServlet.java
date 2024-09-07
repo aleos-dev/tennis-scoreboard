@@ -1,11 +1,11 @@
 package com.aleos.servlet;
 
-import com.aleos.service.ImageService;
 import com.aleos.configuration.AppContextAttribute;
 import com.aleos.exception.ImageServiceException;
 import com.aleos.exception.UniqueConstraintViolationException;
 import com.aleos.model.dto.in.PlayerNamePayload;
 import com.aleos.model.dto.in.PlayerPayload;
+import com.aleos.service.ImageService;
 import com.aleos.service.PlayerService;
 import com.aleos.servicelocator.ServiceLocator;
 import com.aleos.util.ServletUtil;
@@ -19,6 +19,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -84,7 +86,8 @@ public class PlayerServlet extends HttpServlet {
             String newName = payload.name();
             saveUploadedImage(extractImagePart(req), newName, oldName);
 
-            ServletUtil.redirect(req, resp, "/players/" + payload.name());
+            var urlEncodedName = URLEncoder.encode(payload.name(), StandardCharsets.UTF_8);
+            ServletUtil.redirect(req, resp, "/players/" + urlEncodedName);
 
         } catch (UniqueConstraintViolationException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
@@ -116,6 +119,8 @@ public class PlayerServlet extends HttpServlet {
                 imageService.remove(oldName);
             } else if (imagePart.getSize() > 0) {
                 throw new ImageServiceException("Incorrect content type for the avatar: " + contentType);
+            } else if (!newName.equalsIgnoreCase(oldName)) {
+                imageService.renameAvatar(newName, oldName);
             }
 
         } catch (IOException e) {
