@@ -19,4 +19,6 @@ public interface InMemoryStorage<T, K> {
     boolean checkCurrentParticipant(String name);
 
     Optional<UUID> findOngoingMatchIdByPlayerName(String name);
+
+    List<String> getParticipants();
 }
