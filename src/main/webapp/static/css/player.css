@@ -27,6 +27,7 @@ p {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
+    width: 800px;
     border: 1px solid #ddd;
     padding: 25px;
     border-radius: 8px;

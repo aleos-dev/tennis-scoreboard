@@ -31,7 +31,8 @@
     <div class="score-label">Award Point</div>
 
     <form class="score-control"
-          action="${pageContext.request.contextPath}/match-scores/${matchScore.matchID}" method="post">
+          action="${pageContext.request.contextPath}/match-scores/${matchScore.matchID}"
+          method="post">
 
         <input type="hidden" name="pointWinner" id="pointWinner" value="">
 
