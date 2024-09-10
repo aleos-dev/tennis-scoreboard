@@ -16,7 +16,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Part;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -80,11 +79,9 @@ public class PlayerServlet extends HttpServlet {
 
         // not atomic
         try {
-            playerService.update(identifier, payload);
 
-            String oldName = identifier.name();
-            String newName = payload.name();
-            saveUploadedImage(extractImagePart(req), newName, oldName);
+            playerService.update(identifier, payload);
+            imageService.saveOrUpdateAvatar(req, payload.name(), identifier.name());
 
             var urlEncodedName = URLEncoder.encode(payload.name(), StandardCharsets.UTF_8);
             ServletUtil.redirect(req, resp, "/players/" + urlEncodedName);
@@ -98,33 +95,6 @@ public class PlayerServlet extends HttpServlet {
             logger.log(Level.SEVERE, e.getMessage(), e);
             ServletUtil.setErrors(req, "The image can't be loaded");
             ServletUtil.forwardToJsp(req, resp, CONTROL_PLAYER_JSP_REFERENCE);
-        }
-    }
-
-    private Part extractImagePart(HttpServletRequest req) {
-        try {
-            return req.getPart("image");
-        } catch (IOException e) {
-            throw new ImageServiceException("Can not retrieve the Part from request", e);
-        } catch (ServletException e) {
-            throw new ImageServiceException("Not multipart request type", e);
-        }
-    }
-
-    private void saveUploadedImage(Part imagePart, String newName, String oldName) {
-        try {
-            String contentType = imagePart.getContentType();
-            if (contentType.startsWith("image/")) {
-                imageService.saveAvatarAsWebPImage(imagePart.getInputStream(), newName);
-                imageService.remove(oldName);
-            } else if (imagePart.getSize() > 0) {
-                throw new ImageServiceException("Incorrect content type for the avatar: " + contentType);
-            } else if (!newName.equalsIgnoreCase(oldName)) {
-                imageService.renameAvatar(newName, oldName);
-            }
-
-        } catch (IOException e) {
-            throw new ImageServiceException("Can not retrieve an InputStream from the image Part", e);
         }
     }
 }

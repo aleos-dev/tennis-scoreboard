@@ -2,6 +2,9 @@ package com.aleos.service;
 
 import com.aleos.exception.ImageServiceException;
 import com.aleos.util.PropertiesUtil;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Part;
 import jakarta.validation.constraints.NotNull;
 
 import javax.imageio.ImageIO;
@@ -115,7 +118,28 @@ public class ImageService {
         }
     }
 
-    public void renameAvatar(String newName, String oldName) {
+    public void saveOrUpdateAvatar(HttpServletRequest req, String newName, String oldName) {
+        var imagePart = extractImagePart(req);
+
+        try {
+            if (isImageContent(imagePart)) {
+                saveAvatarAsWebPImage(imagePart.getInputStream(), newName);
+
+                if (isNameChanged(newName, oldName)) {
+                    remove(oldName);
+                }
+            } else if (imagePart.getSize() > 0) {
+                throw new ImageServiceException("The avatar should be image/* type.");
+            } else if (isNameChanged(newName, oldName)) {
+                rename(oldName, newName);
+            }
+
+        } catch (IOException e) {
+            throw new ImageServiceException("Can not retrieve an InputStream from the image Part", e);
+        }
+    }
+
+    private void rename(String oldName, String newName) {
         try {
             Path oldAvatarPath = Paths.get(AVATARS_STORAGE_PATH, oldName + IMAGE_FORMAT);
             Path newAvatarPath = Paths.get(AVATARS_STORAGE_PATH, newName + IMAGE_FORMAT);
@@ -129,6 +153,24 @@ public class ImageService {
         } catch (IOException e) {
             throw new ImageServiceException("Error renaming the avatar from %s to %s".formatted(oldName, newName), e);
         }
+    }
+
+    private boolean isNameChanged(String newName, String oldName) {
+        return !newName.equalsIgnoreCase(oldName);
+    }
+
+    private Part extractImagePart(HttpServletRequest req) {
+        try {
+            return req.getPart("image");
+        } catch (IOException e) {
+            throw new ImageServiceException("Can not retrieve the Part from request", e);
+        } catch (ServletException e) {
+            throw new ImageServiceException("Not multipart request type", e);
+        }
+    }
+
+    private boolean isImageContent(Part imagePart) {
+        return imagePart.getContentType().startsWith("image/");
     }
 }
 
