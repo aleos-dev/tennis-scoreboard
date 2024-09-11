@@ -1,0 +1,32 @@
+name: Deploy container on a remote server
+on:
+  workflow_run:
+    workflows: [Release action]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote commands by ssh
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USERNAME }}
+          key: ${{ secrets.SSH_AWS }}
+          script: |
+            # Step 1: Backup the current WAR file
+            echo "Backing up the current WAR file..."
+            mv /opt/tomcat/apache-tomcat-10.1.26/webapps/tennis-scoreboard.war /opt/tomcat/apache-tomcat-10.1.26/webapps/tennis-scoreboard.war.bak
+            
+            # Step 2: Download the latest release WAR file using the GitHub API to get the latest release dynamically
+            echo "Downloading the latest WAR file..."
+            LATEST_RELEASE=$(curl -s https://api.github.com/repos/aleos-dev/tennis-scoreboard/releases/latest | grep "browser_download_url.*war" | cut -d : -f 2,3 | tr -d \" | tr -d ' ')
+            echo $LATEST_RELEASE
+            wget $LATEST_RELEASE -O /opt/tomcat/apache-tomcat-10.1.26/webapps/tennis-scoreboard.war
+            
+            # Step 3: Restart Tomcat
+            echo "Restarting Tomcat..."
+            sudo systemctl restart tomcat
