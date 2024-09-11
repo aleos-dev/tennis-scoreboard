@@ -8,8 +8,8 @@
 <head>
     <%@ include file="../common/head.jsp" %>
     <title>Player profile</title>
-    <link rel="stylesheet" type="text/css"
-          href="${pageContext.request.contextPath}/static/css/player.css">
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/static/css/player.css">
+    <script src="${pageContext.request.contextPath}/static/js/imageInput.js"></script>
 </head>
 
 <body>
