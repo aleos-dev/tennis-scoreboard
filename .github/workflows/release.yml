@@ -1,0 +1,65 @@
+name: Release action
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4.2.1
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build projects
+        run: |
+          cd backend
+          mvn -B package --file pom.xml
+
+      - name: Copy artifact
+        run: |
+          mkdir app
+          cp backend/target/*.war app/tennis-scoreboard.war
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4.3.3
+        with:
+          # identifier to uploaded files
+          name: uploaded-data
+          path: app/tennis-scoreboard.war
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Artifact
+        uses: actions/download-artifact@v4.1.8
+        with:
+          # identifier of files to download
+          name: uploaded-data
+          path: to-release
+
+      - name: List contents of the artifact directory
+        run: ls -l to-release/
+
+      - name: Release
+        uses: ncipollo/release-action@v1.14.0
+        with:
+          name: "tennis-scoreboard.war"
+          # path to file with the name of the uploaded file
+          artifacts: "to-release/tennis-scoreboard.war"
+          token: ${{ secrets.FOR_RELEASE_TOKEN }}
