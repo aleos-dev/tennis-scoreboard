@@ -24,7 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @WebServlet("/players/*")
-@MultipartConfig
+@MultipartConfig(maxFileSize = 1024 * 1024 * 2)
 public class PlayerServlet extends HttpServlet {
 
     private static final Logger logger = Logger.getLogger(PlayerServlet.class.getName());
