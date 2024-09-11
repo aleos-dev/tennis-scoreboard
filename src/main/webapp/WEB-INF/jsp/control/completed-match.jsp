@@ -13,7 +13,8 @@
     <script src="${pageContext.request.contextPath}/static/js/toggleHistory.js"></script>
 </head>
 
-<body>
+<body style="background: url('${pageContext.request.contextPath}/static/images/completed-match-background.webp') no-repeat center/cover">
+
 <div class="content">
     <%@ include file="../common/header.jsp" %>
 

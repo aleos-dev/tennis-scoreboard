@@ -1,8 +1,3 @@
-body {
-    background: url('/static/images/completed-match-background.webp') no-repeat center center/cover;
-    background-position: center;
-}
-
 .completed-header {
     display: flex;
     flex-direction: row;

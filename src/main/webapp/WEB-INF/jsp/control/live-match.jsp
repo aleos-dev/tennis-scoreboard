@@ -5,6 +5,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <%@ include file="../common/head.jsp" %>
     <title>Match Control</title>
@@ -14,10 +15,10 @@
           href="${pageContext.request.contextPath}/static/css/live-match.css">
     <script src="${pageContext.request.contextPath}/static/js/submitScore.js"></script>
     <script src="${pageContext.request.contextPath}/static/js/liveTime.js"></script>
-
 </head>
 
-<body>
+<body style="background: url('${pageContext.request.contextPath}/static/images/active-match-background.webp') no-repeat center/cover">
+
 <%@ include file="../common/header.jsp" %>
 
 <div class="info-header">

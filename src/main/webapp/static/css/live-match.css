@@ -1,7 +1,3 @@
-body {
-    background: url('/static/images/active-match-background.webp') no-repeat center center/cover;
-}
-
 .info-header {
     text-align: center;
     padding: 5px;
