@@ -25,13 +25,12 @@ jobs:
 
       - name: Build projects
         run: |
-          cd backend
           mvn -B package --file pom.xml
 
       - name: Copy artifact
         run: |
           mkdir app
-          cp backend/target/*.war app/tennis-scoreboard.war
+          cp target/*.war app/tennis-scoreboard.war
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4.3.3
