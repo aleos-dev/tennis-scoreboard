@@ -10,14 +10,14 @@
     <%@ include file="../common/head.jsp" %>
     <title>Match Control</title>
     <link rel="stylesheet" type="text/css"
-          href="${pageContext.request.contextPath}/static/css/live-match-notification.css">
+          href="${basePath}/static/css/live-match-notification.css">
     <link rel="stylesheet" type="text/css"
-          href="${pageContext.request.contextPath}/static/css/live-match.css">
-    <script src="${pageContext.request.contextPath}/static/js/submitScore.js"></script>
-    <script src="${pageContext.request.contextPath}/static/js/liveTime.js"></script>
+          href="${basePath}/static/css/live-match.css">
+    <script src="${basePath}/static/js/submitScore.js"></script>
+    <script src="${basePath}/static/js/liveTime.js"></script>
 </head>
 
-<body style="background: url('${pageContext.request.contextPath}/static/images/active-match-background.webp') no-repeat center/cover">
+<body style="background: url('${basePath}/static/images/active-match-background.webp') no-repeat center/cover">
 
 <%@ include file="../common/header.jsp" %>
 
@@ -32,7 +32,7 @@
     <div class="score-label">Award Point</div>
 
     <form class="score-control"
-          action="${pageContext.request.contextPath}/match-scores/${matchScore.matchID}"
+          action="${basePath}/match-scores/${matchScore.matchID}"
           method="post">
 
         <input type="hidden" name="pointWinner" id="pointWinner" value="">

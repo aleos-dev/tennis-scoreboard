@@ -8,8 +8,8 @@
 <head>
     <%@ include file="../common/head.jsp" %>
     <title>Player profile</title>
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/static/css/player.css">
-    <script src="${pageContext.request.contextPath}/static/js/imageInput.js"></script>
+    <link rel="stylesheet" type="text/css" href="${basePath}/static/css/player.css">
+    <script src="${basePath}/static/js/imageInput.js"></script>
 </head>
 
 <body>
@@ -27,7 +27,7 @@
 
                     <c:when test="${editMode}">
 
-                        <form action="${pageContext.request.contextPath}/players/${requestScope.playerDto.name()}"
+                        <form action="${basePath}/players/${requestScope.playerDto.name()}"
                               method="post"
                               enctype="multipart/form-data">
 
@@ -42,7 +42,7 @@
                             <%@ include file="../fragment/player-info.jspf" %>
 
                             <button type="submit" class="cta-button">Save Changes</button>
-                            <a href="${pageContext.request.contextPath}/players/${requestScope.playerDto.name()}">Cancel</a>
+                            <a href="${basePath}/players/${requestScope.playerDto.name()}">Cancel</a>
                         </form>
                     </c:when>
 
@@ -55,7 +55,7 @@
                             <c:if test="${not empty requestScope.playerDto.ongoingMatchUuid()}">
                                 <div class="ongoing-match">
                                     <p>
-                                        <a href="${pageContext.request.contextPath}/matches/${requestScope.playerDto.ongoingMatchUuid()}"
+                                        <a href="${basePath}/matches/${requestScope.playerDto.ongoingMatchUuid()}"
                                            class="matches-link">Check ongoing match</a>
                                     </p>
                                 </div>
@@ -65,7 +65,7 @@
                             <div class="refs">
                                 <p><a href="${requestScope.playerDto.matchesEndpoint()}">View Player's Matches</a></p>
 
-                                <p><a href="${pageContext.request.contextPath}/players">Back to Player Search</a></p>
+                                <p><a href="${basePath}/players">Back to Player Search</a></p>
                             </div>
                         </c:if>
                     </c:otherwise>

@@ -9,11 +9,11 @@
     <%@ include file="../common/head.jsp" %>
     <title>Match Info</title>
     <link rel="stylesheet" type="text/css"
-          href="${pageContext.request.contextPath}/static/css/completed-match.css">
-    <script src="${pageContext.request.contextPath}/static/js/toggleHistory.js"></script>
+          href="${basePath}/static/css/completed-match.css">
+    <script src="${basePath}/static/js/toggleHistory.js"></script>
 </head>
 
-<body style="background: url('${pageContext.request.contextPath}/static/images/completed-match-background.webp') no-repeat center/cover">
+<body style="background: url('${basePath}/static/images/completed-match-background.webp') no-repeat center/cover">
 
 <div class="content">
     <%@ include file="../common/header.jsp" %>
@@ -40,20 +40,20 @@
 
     <div class="completed-match-container">
         <div class="player ${match.winner != null && match.winner.equalsIgnoreCase(match.playerOne) ? 'player-winner' : 'player-loser'}">
-            <img src="${pageContext.request.contextPath}/avatars/${match.playerOne}" alt="Player"
+            <img src="${basePath}/avatars/${match.playerOne}" alt="Player"
                  class="player-image">
         </div>
 
         <div class="scoreboard-container">
             <div class="vs-icon">
-                <img src="${pageContext.request.contextPath}/static/images/vs-element.webp"
+                <img src="${basePath}/static/images/vs-element.webp"
                      alt="VS">
             </div>
             <%@ include file="../fragment/completed-match-scoreboard.jspf" %>
         </div>
 
         <div class="player ${match.winner != null && match.winner.equalsIgnoreCase(match.playerTwo) ? 'player-winner' : 'player-loser'}">
-            <img src="${pageContext.request.contextPath}/avatars/${match.playerTwo}" alt="Player"
+            <img src="${basePath}/avatars/${match.playerTwo}" alt="Player"
                  class="player-image">
         </div>
     </div>

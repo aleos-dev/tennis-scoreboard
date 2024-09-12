@@ -7,7 +7,7 @@
 <head>
     <title>Matches</title>
     <%@ include file="../common/head.jsp" %>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/matches.css">
+    <link rel="stylesheet" href="${basePath}/static/css/matches.css">
 </head>
 
 <body>

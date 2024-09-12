@@ -5,7 +5,7 @@
 
 <head>
     <%@ include file="WEB-INF/jsp/common/head.jsp" %>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/index.css">
+    <link rel="stylesheet" href="${basePath}/static/css/index.css">
     <title>Welcome to Tennis Scoreboard</title>
 </head>
 

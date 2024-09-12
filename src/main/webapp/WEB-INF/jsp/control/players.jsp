@@ -7,7 +7,7 @@
 <head>
     <title>Players</title>
     <%@ include file="../common/head.jsp" %>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/players.css">
+    <link rel="stylesheet" href="${basePath}/static/css/players.css">
 </head>
 
 <body>

@@ -6,7 +6,7 @@
 
 <head>
     <%@ include file="../common/head.jsp" %>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/create-match.css">
+    <link rel="stylesheet" href="${basePath}/static/css/create-match.css">
     <title>New Match</title>
 </head>
 

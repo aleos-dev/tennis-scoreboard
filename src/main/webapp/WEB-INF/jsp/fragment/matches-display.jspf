@@ -8,7 +8,7 @@
             <c:set var="liveMatch" value="${match}" scope="request"/>
             <jsp:useBean id="liveMatch" scope="request" type="com.aleos.model.dto.out.ActiveMatchDto"/>
 
-            <a href="${pageContext.request.contextPath}/matches/${liveMatch.id}" class="match-details-link">
+            <a href="${basePath}/matches/${liveMatch.id}" class="match-details-link">
                 <div class="live-match">
                     <div class="match-item">
 
@@ -37,7 +37,7 @@
             <c:set var="completedMatch" value="${match}" scope="request"/>
             <jsp:useBean id="completedMatch" scope="request" type="com.aleos.model.dto.out.ConcludedMatchDto"/>
 
-            <a href="${pageContext.request.contextPath}/matches/${completedMatch.id}" class="match-details-link">
+            <a href="${basePath}/matches/${completedMatch.id}" class="match-details-link">
                 <div class="completed-match">
                     <div class="match-item">
 

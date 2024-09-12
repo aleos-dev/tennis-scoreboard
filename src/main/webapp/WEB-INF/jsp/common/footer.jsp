@@ -7,7 +7,7 @@
                 <li><a href="https://ale-os.com/" target="_blank" rel="noopener noreferrer">My blog</a></li>
                 <li><a href="https://github.com/aleos-dev/" target="_blank" rel="noopener noreferrer">Github</a></li>
                 <li><a href="https://leetcode.com/aleos-dev" target="_blank" rel="noopener noreferrer">Leetcode</a></li>
-                <li><a href="${pageContext.request.contextPath}/about">About</a></li>
+                <li><a href="${basePath}/about">About</a></li>
             </ul>
         </nav>
     </div>

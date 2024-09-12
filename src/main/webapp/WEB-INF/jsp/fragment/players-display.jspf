@@ -2,7 +2,7 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 
 <c:forEach var="playerDto" items="${requestScope.playersDto.content}">
-    <a href="${pageContext.request.contextPath}/players/${playerDto.name()}" class="player-details-ref">
+    <a href="${basePath}/players/${playerDto.name()}" class="player-details-ref">
 
         <div class="player-item">
             <h3>
@@ -13,7 +13,7 @@
             <div class="player-content">
                 <c:if test="${not empty playerDto.ongoingMatchUuid()}">
                     <a class="ongoing-match-ref"
-                       href="${pageContext.request.contextPath}/matches/${playerDto.ongoingMatchUuid()}">
+                       href="${basePath}/matches/${playerDto.ongoingMatchUuid()}">
                         View Ongoing Match
                     </a>
                 </c:if>
