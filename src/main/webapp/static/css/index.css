@@ -14,4 +14,7 @@ p {
     margin-top: 50px;
 }
 
+.site-footer {
+    position: static;
+}
 
