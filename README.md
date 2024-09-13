@@ -1,3 +1,4 @@
+
 # Tennis Scoreboard 🎾
 
 | 🚀 Welcome to the Tennis Scoreboard project! This pet project has significantly expanded my understanding of server-side rendering (SSR) and foundational web technologies like HTML, CSS, and Flexbox. Let me tell you, working with CSS layouts was like therapy—tough and frustrating at times, but part of the learning process. <br/><br>With this scoreboard, you can create, manage, and review tennis matches (both ongoing and finished). The project also includes functionality for editing player profiles. Plus, pagination is here so you don’t have to endlessly scroll through match results like you're doomscrolling on social media. Implementing pagination and filtering was a valuable experience.<br/><br/>I’ve achieved my goals with this project, and I’m excited to take on the next challenge! | ![](/.github/img/tennis-scoreboard-main.webp) |
@@ -46,6 +47,62 @@
 ```
 
 ## Technologies and Frameworks
+<table align="center">
+  <tr>
+      <td valign="middle">
+          <img src="https://user-images.githubusercontent.com/25181517/117201156-9a724800-adec-11eb-9a9d-3cd0f67da4bc.png" width="50"><br>
+            Java
+    </td>
+    <td valign="middle">
+          <img src="https://github.com/onemarc/tech-icons/blob/main/icons/apachemaven.svg" width="50"><br>
+            Maven
+    </td>
+    <td valign="middle">
+          <img src="https://github.com/onemarc/tech-icons/blob/main/icons%232/flyway.svg" width="50"><br>
+            Flyway
+    </td>
+    <td valign="middle">
+        <img src="https://github.com/onemarc/tech-icons/blob/main/icons/hibernate-dark.svg" width="50"><br>
+          Hibernate
+    </td>
+    <td valign="middle">
+       <img src="https://github.com/onemarc/tech-icons/blob/main/icons/apachetomcat.svg" width="50"><br>
+          Tomcat
+    </td>
+        <td valign="middle">
+       <img src="https://user-images.githubusercontent.com/25181517/117533873-484d4480-afef-11eb-9fad-67c8605e3592.png" width="50"><br>
+          JUnit
+    </td>
+    <td valign="middle">
+        <img src="https://github.com/onemarc/tech-icons/blob/main/icons/jsp.svg" width="50"><br>
+          JSP
+    </td>
+    <td valign="middle">
+       <img src="https://github.com/onemarc/tech-icons/blob/main/icons/glassfish.svg" width="50"><br>
+          Glassfish
+    </td>
+    <td valign="middle">
+        <img src="https://github.com/onemarc/tech-icons/blob/main/icons/html.svg" width="50"><br>
+          HTML
+    </td>
+    <td valign="middle">
+        <img src="https://github.com/onemarc/tech-icons/blob/main/icons/css.svg" width="50"><br>
+          CSS
+    </td>
+    <td valign="middle">
+        <img src="https://user-images.githubusercontent.com/25181517/117207330-263ba280-adf4-11eb-9b97-0ac5b40bc3be.png" width="50"><br>
+          Docker
+    </td>
+    <td valign="middle">
+        <img src="https://user-images.githubusercontent.com/25181517/183868728-b2e11072-00a5-47e2-8a4e-4ebbb2b8c554.png" width="50"><br>
+          CI/CD
+    </td>
+    <td valign="middle">
+          <img src="https://github.com/h2database/h2database/blob/master/h2/src/docsrc/images/h2-logo.png" width="50"><br>
+            H2
+     </td>
+  </tr>
+</table>
 
 - 🛠 **Maven**: A build and dependency management tool.
 - 🗄 **H2 Database**: In-memory database.
@@ -65,6 +122,8 @@
       APIs.
 - 🌐 **Servlet API**: For handling client-server communication.
 - 🚀 **Tomcat**: A servlet container that serves as the implementation of the Servlet API and hosts the web application.
+
+  ---
 
 ## Reflection on the project
 
