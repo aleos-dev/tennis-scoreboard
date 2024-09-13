@@ -1,11 +1,9 @@
 input, label, fieldset, #format-id {
-    font-size: 1.1em;
     margin: 5px;
     margin-left: 20px;
 }
 
 legend {
-    font-size: 1.3em;
     font-weight: bold;
     padding-bottom: 10px;
     margin-left: 10px;

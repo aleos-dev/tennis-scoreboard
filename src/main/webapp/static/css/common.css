@@ -17,9 +17,9 @@
 
 body {
     background: url('/static/images/tennis-scoreboard-main-background.webp') no-repeat center/cover;
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
 }
 
 .content {
@@ -30,18 +30,10 @@ body {
 }
 
 .vertical-center {
-    height: 400px;
     justify-content: center;
 }
 
 .horizontal-center {
-    align-items: center;
-}
-
-.flex-between {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
     align-items: center;
 }
 
@@ -98,19 +90,18 @@ body {
 /* Pagination Section */
 .pagination-section {
     text-align: center;
-    margin: 40px 0;
+    margin: 10px 0;
 }
 
 .pagination-controls {
     display: flex;
     justify-content: center;
     flex-direction: row;
-    width: 500px;
+    width: 400px;
 }
 
 .pagination-controls a {
-    padding: 8px 16px;
-    margin: 0 5px;
+    padding: 5px 10px;
     background: #007bff;
     color: #fff;
     text-decoration: none;
@@ -123,7 +114,6 @@ body {
 }
 
 .pagination-element {
-    min-width: 80px;
     width: 100%;
 }
 

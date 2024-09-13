@@ -52,20 +52,23 @@
                             <h1>${requestScope.playerDto.name()}</h1>
                             <%@ include file="../fragment/player-info.jspf" %>
 
-                            <c:if test="${not empty requestScope.playerDto.ongoingMatchUuid()}">
-                                <div class="ongoing-match">
-                                    <p>
-                                        <a href="${basePath}/matches/${requestScope.playerDto.ongoingMatchUuid()}"
-                                           class="matches-link">Check ongoing match</a>
+                            <div class="player-info-links content">
+                                <c:if test="${not empty requestScope.playerDto.ongoingMatchUuid()}">
+                                    <div class="ongoing-match">
+                                        <p>
+                                            <a href="${basePath}/matches/${requestScope.playerDto.ongoingMatchUuid()}"
+                                               class="matches-link">Check ongoing match</a>
+                                        </p>
+                                    </div>
+                                </c:if>
+
+
+                                <div class="refs">
+                                    <p><a href="${requestScope.playerDto.matchesEndpoint()}">View Player's Matches</a>
                                     </p>
+
+                                    <p><a href="${basePath}/players">Back to Player Search</a></p>
                                 </div>
-                            </c:if>
-
-
-                            <div class="refs">
-                                <p><a href="${requestScope.playerDto.matchesEndpoint()}">View Player's Matches</a></p>
-
-                                <p><a href="${basePath}/players">Back to Player Search</a></p>
                             </div>
                         </c:if>
                     </c:otherwise>
