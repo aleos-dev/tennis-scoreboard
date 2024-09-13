@@ -11,6 +11,6 @@ RUN chown -R app-user:app-group /usr/local/tomcat
 USER app-user:app-group
 WORKDIR /usr/local/tomcat/webapps/
 ARG WAR_FILE=tennis-scoreboard.war
-COPY --from=build /app/target/${WAR_FILE} /usr/local/tomcat/webapps/
+COPY --from=build /app/target/${WAR_FILE} /usr/local/tomcat/webapps/ROOT.war
 EXPOSE 8080
 CMD ["catalina.sh", "run"]
