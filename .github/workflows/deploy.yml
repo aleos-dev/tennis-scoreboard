@@ -14,52 +14,32 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.REMOTE_HOST }}
-          username: ubuntu
+          username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_AWS }}
 
           script: |
-            
-            # Step 1: Stop Tomcat to prevent the server from hanging (optional if already stopped)
+            # Step 1: Stop Tomcat as the tomcat user
             echo "Stopping Tomcat..."
+            sudo -u tomcat /opt/tomcat/bin/shutdown.sh || true
             
-            /opt/tomcat/apache-tomcat-10.1.26/bin/shutdown.sh || true
-            
-            # Step 2: Backup the current WAR file if it exists
+            # Step 2: Backup the current WAR file if it exists (sudo required for mv)
             echo "Backing up the current WAR file..."
-            
-            if [ -f /opt/tomcat/apache-tomcat-10.1.26/webapps/tennis-scoreboard.war ]; then
-              mv /opt/tomcat/apache-tomcat-10.1.26/webapps/tennis-scoreboard.war /opt/tomcat/apache-tomcat-10.1.26/webapps/tennis-scoreboard.war.bak
+            if [ -f /opt/tomcat/webapps/tennis-scoreboard.war ]; then
+              sudo mv /opt/tomcat/webapps/tennis-scoreboard.war /opt/tomcat/webapps/tennis-scoreboard.war.bak
             else
               echo "No existing WAR file found to backup."
             fi
-            
-            # Step 3: Remove the old extracted folder if it exists
-            echo "Removing old extracted folder..."
-            
-            if [ -d /opt/tomcat/apache-tomcat-10.1.26/webapps/tennis-scoreboard ]; then
-              sudo rm -rf /opt/tomcat/apache-tomcat-10.1.26/webapps/tennis-scoreboard
-              echo "Old folder removed."
-            else
-              echo "No existing folder found to remove."
-            fi
 
-            # Step 4: Download the latest release WAR file using the GitHub API to get the latest release dynamically
+            # Step 3: Download the latest release WAR file using the GitHub API to get the latest release dynamically
             echo "Downloading the latest WAR file..."
-            
             LATEST_RELEASE=$(curl -s https://api.github.com/repos/aleos-dev/tennis-scoreboard/releases/latest | grep "browser_download_url.*war" | cut -d : -f 2,3 | tr -d \" | tr -d ' ')
             echo $LATEST_RELEASE
-            wget $LATEST_RELEASE -O /opt/tomcat/apache-tomcat-10.1.26/webapps/tennis-scoreboard.war
+            sudo wget $LATEST_RELEASE -O /opt/tomcat/webapps/tennis-scoreboard.war
             
-            # Step 5: Start Tomcat using startup.sh
+            # Step 4: Ensure correct permissions for the WAR file
+            echo "Setting correct permissions for the new WAR file..."
+            sudo chown tomcat:tomcat /opt/tomcat/webapps/tennis-scoreboard.war
+            
+            # Step 5: Start Tomcat as the tomcat user
             echo "Starting Tomcat..."
-            
-            /opt/tomcat/apache-tomcat-10.1.26/bin/startup.sh
-            
-            echo "Checking if Tomcat started..."
-            if curl -s http://localhost:9091/ > /dev/null; then
-              echo "Tomcat is running."
-            else
-              echo "Tomcat failed to start."
-              tail -n 50 /opt/tomcat/apache-tomcat-10.1.26/logs/catalina.out
-              exit 1
-            fi
+            sudo -u tomcat /opt/tomcat/bin/startup.sh
