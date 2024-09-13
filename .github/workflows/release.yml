@@ -23,6 +23,10 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: Run Unit Tests
+        run: |
+          mvn -B clean test
+
       - name: Build projects
         run: |
           mvn -B package --file pom.xml
