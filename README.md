@@ -5,7 +5,7 @@
 
 ### 🚀 Live Demo
 
-`Visit the live version of our project here:` [Tennis Scoreboard](https://ts.ale-os.com).
+`Visit the live version of our project here:` [Tennis Scoreboard](https://tennis-scoreboard.ale-os.com).
 
 ### 📚 Learn More
 
@@ -27,16 +27,15 @@
 
 🛠 [Deployment](#deployment)
 
-🌱 [Getting Started](#getting-started)
+🌱 [How to run the app on the local machine with Docker](#how-to-run-app-on-the-local-machine)
 
-
-📋 [Project Requirements](https://zhukovsd.github.io/java-backend-learning-course/projects/currency-exchange/)
+📋 [Project Requirements](https://zhukovsd.github.io/java-backend-learning-course/projects/tennis-scoreboard/)
 
 💬 [Share your feedback](#share-your-feedback)
 
-🙌 [Acknowledgments](#Acknowledgments)
+🙌 [Acknowledgments](#acknowledgments)
 
-## Main Goals 💡
+## Main Goals
 
 ```
 - Gain practical experience with Server-Side Rendering (SSR) using Java Server Pages (JSP).
@@ -67,12 +66,11 @@
 - 🌐 **Servlet API**: For handling client-server communication.
 - 🚀 **Tomcat**: A servlet container that serves as the implementation of the Servlet API and hosts the web application.
 
-
-
-## Reflection on the project 📖
+## Reflection on the project
 
 ---
-### Match logic🎾
+
+### Match logic
 
 The com.aleos.match package encapsulates the object-oriented logic for tennis match progression, including games, sets,
 and entire matches. At the heart of this package is the AbstractStage class, which serves as the foundational template
@@ -230,7 +228,7 @@ Avoiding Offset in Pagination: Current observations suggest that using an offset
 
 ---
 
-## Java Server Page (JSP)
+### Java Server Page
 
 Java Server Pages (JSP) is a technology that mixes HTML, Expression Language (EL), and Java scriptlets, facilitating the
 creation of dynamically generated web pages. Although JSP allows for scriptlets—Java code embedded directly within the
@@ -248,7 +246,7 @@ with considerations for best practices in web development.
 
 ---
 
-## Hyper-TExt-markup-language (HTML)
+### Hyper-Text-Markup-Language
 
 HTML (HyperText Markup Language) is the standard markup language used to create and structure content on the web. It
 forms the backbone of any web page, defining the skeletal layout and assembly of various page elements. HTML uses a
@@ -269,7 +267,7 @@ interactivity to the web content, demonstrating HTML’s pivotal role in web dev
 
 ---
 
-## Cascading Style Sheets (CSS)
+### Cascading Style Sheets
 
 While HTML forms the hierarchical structure of web elements, CSS acts as their stylist, enabling the separation of
 presentation from content. This separation enhances accessibility and flexibility, allowing for detailed control over
@@ -285,7 +283,7 @@ significant investment of time. My beginner attempting to use CSS cold only gras
 
 --- 
 
-## Conclusion
+### Conclusion
 
 Despite the errors I made, this project provided a wealth of new experiences and the opportunity to refine technologies
 I was already familiar with. It was undoubtedly worth the time invested, and it stands out as one of the best projects I
@@ -296,9 +294,74 @@ of learning through practical application, making it a rewarding endeavor in my 
 
 ## Deployment
 
+### Overview
+
+The deployment process for the Tennis-Scoreboard application is automated using GitHub Actions and follows a CI/CD
+pipeline. The process ensures that the application is built, tested, and deployed.
+
+The pipeline consists of two main stages:
+
+1. Release Build Process
+2. Deployment to Remote Server
+
+Each of these stages is executed through GitHub Actions workflows configured in release.yml and deploy.yml.
+
+#### Release Build Process
+
+The release process is triggered when a tag is pushed to the repository. 
+
+- Trigger: The process starts when a Git tag is pushed (on: push: tags: '*').
+- Build and Packaging:
+  - The source code is checked out from the repository.
+  - The JDK 21 (Eclipse Temurin) environment is set up.
+  - The Maven build tool is used to compile and package the application into a .war file.
+  - After the build, the .war file (tennis-scoreboard.war) is copied to a designated directory.
+  - This .war file is uploaded as a build artifact to GitHub for further processing.
+  
+- Release: 
+  - Once the artifact is uploaded, the second stage of the job downloads the .war file.
+  - The ncipollo/release-action GitHub action is used to publish a release in the GitHub repository. The artifact is
+      attached to the release, and this release is accessible for deployment purposes.
+
+#### Deployment to Remote Server
+The deployment is handled through the deploy.yml file, which is triggered when the release process is completed (on:
+   workflow_run).
+
+- SSH into Remote Server: The workflow uses appleboy/ssh-action to remotely connect to the server where the application is hosted. 
+- Tomcat Restart: The running Tomcat server is stopped using the shutdown.sh script.
+- Backup the Current WAR File: If an existing WAR file is found, it is backed up by renaming it (e.g., tennis-scoreboard.war.bak). 
+- Download Latest Release: The workflow dynamically retrieves the latest release from the GitHub repository using the GitHub API. The downloaded WAR file is placed in the Tomcat webapps directory.
+- Set File Permissions: The file permissions are adjusted so that Tomcat can read and execute the new WAR file.
+- Start Tomcat: The Tomcat server is restarted using the startup.sh script to deploy the new version of the application.
+
+#### Environment Configuration
+1. Front-End Server (Apache2):
+The application is hosted on a remote server where Apache2 acts as the front-end web server. Apache handles all incoming HTTP (port 80) and HTTPS (port 443) traffic and serves as a proxy to the Tomcat server. Apache is responsible for managing SSL certificates and encrypting traffic.
+
+2. Reverse Proxy to Tomcat:
+Apache2 is configured to proxy all incoming requests for the subdomain (tennis-scoreboard.ale-os.com) to a Tomcat server running in the background on the same machine. Apache forwards the requests to Tomcat, which is bound to localhost. Tomcat handles the application logic and serves the content back to Apache, which then returns the response to the client.
+
+3. Tomcat Configuration:
+Tomcat runs as a background service on the remote server and is configured to serve the application via localhost. The WAR file is deployed in Tomcat's webapps directory, and Apache2 forwards requests to Tomcat using proxy directives. Tomcat does not handle SSL directly; instead, Apache takes care of encrypting the communication and proxies the traffic securely to Tomcat.
+
+4. SSL Configuration:
+SSL certificates are managed by Apache2 using Let's Encrypt. All HTTPS traffic is terminated at Apache, and the requests are then proxied to Tomcat over unencrypted HTTP.
+
+#### Secrets Management
+Several secrets are used within the CI/CD pipeline to ensure security:
+
+- *SSH Keys*: The deployment process uses SSH keys (secrets.SSH_AWS) to connect securely to the remote server.
+- *GitHub Token*: The release action uses a GitHub token (secrets.FOR_RELEASE_TOKEN) to create and upload releases.
+- *Username and Host*: The username and host details for the remote server are stored securely in GitHub secrets (
+secrets.USERNAME, secrets.REMOTE_HOST).
+
+#### Conclusion
+   This CI/CD pipeline automates the build, release, and deployment process for the Tennis-Scoreboard application. Using
+   GitHub Actions, Maven, and Tomcat, the system ensures that each new release is built and deployed to production with
+   minimal manual intervention.
 ---
 
-## Getting started
+## How to run app on the local machine
 
 Follow these steps to get the project up and running on your local machine.
 
@@ -340,5 +403,20 @@ Ensure that port **8080** on localhost are free for use.
   Once the project is running, you can access the frontend at:
 
     ```sh
-    http://localhost:8080/tennis-scoreboard
+    http://localhost:8080/
     ```
+  
+## Share your feedback
+I am continuously looking to refine my understanding and implementation of programming. If you have insights,
+critiques, or advice—or if you wish to discuss any aspect of this project further—I warmly welcome your
+contributions. Please feel free to [open an issue](https://github.com/aleos-dev/tennis-scoreboard/issues) to share
+your
+thoughts.
+
+## Acknowledgments
+
+`I want to express my gratitude to the author of the `[technical requirements](https://zhukovsd.github.io/java-backend-learning-course/projects/currency-exchange/)` for this project, `[S. Zhukov](https://t.me/zhukovsd_it_mentor)`. I would also like to thank [A. Shinchik](https://github.com/shinchik17), a fellow developer, for assisting with the testing of the first working version of this application.
+
+`As a backend developer, I used to think handling millions of requests per second was hard... then I tried aligning a div in CSS.`
+
+`When I started working on the frontend, I thought async requests were tough. Then I met my true enemy: browser compatibility.`
