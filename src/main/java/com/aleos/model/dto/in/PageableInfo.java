@@ -15,7 +15,7 @@ public class PageableInfo implements Pageable {
     @Max(value = 255, message = "Page should be no more than {value}.")
     int pageNumber;
 
-    @Min(value = 0, message = "Size should be at least {value}.")
+    @Min(value = 2, message = "Size should be at least {value}.")
     @Max(value = 255, message = "Size should be no more than {value}.")
     int pageSize;
 
