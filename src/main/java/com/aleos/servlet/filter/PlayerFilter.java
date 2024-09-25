@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -136,15 +137,22 @@ public class PlayerFilter extends AbstractEndpointFilter {
     }
 
     private PageableInfo getPageablePayload(HttpServletRequest req) {
-        return PageableInfo.of(
-                toInteger(Optional.ofNullable(req.getParameter("page"))
-                        .orElseGet(() -> PropertiesUtil.get("pageable.default.page").orElse("1"))),
-                toInteger(Optional.ofNullable(req.getParameter("size"))
-                        .orElseGet(() -> PropertiesUtil.get("pageable.default.size").orElse("2"))),
-                Optional.ofNullable(req.getParameter("sortBy"))
-                        .orElseGet(() -> PropertiesUtil.get("pageable.player.default.sortBy").orElse(null)),
-                Optional.ofNullable(req.getParameter("sortDirection"))
-                        .orElseGet(() -> PropertiesUtil.get("pageable.player.default.sortDirection").orElse(null))
-        );
+        int page = Optional.ofNullable(toInteger(req.getParameter("page"))).orElse(1);
+        int size = Optional.ofNullable(toInteger(req.getParameter("size")))
+                .orElse(toInteger(PropertiesUtil.get("pageable.default.size").orElse("2")));
+        String sortBy = getSortBy(req);
+        String sortDirection = Optional.ofNullable(req.getParameter("sortDirection"))
+                .orElseGet(() -> PropertiesUtil.get("pageable.player.default.sortDirection").orElse("ASC"));
+
+        return PageableInfo.of(page, size, sortBy, sortDirection);
+    }
+
+    private String getSortBy(HttpServletRequest req) {
+        var sortBy = req.getParameter("sortBy");
+        var allowedSortBy = List.of("createdAt", "name", "country");
+
+        return sortBy != null && allowedSortBy.contains(sortBy)
+                ? sortBy
+                : PropertiesUtil.get("pageable.player.default.sortBy").orElse("name");
     }
 }

@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -115,16 +116,14 @@ public class MatchFilter extends AbstractEndpointFilter {
     }
 
     private PageableInfo getPageablePayload(HttpServletRequest req) {
-        return PageableInfo.of(
-                toInteger(Optional.ofNullable(req.getParameter("page"))
-                        .orElseGet(() -> PropertiesUtil.get("pageable.default.page").orElse("1"))),
-                toInteger(Optional.ofNullable(req.getParameter("size"))
-                        .orElseGet(() -> PropertiesUtil.get("pageable.default.size").orElse("2"))),
-                Optional.ofNullable(req.getParameter("sortBy"))
-                        .orElseGet(() -> PropertiesUtil.get("pageable.match.default.sortBy").orElse(null)),
-                Optional.ofNullable(req.getParameter("sortDirection"))
-                        .orElseGet(() -> PropertiesUtil.get("pageable.match.default.sortDirection").orElse(null))
-        );
+        int page = Optional.ofNullable(toInteger(req.getParameter("page"))).orElse(1);
+        int size = Optional.ofNullable(toInteger(req.getParameter("size")))
+                .orElse(toInteger(PropertiesUtil.get("pageable.default.size").orElse("2")));
+        String sortBy = getSortBy(req);
+        String sortDirection = Optional.ofNullable(req.getParameter("sortDirection"))
+                .orElseGet(() -> PropertiesUtil.get("pageable.match.default.sortDirection").orElse(null));
+
+        return PageableInfo.of(page, size, sortBy, sortDirection);
     }
 
     private MatchFilterCriteria getMatchFilterCriteria(HttpServletRequest req) {
@@ -137,5 +136,14 @@ public class MatchFilter extends AbstractEndpointFilter {
                 name == null || name.isBlank() ? null : name.trim(),
                 before == null || before.isBlank() ? null : toInstant(before)
         );
+    }
+
+    private String getSortBy(HttpServletRequest req) {
+        var sortBy = req.getParameter("sortBy");
+        var allowedSortBy = List.of("concludedAt");
+
+        return sortBy != null && allowedSortBy.contains(sortBy)
+                ? sortBy
+                : PropertiesUtil.get("pageable.match.default.sortBy").orElse(null);
     }
 }

@@ -54,7 +54,7 @@ public abstract class AbstractEndpointFilter extends HttpFilter {
 
     protected Integer toInteger(String value) {
         try {
-            return Integer.parseInt(value);
+            return value == null ? null : Integer.parseInt(value);
         } catch (NumberFormatException e) {
             return null;
         }
