@@ -2,12 +2,13 @@ package com.aleos.mapper;
 
 import com.aleos.match.stage.StandardMatch;
 import com.aleos.match.stage.TennisMatch;
-import com.aleos.model.entity.Match;
-import com.aleos.model.enums.MatchStatus;
 import com.aleos.model.dto.out.ActiveMatchDto;
 import com.aleos.model.dto.out.ConcludedMatchDto;
+import com.aleos.model.entity.Match;
+import com.aleos.model.enums.MatchStatus;
 import com.aleos.service.ScoreTrackerService;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.Provider;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -22,7 +23,7 @@ public class MatchMapper {
     public MatchMapper(ModelMapper mapper, ScoreTrackerService scoreTrackerService) {
         this.mapper = mapper;
         this.scoreTrackerService = scoreTrackerService;
-        setupMapper();
+        configureMapper();
     }
 
     public ActiveMatchDto toDto(TennisMatch tennisMatch) {
@@ -33,42 +34,37 @@ public class MatchMapper {
         return mapper.map(match, ConcludedMatchDto.class);
     }
 
-    private void setupMapper() {
-        setConverterFromStandardMatchToActiveMatchDto();
-        setConverterFromMatchToConcludedMatchDto();
+    private void configureMapper() {
+        mapper.createTypeMap(StandardMatch.class, ActiveMatchDto.class).setProvider(activeMatchDtoProvider());
+
+        mapper.createTypeMap(Match.class, ConcludedMatchDto.class).setProvider(concludedMatchDtoProvider());
     }
 
-    private void setConverterFromStandardMatchToActiveMatchDto() {
-        mapper.createTypeMap(StandardMatch.class, ActiveMatchDto.class)
-                .setConverter(context -> {
-                    TennisMatch source = context.getSource();
+    private Provider<ActiveMatchDto> activeMatchDtoProvider() {
+        return req -> {
+            var source = (TennisMatch) req.getSource();
 
-                    return new ActiveMatchDto(
-                            source.getId(),
-                            source.getPlayerOneName(),
-                            source.getPlayerTwoName(),
-                            MatchStatus.ONGOING,
-                            scoreTrackerService.findById(source.getId())
-                                    .orElseThrow(() -> new NoSuchElementException("Score not found for match ID: " + source.getId())),
-                            LocalDateTime.ofInstant(source.getCreatedAt(), ZoneId.systemDefault())
-                    );
-                });
+            return new ActiveMatchDto(
+                    source.getId(),
+                    source.getPlayerOneName(),
+                    source.getPlayerTwoName(),
+                    MatchStatus.ONGOING,
+                    scoreTrackerService.findById(source.getId()).orElseThrow(() -> new NoSuchElementException("Score not found for match ID: " + source.getId())),
+                    LocalDateTime.ofInstant(source.getCreatedAt(), ZoneId.systemDefault()
+                    ));
+        };
     }
 
-    private void setConverterFromMatchToConcludedMatchDto() {
-        mapper.createTypeMap(Match.class, ConcludedMatchDto.class)
-                .setConverter(context -> {
-                    Match source = context.getSource();
+    private Provider<ConcludedMatchDto> concludedMatchDtoProvider() {
+        return req -> {
+            var source = (Match) req.getSource();
 
-                    return new ConcludedMatchDto(
-                            source.getId(),
-                            source.getPlayerOne().getName(),
-                            source.getPlayerTwo().getName(),
-                            MatchStatus.FINISHED,
-                            source.getWinner().getName(),
-                            source.getInfo(),
-                            LocalDateTime.ofInstant(source.getConcludedAt(), ZoneId.systemDefault())
-                    );
-                });
+            return new ConcludedMatchDto(source.getId(),
+                    source.getPlayerOne().getName(),
+                    source.getPlayerTwo().getName(), MatchStatus.FINISHED,
+                    source.getWinner().getName(), source.getInfo(),
+                    LocalDateTime.ofInstant(source.getConcludedAt(), ZoneId.systemDefault()
+                    ));
+        };
     }
 }

@@ -5,6 +5,7 @@ import com.aleos.model.dto.out.PlayerDto;
 import com.aleos.model.entity.Player;
 import com.aleos.service.MatchService;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.Provider;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -19,7 +20,7 @@ public class PlayerMapper {
     public PlayerMapper(ModelMapper mapper, MatchService matchService) {
         this.mapper = mapper;
         this.matchService = matchService;
-        configureMappings();
+        configureMapper();
     }
 
     public PlayerDto toDto(Player player) {
@@ -27,34 +28,35 @@ public class PlayerMapper {
     }
 
     public Player toEntity(PlayerPayload payload) {
-        Player player = new Player();
+        var player = new Player();
         player.setName(payload.name());
         player.setCountry(payload.country());
 
         return player;
     }
 
-    private void configureMappings() {
-        setConverterFromPlayerToPlayerDto();
+    private void configureMapper() {
+        mapper.createTypeMap(Player.class, PlayerDto.class)
+                .setProvider(playerDtoProvider());
     }
 
-    private void setConverterFromPlayerToPlayerDto() {
-        mapper.createTypeMap(Player.class, PlayerDto.class)
-                .setConverter(context -> {
-                    Player source = context.getSource();
+    private Provider<PlayerDto> playerDtoProvider() {
+        return req -> {
+            var source = (Player) req.getSource();
 
-                    String encodedName = URLEncoder.encode(source.getName(), StandardCharsets.UTF_8);
-                    String matchesEndpoint = String.format("/matches?playerName=%s", encodedName);
-                    String ongoingMatchUuid = matchService.findOngoingMatchIdByPlayerName(source.getName())
-                            .map(UUID::toString)
-                            .orElse(null);
+            String encodedName = URLEncoder.encode(source.getName(), StandardCharsets.UTF_8);
+            String matchesEndpoint = String.format("/matches?playerName=%s", encodedName);
 
-                    return new PlayerDto(
-                            source.getName(),
-                            source.getCountry(),
-                            matchesEndpoint,
-                            ongoingMatchUuid
-                    );
-                });
+            String ongoingMatchUuid = matchService.findOngoingMatchIdByPlayerName(source.getName())
+                    .map(UUID::toString)
+                    .orElse(null);
+
+            return new PlayerDto(
+                    source.getName(),
+                    source.getCountry(),
+                    matchesEndpoint,
+                    ongoingMatchUuid
+            );
+        };
     }
 }
